@@ -2,12 +2,13 @@
  * MyMap.c
  *
  *  Created on: Mar 1, 2018
- *      Author: bob
+ *      Author: Arkadiusz Netczuk
  */
 
 #include "mymap/MyMap.h"
 
 #include <stddef.h>         /// NULL
+#include <stdio.h>          /// printf
 
 
 /**
@@ -38,5 +39,6 @@ int mymap_init(map_t *map) {
  */
 int mymap_dump(map_t *map) {
     //TODO: implement
+    ///printf("%s", "xxxx");
     return -1;
 }

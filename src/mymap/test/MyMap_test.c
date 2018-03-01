@@ -2,7 +2,7 @@
  * MyMap_test.c
  *
  *  Created on: Mar 1, 2018
- *      Author: bob
+ *      Author: Arkadiusz Netczuk
  */
 
 #include "mymap/MyMap.h"

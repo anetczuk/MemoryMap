@@ -2,7 +2,7 @@
  * MyMap.h
  *
  *  Created on: Mar 1, 2018
- *      Author: bob
+ *      Author: Arkadiusz Netczuk
  */
 
 #ifndef MYMAP_H_

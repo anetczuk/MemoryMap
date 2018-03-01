@@ -2,7 +2,7 @@
  * map_t.h
  *
  *  Created on: Mar 1, 2018
- *      Author: bob
+ *      Author: Arkadiusz Netczuk
  */
 
 #ifndef MAPT_H_
