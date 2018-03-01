@@ -4,6 +4,12 @@
 
 cmake_minimum_required(VERSION 3.0.2)
 
+
+if( "${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_BINARY_DIR}" )
+	message( FATAL_ERROR "Building in source is forbidden. Change output directory.")
+endif()
+
+
 project( memorymap )
 
 
