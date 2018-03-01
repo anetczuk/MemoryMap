@@ -49,18 +49,65 @@ static void list_init_param_NULL(void **state) {
     (void) state; /* unused */
 
     const int ret = list_init(NULL);
-
     assert_int_equal( ret, -1 );
 }
 
+static void list_init_valid(void **state) {
+    (void) state; /* unused */
 
+    LinkedList list;
+    const int ret = list_init(&list);
+    assert_int_equal( ret, 0 );
+}
+
+
+/// ==================================================
+
+
+static void list_release_param_NULL(void **state) {
+    (void) state; /* unused */
+
+    const int ret = list_release(NULL);
+    assert_int_equal( ret, -1 );
+}
+
+static void list_release_list(void **state) {
+    (void) state; /* unused */
+
+    LinkedList list;
+    list_init(&list);
+    const int ret = list_release(&list);
+    assert_int_equal( ret, 0 );
+}
+
+static void list_release_2(void **state) {
+    (void) state; /* unused */
+
+    LinkedList list;
+    const int init = list_init(&list);
+    assert_int_equal( init, 0 );
+
+    list_add(&list, 1);
+    list_add(&list, 2);
+
+    const int ret = list_release(&list);
+    assert_int_equal( ret, 2 );
+}
+
+
+/// ==================================================
 
 
 int main(void) {
     const struct UnitTest tests[] = {
+        unit_test(list_release_param_NULL),
+        unit_test(list_release_list),
+        unit_test(list_release_2),
+
         unit_test(list_mmap_param_NULL),
         unit_test(list_munmap_param_NULL),
-        unit_test(list_init_param_NULL)
+        unit_test(list_init_param_NULL),
+        unit_test(list_init_valid)
     };
 
     return run_group_tests(tests);

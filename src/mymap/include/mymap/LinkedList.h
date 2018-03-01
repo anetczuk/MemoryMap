@@ -26,16 +26,42 @@
 
 
 typedef struct {
-    //TODO: implement
-} LinkedList;
+    int val;
+} memory_area;
 
 
+struct LinkedListNode {
+    memory_area area;
+    struct LinkedListNode* next;
+};
 
-void* list_mmap(LinkedList* map, void *vaddr, unsigned int size, unsigned int flags, void *o);
+typedef struct LinkedListNode LinkedList;
 
-void list_munmap(LinkedList* map, void *vaddr);
 
+/// =============================================
+
+
+void* list_mmap(LinkedList* list, void *vaddr, unsigned int size, unsigned int flags, void *o);
+
+void list_munmap(LinkedList* list, void *vaddr);
+
+/**
+ * If list has be initialized previously, then have to be released
+ * before next initialization.
+ */
 int list_init(LinkedList* list);
+
+
+/// =============================================
+
+
+int list_add(LinkedList* list, int val);
+
+/**
+ * List has to be initialized before releasing.
+ * Returns number of released elements (size of list)
+ */
+int list_release(LinkedList* list);
 
 
 #endif /* LINKEDLIST_H_ */

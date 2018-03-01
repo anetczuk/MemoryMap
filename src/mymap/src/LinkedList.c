@@ -23,19 +23,58 @@
 
 #include "mymap/LinkedList.h"
 
-#include <stddef.h>         /// NULL
+#include <stddef.h>                 /// NULL
+#include <stdlib.h>                 /// free
 
 
-void* list_mmap(LinkedList* map, void *vaddr, unsigned int size, unsigned int flags, void *o) {
+void* list_mmap(LinkedList* list, void *vaddr, unsigned int size, unsigned int flags, void *o) {
     //TODO: implement
     return NULL;
 }
 
-void list_munmap(LinkedList* map, void *vaddr) {
+void list_munmap(LinkedList* list, void *vaddr) {
     //TODO: implement
 }
 
 int list_init(LinkedList* list) {
-    //TODO: implement
-    return -1;
+    if (list == NULL) {
+        return -1;
+    }
+    list->area.val = 0;
+    list->next = NULL;
+    return 0;
+}
+
+
+/// ===================================================
+
+
+int list_add(LinkedList* list, int val) {
+    if (list == NULL) {
+        return -1;
+    }
+
+    /// finding last element
+    LinkedList* curr = list;
+    while( curr->next != NULL ) {
+        curr = curr->next;
+    }
+
+    /// curr points to last element
+    curr->next = calloc( 1, sizeof(LinkedList) );
+    curr->area.val = val;
+
+    return 0;
+}
+
+int list_release(LinkedList* list) {
+    if (list == NULL) {
+        return -1;
+    }
+    /**
+     * Done in recursive manner. In case of very large lists consider
+     * reimplementing it using while() and vector structure.
+     */
+    const int released = list_release(list->next);
+    return released+1;
 }
