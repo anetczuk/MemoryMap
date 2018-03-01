@@ -34,6 +34,9 @@ list(APPEND CMAKE_CXX_FLAGS "-pedantic")
 #list(APPEND CMAKE_CXX_FLAGS "-Wno-long-long")
 
 
+## enable CTest utility
+enable_testing()
+
 
 ## ================= build =================
 

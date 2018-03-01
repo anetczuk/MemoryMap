@@ -18,8 +18,16 @@ include_directories( ${CMOCKA_INCLUDE_DIR} )
 set( EXT_LIBS mymap ${CMOCKA_LIBRARIES} )
 
 
-add_executable( mymap_test MyMap_test.c )
-target_link_libraries( mymap_test ${EXT_LIBS} )
+file(GLOB cpp_test_files *_test.c )
 
-add_executable( linkedlist_test LinkedList_test.c )
-target_link_libraries( linkedlist_test ${EXT_LIBS} )
+
+## generate test suites
+foreach(test_filename IN LISTS cpp_test_files)
+	## extract filename without extension
+	get_filename_component(test_name ${test_filename} NAME_WE)
+
+	## build executable
+	add_executable( ${test_name} ${test_filename} )
+	target_link_libraries( ${test_name} ${EXT_LIBS} )
+	add_test( ${test_name} ${test_name} )
+endforeach()
