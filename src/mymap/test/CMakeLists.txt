@@ -20,3 +20,6 @@ set( EXT_LIBS mymap ${CMOCKA_LIBRARIES} )
 
 add_executable( mymap_test MyMap_test.c )
 target_link_libraries( mymap_test ${EXT_LIBS} )
+
+add_executable( linkedlist_test LinkedList_test.c )
+target_link_libraries( linkedlist_test ${EXT_LIBS} )
