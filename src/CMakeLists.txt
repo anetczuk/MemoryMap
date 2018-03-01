@@ -23,10 +23,15 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif()
 
 
+## set default compilation standard
+set( CMAKE_C_STANDARD 90 )
+set( CMAKE_C_STANDARD_REQUIRED ON )
+
+
 ## compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-long-long")
+list(APPEND CMAKE_CXX_FLAGS "-Wall")
+list(APPEND CMAKE_CXX_FLAGS "-pedantic")
+#list(APPEND CMAKE_CXX_FLAGS "-Wno-long-long")
 
 
 
