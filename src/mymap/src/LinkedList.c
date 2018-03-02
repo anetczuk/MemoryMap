@@ -25,38 +25,13 @@
 
 #include <stdlib.h>                 /// free
 
-///#include "mymap/MemoryFlag.h"
+#include "mymap/MemoryArea.h"
 
-
-typedef struct {
-    size_t memOffset;
-} memory_area;
 
 typedef struct LinkedListNode {
-    memory_area area;
+    MemoryArea area;
     struct LinkedListNode* next;
 } LinkedListItem;
-
-
-/// ===================================================
-
-
-void* list_mmap(LinkedList* list, void *vaddr, unsigned int size, unsigned int flags, void *o) {
-    //TODO: implement
-    return NULL;
-}
-
-void list_munmap(LinkedList* list, void *vaddr) {
-    //TODO: implement
-}
-
-int list_init(LinkedList* list) {
-    if (list == NULL) {
-        return -1;
-    }
-    list->root = NULL;
-    return 0;
-}
 
 
 /// ===================================================
@@ -84,46 +59,50 @@ int list_getValue(LinkedList* list, const size_t index) {
     for(size_t i=0; i<index; ++i) {
         curr = curr->next;
     }
-    return curr->area.memOffset;
+    return curr->area.offset;
 }
 
-void list_insertNode(LinkedListItem** node, const int val) {
+void list_insertNode(LinkedListItem** node) {
     LinkedListItem* old = *node;
     (*node) = calloc( 1, sizeof(LinkedListItem) );
-    (*node)->area.memOffset = val;
     (*node)->next = old;
+}
+
+void list_insertValue(LinkedListItem** node, const size_t val) {
+    list_insertNode(node);
+    (*node)->area.offset = val;
 }
 
 /**
  * Here list element is always not NULL and it's value is smaller than 'val'.
  */
-void list_addToNode(LinkedListItem* list, const int val) {
+void list_addToNode(LinkedListItem* list, const size_t val) {
     LinkedListItem* curr = list;
     while( curr->next != NULL ) {
-        if (curr->next->area.memOffset >= val) {
-            list_insertNode(&(curr->next), val);
+        if (curr->next->area.offset >= val) {
+            list_insertValue(&(curr->next), val);
             return ;
         }
         curr = curr->next;
     }
 
     /// curr points to last element
-    list_insertNode( &(curr->next), val );
+    list_insertValue( &(curr->next), val );
     return ;
 }
 
-int list_add(LinkedList* list, const int val) {
+int list_add(LinkedList* list, const size_t val) {
     if (list == NULL) {
         return -1;
     }
 
     if (list->root == NULL) {
-        list_insertNode(&(list->root), val);
+        list_insertValue(&(list->root), val);
         return 0;
     }
 
-    if (list->root->area.memOffset >= val) {
-        list_insertNode(&(list->root), val);
+    if (list->root->area.offset >= val) {
+        list_insertValue(&(list->root), val);
         return 0;
     }
 
@@ -150,4 +129,37 @@ int list_release(LinkedList* list) {
     }
     const int released = list_releaseNodes(list->root);
     return released+1;
+}
+
+
+/// ===================================================
+
+
+void* list_mmap(LinkedList* list, void *vaddr, unsigned int size, unsigned int flags, void *o) {
+//    if (list == NULL) {
+//        return NULL;
+//    }
+//    MemoryArea area;
+//    area.offset = vaddr;
+//    area.size = size;
+//    area.flags = flags;
+//    if (list->root == NULL) {
+//        /// empty list
+//        list_insertNode(&(list->root));
+//        list->root->area = area;
+//        return list->root->area.offset;
+//    }
+    return NULL;
+}
+
+void list_munmap(LinkedList* list, void *vaddr) {
+    //TODO: implement
+}
+
+int list_init(LinkedList* list) {
+    if (list == NULL) {
+        return -1;
+    }
+    list->root = NULL;
+    return 0;
 }

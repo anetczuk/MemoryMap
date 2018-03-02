@@ -21,47 +21,26 @@
 /// SOFTWARE.
 ///
 
-#ifndef LINKEDLIST_H_
-#define LINKEDLIST_H_
+#ifndef MEMORYAREA_H_
+#define MEMORYAREA_H_
 
-#include <stddef.h>                 /// NULL, size_t
+#include <stddef.h>                 /// size_t
+
+/// #include "mymap/MemoryArea.h"
 
 
-struct LinkedListNode;
+typedef enum {
+    READ = (1 << 0),
+    WRITE = (1 << 1),
+    EXEC = (1 << 2)
+} MemoryFlag;
+
 
 typedef struct {
-    struct LinkedListNode* root;
-} LinkedList;
+    size_t offset;
+    size_t size;
+    MemoryFlag flags;
+} MemoryArea;
 
 
-/// =============================================
-
-
-void* list_mmap(LinkedList* list, void *vaddr, unsigned int size, unsigned int flags, void *o);
-
-void list_munmap(LinkedList* list, void *vaddr);
-
-/**
- * If list has be initialized previously, then have to be released
- * before next initialization.
- */
-int list_init(LinkedList* list);
-
-
-/// =============================================
-
-
-size_t list_size(LinkedList* list);
-
-int list_getValue(LinkedList* list, const size_t index);
-
-int list_add(LinkedList* list, const size_t val);
-
-/**
- * List has to be initialized before releasing.
- * Returns number of released elements (size of list)
- */
-int list_release(LinkedList* list);
-
-
-#endif /* LINKEDLIST_H_ */
+#endif /* MEMORYAREA_H_ */
