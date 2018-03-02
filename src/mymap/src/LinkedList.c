@@ -25,9 +25,11 @@
 
 #include <stdlib.h>                 /// free
 
+///#include "mymap/MemoryFlag.h"
+
 
 typedef struct {
-    int val;
+    size_t memOffset;
 } memory_area;
 
 typedef struct LinkedListNode {
@@ -82,13 +84,13 @@ int list_getValue(LinkedList* list, const size_t index) {
     for(size_t i=0; i<index; ++i) {
         curr = curr->next;
     }
-    return curr->area.val;
+    return curr->area.memOffset;
 }
 
 void list_insertNode(LinkedListItem** node, const int val) {
     LinkedListItem* old = *node;
-    (*node) = calloc( 1, sizeof(LinkedList) );
-    (*node)->area.val = val;
+    (*node) = calloc( 1, sizeof(LinkedListItem) );
+    (*node)->area.memOffset = val;
     (*node)->next = old;
 }
 
@@ -98,7 +100,7 @@ void list_insertNode(LinkedListItem** node, const int val) {
 void list_addToNode(LinkedListItem* list, const int val) {
     LinkedListItem* curr = list;
     while( curr->next != NULL ) {
-        if (curr->next->area.val >= val) {
+        if (curr->next->area.memOffset >= val) {
             list_insertNode(&(curr->next), val);
             return ;
         }
@@ -120,7 +122,7 @@ int list_add(LinkedList* list, const int val) {
         return 0;
     }
 
-    if (list->root->area.val >= val) {
+    if (list->root->area.memOffset >= val) {
         list_insertNode(&(list->root), val);
         return 0;
     }
@@ -138,6 +140,7 @@ int list_releaseNodes(LinkedListItem* list) {
      * reimplementing it using while() and vector structure.
      */
     const int released = list_releaseNodes(list->next);
+    free(list);
     return released+1;
 }
 
