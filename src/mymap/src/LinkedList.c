@@ -27,6 +27,19 @@
 #include <stdlib.h>                 /// free
 
 
+typedef struct {
+    int val;
+} memory_area;
+
+typedef struct LinkedListNode {
+    memory_area area;
+    struct LinkedListNode* next;
+} LinkedListItem;
+
+
+/// ===================================================
+
+
 void* list_mmap(LinkedList* list, void *vaddr, unsigned int size, unsigned int flags, void *o) {
     //TODO: implement
     return NULL;
@@ -40,8 +53,7 @@ int list_init(LinkedList* list) {
     if (list == NULL) {
         return -1;
     }
-    list->area.val = 0;
-    list->next = NULL;
+    list->root = NULL;
     return 0;
 }
 
@@ -49,25 +61,40 @@ int list_init(LinkedList* list) {
 /// ===================================================
 
 
-int list_add(LinkedList* list, int val) {
+void list_setNode(LinkedListItem** node, const int val) {
+    (*node) = calloc( 1, sizeof(LinkedList) );
+    (*node)->next = NULL;
+    (*node)->area.val = val;
+}
+
+int list_addToNode(LinkedListItem* list, const int val) {
     if (list == NULL) {
         return -1;
     }
 
     /// finding last element
-    LinkedList* curr = list;
+    LinkedListItem* curr = list;
     while( curr->next != NULL ) {
         curr = curr->next;
     }
 
     /// curr points to last element
-    curr->next = calloc( 1, sizeof(LinkedList) );
-    curr->area.val = val;
-
+    list_setNode( &(curr->next), val );
     return 0;
 }
 
-int list_release(LinkedList* list) {
+int list_add(LinkedList* list, const int val) {
+    if (list == NULL) {
+        return -1;
+    }
+    if (list->root == NULL) {
+        list_setNode( &(list->root), val );
+        return 0;
+    }
+    return list_addToNode( list->root, val );
+}
+
+int list_releaseNodes(LinkedListItem* list) {
     if (list == NULL) {
         return -1;
     }
@@ -75,6 +102,14 @@ int list_release(LinkedList* list) {
      * Done in recursive manner. In case of very large lists consider
      * reimplementing it using while() and vector structure.
      */
-    const int released = list_release(list->next);
+    const int released = list_releaseNodes(list->next);
+    return released+1;
+}
+
+int list_release(LinkedList* list) {
+    if (list == NULL) {
+        return -1;
+    }
+    const int released = list_releaseNodes(list->root);
     return released+1;
 }

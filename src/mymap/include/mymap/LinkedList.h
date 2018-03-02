@@ -25,17 +25,11 @@
 #define LINKEDLIST_H_
 
 
+struct LinkedListNode;
+
 typedef struct {
-    int val;
-} memory_area;
-
-
-struct LinkedListNode {
-    memory_area area;
-    struct LinkedListNode* next;
-};
-
-typedef struct LinkedListNode LinkedList;
+    struct LinkedListNode* root;
+} LinkedList;
 
 
 /// =============================================
@@ -55,7 +49,7 @@ int list_init(LinkedList* list);
 /// =============================================
 
 
-int list_add(LinkedList* list, int val);
+int list_add(LinkedList* list, const int val);
 
 /**
  * List has to be initialized before releasing.
