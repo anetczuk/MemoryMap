@@ -24,6 +24,8 @@
 #ifndef LINKEDLIST_H_
 #define LINKEDLIST_H_
 
+#include <stddef.h>                 /// NULL, size_t
+
 
 struct LinkedListNode;
 
@@ -48,6 +50,10 @@ int list_init(LinkedList* list);
 
 /// =============================================
 
+
+size_t list_size(LinkedList* list);
+
+int list_getValue(LinkedList* list, const size_t index);
 
 int list_add(LinkedList* list, const int val);
 

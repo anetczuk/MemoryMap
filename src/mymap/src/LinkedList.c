@@ -23,7 +23,6 @@
 
 #include "mymap/LinkedList.h"
 
-#include <stddef.h>                 /// NULL
 #include <stdlib.h>                 /// free
 
 
@@ -60,6 +59,31 @@ int list_init(LinkedList* list) {
 
 /// ===================================================
 
+
+size_t list_size(LinkedList* list) {
+    if (list==NULL)
+        return 0;
+    if (list->root==NULL)
+        return 0;
+
+    size_t retSize = 1;
+    /// finding last element
+    LinkedListItem* curr = list->root;
+    while( curr->next != NULL ) {
+        curr = curr->next;
+        ++retSize;
+    }
+
+    return retSize;
+}
+
+int list_getValue(LinkedList* list, const size_t index) {
+    LinkedListItem* curr = list->root;
+    for(size_t i=0; i<index; ++i) {
+        curr = curr->next;
+    }
+    return curr->area.val;
+}
 
 void list_setNode(LinkedListItem** node, const int val) {
     (*node) = calloc( 1, sizeof(LinkedList) );
