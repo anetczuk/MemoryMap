@@ -24,6 +24,7 @@
 #include "mymap/LinkedList.h"
 
 #include <stdlib.h>                 /// free
+#include <assert.h>
 
 #include "mymap/MemoryArea.h"
 
@@ -54,7 +55,7 @@ size_t list_size(LinkedList* list) {
     return retSize;
 }
 
-int list_getValue(LinkedList* list, const size_t index) {
+size_t list_getValue(LinkedList* list, const size_t index) {
     LinkedListItem* curr = list->root;
     for(size_t i=0; i<index; ++i) {
         curr = curr->next;
@@ -68,45 +69,63 @@ void list_insertNode(LinkedListItem** node) {
     (*node)->next = old;
 }
 
-void list_insertValue(LinkedListItem** node, const size_t val) {
-    list_insertNode(node);
-    (*node)->area.offset = val;
-}
-
 /**
- * Here list element is always not NULL and it's value is smaller than 'val'.
+ * We assume list and area are not NULL.
  */
-void list_addToNode(LinkedListItem* list, const size_t val) {
-    LinkedListItem* curr = list;
+void* list_addMemory(LinkedList* list, MemoryArea* area) {
+    assert( list != NULL );
+    assert( area != NULL );
+
+    if (list->root == NULL) {
+        list_insertNode(&(list->root));
+        list->root->area = *area;
+        return (void*)list->root->area.offset;
+    }
+
+    /// compare with first element
+    const int doesFit = memory_fitBetween(NULL, &(list->root->area), area);
+    if (doesFit == 0) {
+        list_insertNode(&(list->root));
+        list->root->area = *area;
+        return (void*)list->root->area.offset;
+    }
+
+    /// compare with middle elements
+    LinkedListItem* curr = list->root;
     while( curr->next != NULL ) {
-        if (curr->next->area.offset >= val) {
-            list_insertValue(&(curr->next), val);
-            return ;
+        const int doesFit = memory_fitBetween(&(curr->area), &(curr->next->area), area);
+        if (doesFit == 0) {
+            list_insertNode(&(curr->next));
+            curr->next->area = *area;
+            return (void*)curr->next->area.offset;
         }
         curr = curr->next;
     }
 
     /// curr points to last element
-    list_insertValue( &(curr->next), val );
-    return ;
+    list_insertNode( &(curr->next) );
+    curr->next->area = *area;
+    const size_t addrAfterEnd = curr->area.offset + curr->area.size;
+    if (area->offset<addrAfterEnd) {
+        curr->next->area.offset = addrAfterEnd;
+    }
+    return (void*)curr->next->area.offset;
 }
 
-int list_add(LinkedList* list, const size_t val) {
+int list_addValue(LinkedList* list, const size_t val) {
     if (list == NULL) {
         return -1;
     }
 
-    if (list->root == NULL) {
-        list_insertValue(&(list->root), val);
-        return 0;
-    }
+    MemoryArea area;
+    area.flags = 0;
+    area.offset = val;
+    area.size = 1;
+    area.data = NULL;
 
-    if (list->root->area.offset >= val) {
-        list_insertValue(&(list->root), val);
-        return 0;
+    if (list_addMemory(list, &area) == NULL) {
+        return -1;
     }
-
-    list_addToNode( list->root, val );
     return 0;
 }
 
@@ -136,20 +155,17 @@ int list_release(LinkedList* list) {
 
 
 void* list_mmap(LinkedList* list, void *vaddr, unsigned int size, unsigned int flags, void *o) {
-//    if (list == NULL) {
-//        return NULL;
-//    }
-//    MemoryArea area;
-//    area.offset = vaddr;
-//    area.size = size;
-//    area.flags = flags;
-//    if (list->root == NULL) {
-//        /// empty list
-//        list_insertNode(&(list->root));
-//        list->root->area = area;
-//        return list->root->area.offset;
-//    }
-    return NULL;
+    if (list == NULL) {
+        return NULL;
+    }
+
+    MemoryArea area;
+    area.flags = flags;
+    area.offset = (size_t)vaddr;
+    area.size = size;
+    area.data = NULL;
+
+    return list_addMemory(list, &area);
 }
 
 void list_munmap(LinkedList* list, void *vaddr) {

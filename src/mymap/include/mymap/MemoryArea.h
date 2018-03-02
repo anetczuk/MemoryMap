@@ -26,8 +26,6 @@
 
 #include <stddef.h>                 /// size_t
 
-/// #include "mymap/MemoryArea.h"
-
 
 typedef enum {
     READ = (1 << 0),
@@ -37,10 +35,24 @@ typedef enum {
 
 
 typedef struct {
+    MemoryFlag flags;
     size_t offset;
     size_t size;
-    MemoryFlag flags;
+    unsigned char* data;                /// field is unused, just for clarification
 } MemoryArea;
+
+
+/// ====================================================
+
+
+void memory_init( MemoryArea* area );
+
+void memory_release( MemoryArea* area );
+
+/**
+ * Return 0 if successful, otherwise false.
+ */
+int memory_fitBetween(const MemoryArea* first, const MemoryArea* second, MemoryArea* check);
 
 
 #endif /* MEMORYAREA_H_ */

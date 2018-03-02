@@ -53,9 +53,9 @@ int list_init(LinkedList* list);
 
 size_t list_size(LinkedList* list);
 
-int list_getValue(LinkedList* list, const size_t index);
+size_t list_getValue(LinkedList* list, const size_t index);
 
-int list_add(LinkedList* list, const size_t val);
+int list_addValue(LinkedList* list, const size_t val);
 
 /**
  * List has to be initialized before releasing.

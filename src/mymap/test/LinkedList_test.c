@@ -37,6 +37,32 @@ static void list_mmap_param_NULL(void **state) {
     assert_null( ret );
 }
 
+static void list_mmap_first(void **state) {
+    (void) state; /* unused */
+
+    LinkedList list;
+    list_init(&list);
+
+    const void* ret = list_mmap(&list, (void*)128, 64, 0, NULL);
+    assert_int_equal( ret, 128 );
+
+    list_release(&list);
+}
+
+static void list_mmap_second(void **state) {
+    (void) state; /* unused */
+
+    LinkedList list;
+    list_init(&list);
+
+    list_mmap(&list, (void*)160, 64, 0, NULL);
+
+    const void* ret = list_mmap(&list, (void*)128, 64, 0, NULL);
+    assert_int_equal( ret, 224 );
+
+    list_release(&list);
+}
+
 static void list_munmap_param_NULL(void **state) {
     (void) state; /* unused */
 
@@ -87,8 +113,8 @@ static void list_release_2(void **state) {
     const int init = list_init(&list);
     assert_int_equal( init, 0 );
 
-    list_add(&list, 1);
-    list_add(&list, 2);
+    list_addValue(&list, 1);
+    list_addValue(&list, 2);
 
     const int ret = list_release(&list);
     assert_int_equal( ret, 2 );
@@ -113,13 +139,13 @@ static void list_size_0(void **state) {
     list_release(&list);
 }
 
-static void list_add_first(void **state) {
+static void list_addValue_first(void **state) {
     (void) state; /* unused */
 
     LinkedList list;
     list_init(&list);
-    list_add(&list, 3);
-    list_add(&list, 1);
+    list_addValue(&list, 3);
+    list_addValue(&list, 1);
 
     const size_t lSize = list_size(&list);
     assert_int_equal( lSize, 2 );
@@ -130,13 +156,13 @@ static void list_add_first(void **state) {
     list_release(&list);
 }
 
-static void list_add_last(void **state) {
+static void list_addValue_last(void **state) {
     (void) state; /* unused */
 
     LinkedList list;
     list_init(&list);
-    list_add(&list, 1);
-    list_add(&list, 5);
+    list_addValue(&list, 1);
+    list_addValue(&list, 5);
 
     const size_t lSize = list_size(&list);
     assert_int_equal( lSize, 2 );
@@ -147,14 +173,14 @@ static void list_add_last(void **state) {
     list_release(&list);
 }
 
-static void list_add_middle(void **state) {
+static void list_addValue_middle(void **state) {
     (void) state; /* unused */
 
     LinkedList list;
     list_init(&list);
-    list_add(&list, 1);
-    list_add(&list, 5);
-    list_add(&list, 3);
+    list_addValue(&list, 1);
+    list_addValue(&list, 5);
+    list_addValue(&list, 3);
 
     const size_t lSize = list_size(&list);
     assert_int_equal( lSize, 3 );
@@ -174,13 +200,15 @@ int main(void) {
         unit_test(list_release_param_NULL),
         unit_test(list_release_list),
         unit_test(list_release_2),
-        unit_test(list_add_first),
-        unit_test(list_add_middle),
-        unit_test(list_add_last),
+        unit_test(list_addValue_first),
+        unit_test(list_addValue_middle),
+        unit_test(list_addValue_last),
         unit_test(list_size_NULL),
         unit_test(list_size_0),
 
         unit_test(list_mmap_param_NULL),
+        unit_test(list_mmap_first),
+        unit_test(list_mmap_second),
         unit_test(list_munmap_param_NULL),
         unit_test(list_init_param_NULL),
         unit_test(list_init_valid)
