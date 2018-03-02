@@ -85,37 +85,48 @@ int list_getValue(LinkedList* list, const size_t index) {
     return curr->area.val;
 }
 
-void list_setNode(LinkedListItem** node, const int val) {
+void list_insertNode(LinkedListItem** node, const int val) {
+    LinkedListItem* old = *node;
     (*node) = calloc( 1, sizeof(LinkedList) );
-    (*node)->next = NULL;
     (*node)->area.val = val;
+    (*node)->next = old;
 }
 
-int list_addToNode(LinkedListItem* list, const int val) {
-    if (list == NULL) {
-        return -1;
-    }
-
-    /// finding last element
+/**
+ * Here list element is always not NULL and it's value is smaller than 'val'.
+ */
+void list_addToNode(LinkedListItem* list, const int val) {
     LinkedListItem* curr = list;
     while( curr->next != NULL ) {
+        if (curr->next->area.val >= val) {
+            list_insertNode(&(curr->next), val);
+            return ;
+        }
         curr = curr->next;
     }
 
     /// curr points to last element
-    list_setNode( &(curr->next), val );
-    return 0;
+    list_insertNode( &(curr->next), val );
+    return ;
 }
 
 int list_add(LinkedList* list, const int val) {
     if (list == NULL) {
         return -1;
     }
+
     if (list->root == NULL) {
-        list_setNode( &(list->root), val );
+        list_insertNode(&(list->root), val);
         return 0;
     }
-    return list_addToNode( list->root, val );
+
+    if (list->root->area.val >= val) {
+        list_insertNode(&(list->root), val);
+        return 0;
+    }
+
+    list_addToNode( list->root, val );
+    return 0;
 }
 
 int list_releaseNodes(LinkedListItem* list) {

@@ -113,48 +113,54 @@ static void list_size_0(void **state) {
     list_release(&list);
 }
 
-static void list_size_2(void **state) {
-    (void) state; /* unused */
-
-    LinkedList list;
-    list_init(&list);
-    list_add(&list, 1);
-    list_add(&list, 2);
-
-    const size_t ret = list_size(&list);
-    assert_int_equal( ret, 2 );
-
-    list_release(&list);
-}
-
-static void list_getValue_first(void **state) {
+static void list_add_first(void **state) {
     (void) state; /* unused */
 
     LinkedList list;
     list_init(&list);
     list_add(&list, 3);
-    list_add(&list, 5);
     list_add(&list, 1);
+
+    const size_t lSize = list_size(&list);
+    assert_int_equal( lSize, 2 );
 
     const int val = list_getValue(&list, 0);
-    assert_int_equal( val, 3 );
+    assert_int_equal( val, 1 );
 
     list_release(&list);
 }
 
-static void list_getValue_last(void **state) {
+static void list_add_last(void **state) {
     (void) state; /* unused */
 
     LinkedList list;
     list_init(&list);
-    list_add(&list, 3);
-    list_add(&list, 5);
     list_add(&list, 1);
+    list_add(&list, 5);
 
-    const size_t listSize = list_size(&list);
+    const size_t lSize = list_size(&list);
+    assert_int_equal( lSize, 2 );
 
-    const int val = list_getValue(&list, listSize-1);
-    assert_int_equal( val, 1 );
+    const int val = list_getValue(&list, 1);
+    assert_int_equal( val, 5 );
+
+    list_release(&list);
+}
+
+static void list_add_middle(void **state) {
+    (void) state; /* unused */
+
+    LinkedList list;
+    list_init(&list);
+    list_add(&list, 1);
+    list_add(&list, 5);
+    list_add(&list, 3);
+
+    const size_t lSize = list_size(&list);
+    assert_int_equal( lSize, 3 );
+
+    const int val = list_getValue(&list, 1);
+    assert_int_equal( val, 3 );
 
     list_release(&list);
 }
@@ -168,11 +174,11 @@ int main(void) {
         unit_test(list_release_param_NULL),
         unit_test(list_release_list),
         unit_test(list_release_2),
+        unit_test(list_add_first),
+        unit_test(list_add_middle),
+        unit_test(list_add_last),
         unit_test(list_size_NULL),
         unit_test(list_size_0),
-        unit_test(list_size_2),
-        unit_test(list_getValue_first),
-        unit_test(list_getValue_last),
 
         unit_test(list_mmap_param_NULL),
         unit_test(list_munmap_param_NULL),
