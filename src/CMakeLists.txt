@@ -24,14 +24,20 @@ endif()
 
 
 ## set default compilation standard
-set( CMAKE_C_STANDARD 90 )
-set( CMAKE_C_STANDARD_REQUIRED ON )
+if (CMAKE_VERSION VERSION_LESS "3.1")
+	if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
+		set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99" )
+	endif()
+else()
+	## supported by CMake 3.1 and above
+	set( CMAKE_C_STANDARD 99 )
+	set( CMAKE_C_STANDARD_REQUIRED ON )
+endif()
 
-
-## compiler flags
-list(APPEND CMAKE_CXX_FLAGS "-Wall")
-list(APPEND CMAKE_CXX_FLAGS "-pedantic")
-#list(APPEND CMAKE_CXX_FLAGS "-Wno-long-long")
+## compiler flags, gcc does not handle "appended" values
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall" )
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic" )
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long" )
 
 
 ## enable CTest utility
