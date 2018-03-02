@@ -27,6 +27,7 @@
 
 typedef struct {
     //TODO: implement
+    int var;
 } RBTree;
 
 
