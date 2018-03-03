@@ -29,7 +29,7 @@
 #include <cmocka.h>
 
 
-static void mymap_mmap_param_NULL(void **state) {
+static void mymap_mmap_NULL(void **state) {
     (void) state; /* unused */
 
     const void* ret = mymap_mmap(NULL, NULL, 0, 0, NULL);
@@ -37,7 +37,7 @@ static void mymap_mmap_param_NULL(void **state) {
     assert_null( ret );
 }
 
-static void mymap_munmap_param_NULL(void **state) {
+static void mymap_munmap_NULL(void **state) {
     (void) state; /* unused */
 
     mymap_munmap(NULL, NULL);
@@ -45,7 +45,7 @@ static void mymap_munmap_param_NULL(void **state) {
     assert_true( 1 );
 }
 
-static void mymap_init_param_NULL(void **state) {
+static void mymap_init_NULL(void **state) {
     (void) state; /* unused */
 
     const int ret = mymap_init(NULL);
@@ -53,7 +53,7 @@ static void mymap_init_param_NULL(void **state) {
     assert_int_equal( ret, -1 );
 }
 
-static void mymap_dump_param_NULL(void **state) {
+static void mymap_dump_NULL(void **state) {
     (void) state; /* unused */
 
     const int ret = mymap_dump(NULL);
@@ -65,10 +65,10 @@ static void mymap_dump_param_NULL(void **state) {
 
 int main(void) {
     const struct UnitTest tests[] = {
-        unit_test(mymap_mmap_param_NULL),
-        unit_test(mymap_munmap_param_NULL),
-        unit_test(mymap_init_param_NULL),
-        unit_test(mymap_dump_param_NULL),
+        unit_test(mymap_mmap_NULL),
+        unit_test(mymap_munmap_NULL),
+        unit_test(mymap_init_NULL),
+        unit_test(mymap_dump_NULL),
     };
 
     return run_group_tests(tests);
