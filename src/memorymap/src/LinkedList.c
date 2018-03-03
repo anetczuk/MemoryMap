@@ -112,14 +112,14 @@ void* list_addMemory(LinkedList* list, MemoryArea* area) {
     return (void*)curr->next->area.offset;
 }
 
-int list_addValue(LinkedList* list, const size_t val) {
+int list_add(LinkedList* list, const size_t address, const size_t size) {
     if (list == NULL) {
         return -1;
     }
 
     MemoryArea area;
-    area.offset = val;
-    area.size = 1;
+    area.offset = address;
+    area.size = size;
 
     if (list_addMemory(list, &area) == NULL) {
         return -1;

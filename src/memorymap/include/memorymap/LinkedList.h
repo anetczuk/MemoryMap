@@ -57,7 +57,7 @@ size_t list_size(LinkedList* list);
 
 const MemoryArea* list_get(LinkedList* list, const size_t index);
 
-int list_addValue(LinkedList* list, const size_t val);
+int list_add(LinkedList* list, const size_t address, const size_t size);
 
 /**
  * List has to be initialized before releasing.
