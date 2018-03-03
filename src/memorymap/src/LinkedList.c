@@ -39,13 +39,11 @@ typedef struct LinkedListNode {
 size_t list_size(LinkedList* list) {
     if (list==NULL)
         return 0;
-    if (list->root==NULL)
-        return 0;
 
-    size_t retSize = 1;
-    /// finding last element
+    /// iterating to last element
+    size_t retSize = 0;
     LinkedListItem* curr = list->root;
-    while( curr->next != NULL ) {
+    while( curr != NULL ) {
         curr = curr->next;
         ++retSize;
     }
@@ -69,9 +67,6 @@ void list_insertNode(LinkedListItem** node) {
     (*node)->next = old;
 }
 
-/**
- * We assume list and area are not NULL.
- */
 void* list_addMemory(LinkedList* list, MemoryArea* area) {
     assert( list != NULL );
     assert( area != NULL );
