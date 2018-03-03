@@ -63,6 +63,22 @@ static void list_mmap_second(void **state) {
     list_release(&list);
 }
 
+static void list_mmap_segmented(void **state) {
+    (void) state; /* unused */
+
+    LinkedList list;
+    list_init(&list);
+
+    list_mmap(&list, (void*)100, 64);
+    /// small space between segments
+    list_mmap(&list, (void*)200, 64);
+
+    const void* ret = list_mmap(&list, (void*)128, 64);
+    assert_int_equal( ret, 264 );
+
+    list_release(&list);
+}
+
 static void list_munmap_param_NULL(void **state) {
     (void) state; /* unused */
 
@@ -212,6 +228,7 @@ int main(void) {
         unit_test(list_mmap_param_NULL),
         unit_test(list_mmap_first),
         unit_test(list_mmap_second),
+        unit_test(list_mmap_segmented),
         unit_test(list_munmap_param_NULL),
         unit_test(list_init_param_NULL),
         unit_test(list_init_valid)
