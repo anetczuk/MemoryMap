@@ -35,10 +35,10 @@ typedef enum {
 
 
 typedef struct {
-    MemoryFlag flags;
+    ///MemoryFlag flags;                /// unused
     size_t offset;
     size_t size;
-    unsigned char* data;                /// field is unused, just for clarification
+    ///unsigned char* data;             /// unused
 } MemoryArea;
 
 

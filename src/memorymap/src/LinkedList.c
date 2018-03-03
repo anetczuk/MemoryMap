@@ -26,8 +26,6 @@
 #include <stdlib.h>                 /// free
 #include <assert.h>
 
-#include "memorymap/MemoryArea.h"
-
 
 typedef struct LinkedListNode {
     MemoryArea area;
@@ -55,12 +53,14 @@ size_t list_size(LinkedList* list) {
     return retSize;
 }
 
-size_t list_getValue(LinkedList* list, const size_t index) {
+const MemoryArea* list_get(LinkedList* list, const size_t index) {
+    assert( list != NULL );
+
     LinkedListItem* curr = list->root;
     for(size_t i=0; i<index; ++i) {
         curr = curr->next;
     }
-    return curr->area.offset;
+    return &(curr->area);
 }
 
 void list_insertNode(LinkedListItem** node) {
@@ -118,10 +118,8 @@ int list_addValue(LinkedList* list, const size_t val) {
     }
 
     MemoryArea area;
-    area.flags = 0;
     area.offset = val;
     area.size = 1;
-    area.data = NULL;
 
     if (list_addMemory(list, &area) == NULL) {
         return -1;
@@ -154,16 +152,14 @@ int list_release(LinkedList* list) {
 /// ===================================================
 
 
-void* list_mmap(LinkedList* list, void *vaddr, unsigned int size, unsigned int flags, void *o) {
+void* list_mmap(LinkedList* list, void *vaddr, unsigned int size) {
     if (list == NULL) {
         return NULL;
     }
 
     MemoryArea area;
-    area.flags = flags;
     area.offset = (size_t)vaddr;
     area.size = size;
-    area.data = NULL;
 
     return list_addMemory(list, &area);
 }

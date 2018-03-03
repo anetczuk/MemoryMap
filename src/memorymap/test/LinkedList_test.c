@@ -32,7 +32,7 @@
 static void list_mmap_param_NULL(void **state) {
     (void) state; /* unused */
 
-    const void* ret = list_mmap(NULL, NULL, 0, 0, NULL);
+    const void* ret = list_mmap(NULL, NULL, 0);
 
     assert_null( ret );
 }
@@ -43,7 +43,7 @@ static void list_mmap_first(void **state) {
     LinkedList list;
     list_init(&list);
 
-    const void* ret = list_mmap(&list, (void*)128, 64, 0, NULL);
+    const void* ret = list_mmap(&list, (void*)128, 64);
     assert_int_equal( ret, 128 );
 
     list_release(&list);
@@ -55,9 +55,9 @@ static void list_mmap_second(void **state) {
     LinkedList list;
     list_init(&list);
 
-    list_mmap(&list, (void*)160, 64, 0, NULL);
+    list_mmap(&list, (void*)160, 64);
 
-    const void* ret = list_mmap(&list, (void*)128, 64, 0, NULL);
+    const void* ret = list_mmap(&list, (void*)128, 64);
     assert_int_equal( ret, 224 );
 
     list_release(&list);
@@ -150,8 +150,9 @@ static void list_addValue_first(void **state) {
     const size_t lSize = list_size(&list);
     assert_int_equal( lSize, 2 );
 
-    const int val = list_getValue(&list, 0);
-    assert_int_equal( val, 1 );
+    const MemoryArea* mem = list_get(&list, 0);
+    assert_non_null( mem );
+    assert_int_equal( mem->offset, 1 );
 
     list_release(&list);
 }
@@ -167,8 +168,9 @@ static void list_addValue_last(void **state) {
     const size_t lSize = list_size(&list);
     assert_int_equal( lSize, 2 );
 
-    const int val = list_getValue(&list, 1);
-    assert_int_equal( val, 5 );
+    const MemoryArea* mem = list_get(&list, 1);
+    assert_non_null( mem );
+    assert_int_equal( mem->offset, 5 );
 
     list_release(&list);
 }
@@ -185,8 +187,9 @@ static void list_addValue_middle(void **state) {
     const size_t lSize = list_size(&list);
     assert_int_equal( lSize, 3 );
 
-    const int val = list_getValue(&list, 1);
-    assert_int_equal( val, 3 );
+    const MemoryArea* mem = list_get(&list, 1);
+    assert_non_null( mem );
+    assert_int_equal( mem->offset, 3 );
 
     list_release(&list);
 }

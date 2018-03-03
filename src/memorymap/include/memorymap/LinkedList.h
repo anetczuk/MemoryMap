@@ -26,6 +26,8 @@
 
 #include <stddef.h>                 /// NULL, size_t
 
+#include "memorymap/MemoryArea.h"
+
 
 struct LinkedListNode;
 
@@ -37,7 +39,7 @@ typedef struct {
 /// =============================================
 
 
-void* list_mmap(LinkedList* list, void *vaddr, unsigned int size, unsigned int flags, void *o);
+void* list_mmap(LinkedList* list, void *vaddr, unsigned int size);
 
 void list_munmap(LinkedList* list, void *vaddr);
 
@@ -53,7 +55,7 @@ int list_init(LinkedList* list);
 
 size_t list_size(LinkedList* list);
 
-size_t list_getValue(LinkedList* list, const size_t index);
+const MemoryArea* list_get(LinkedList* list, const size_t index);
 
 int list_addValue(LinkedList* list, const size_t val);
 
