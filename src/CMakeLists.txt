@@ -43,7 +43,11 @@ set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long" )
 enable_testing()
 
 
+
 ## ================= build =================
+
+
+add_subdirectory( memorymap )
 
 add_subdirectory( mymap )
 

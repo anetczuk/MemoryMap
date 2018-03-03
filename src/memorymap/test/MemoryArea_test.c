@@ -21,7 +21,7 @@
 /// SOFTWARE.
 ///
 
-#include "mymap/MemoryArea.h"
+#include "memorymap/MemoryArea.h"
 
 #include <stdarg.h>
 #include <stddef.h>

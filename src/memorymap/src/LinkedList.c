@@ -21,12 +21,12 @@
 /// SOFTWARE.
 ///
 
-#include "mymap/LinkedList.h"
+#include "memorymap/LinkedList.h"
 
 #include <stdlib.h>                 /// free
 #include <assert.h>
 
-#include "mymap/MemoryArea.h"
+#include "memorymap/MemoryArea.h"
 
 
 typedef struct LinkedListNode {

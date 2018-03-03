@@ -21,7 +21,7 @@
 /// SOFTWARE.
 ///
 
-#include "mymap/LinkedList.h"
+#include "memorymap/LinkedList.h"
 
 #include <stdarg.h>
 #include <stddef.h>

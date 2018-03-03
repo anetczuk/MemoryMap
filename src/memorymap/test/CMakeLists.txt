@@ -15,7 +15,7 @@ endif()
 include_directories( ${CMOCKA_INCLUDE_DIR} )
 
 
-set( EXT_LIBS mymap ${CMOCKA_LIBRARIES} )
+set( EXT_LIBS memorymap ${CMOCKA_LIBRARIES} )
 
 
 file(GLOB cpp_test_files *_test.c )
@@ -31,7 +31,7 @@ foreach(test_filename IN LISTS cpp_test_files)
 	## build executable
 	add_executable( ${test_name} ${test_filename} )
 	target_link_libraries( ${test_name} ${EXT_LIBS} )
-	add_test( mymap/${test_name} ${test_name} )
+	add_test( memorymap/${test_name} ${test_name} )
 	
 	## generate bash script
 	configure_file( ${GENERATOR_FILE} "${test_name}.sh" @ONLY )
