@@ -23,3 +23,47 @@
 
 #include "memorymap/RBTree.h"
 
+#include "memorymap/MemoryArea.h"
+
+
+typedef struct LinkedListNode {
+    MemoryArea area;
+    struct LinkedListNode* next;
+} LinkedListItem;
+
+
+/// ===================================================
+
+
+size_t tree_size(RBTree* tree) {
+    //TODO: implement
+    return -1;
+}
+
+int tree_add(RBTree* tree, const size_t address, const size_t size) {
+    //TODO: implement
+    return -1;
+}
+
+int tree_release(RBTree* tree) {
+    //TODO: implement
+    return -1;
+}
+
+
+/// ===================================================
+
+
+void* tree_mmap(RBTree* tree, void *vaddr, unsigned int size) {
+    //TODO: implement
+    return NULL;
+}
+
+void tree_munmap(RBTree* tree, void *vaddr) {
+    //TODO: implement
+}
+
+int tree_init(RBTree* tree) {
+    //TODO: implement
+    return -1;
+}

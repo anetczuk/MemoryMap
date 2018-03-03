@@ -24,11 +24,41 @@
 #ifndef RBTREE_H_
 #define RBTREE_H_
 
+#include <stddef.h>                 /// NULL, size_t
+
+
+struct RBTree;
 
 typedef struct {
-    //TODO: implement
-    int var;
+    struct RBTreeNode* root;
 } RBTree;
 
+
+/// =============================================
+
+
+void* tree_mmap(RBTree* tree, void *vaddr, unsigned int size);
+
+void tree_munmap(RBTree* tree, void *vaddr);
+
+/**
+ * If list has be initialized previously, then have to be released
+ * before next initialization.
+ */
+int tree_init(RBTree* tree);
+
+
+/// =============================================
+
+
+size_t tree_size(RBTree* tree);
+
+int tree_add(RBTree* tree, const size_t address, const size_t size);
+
+/**
+ * List has to be initialized before releasing.
+ * Returns number of released elements (size of list)
+ */
+int tree_release(RBTree* tree);
 
 #endif /* RBTREE_H_ */
