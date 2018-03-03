@@ -156,7 +156,7 @@ static void tree_release_NULL(void **state) {
     assert_int_equal( ret, -1 );
 }
 
-static void tree_release_list(void **state) {
+static void tree_release_empty(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -179,6 +179,20 @@ static void tree_release_2(void **state) {
     assert_int_equal( ret, 2 );
 }
 
+static void tree_add_first(void **state) {
+    (void) state; /* unused */
+
+    RBTree tree;
+    tree_init(&tree);
+    tree_add(&tree, 3, 1);
+    tree_add(&tree, 1, 1);
+
+    const size_t lSize = tree_size(&tree);
+    assert_int_equal( lSize, 2 );
+
+    tree_release(&tree);
+}
+
 
 /// ==================================================
 
@@ -186,8 +200,9 @@ static void tree_release_2(void **state) {
 int main(void) {
     const struct UnitTest tests[] = {
         unit_test(tree_release_NULL),
-        unit_test(tree_release_list),
+        unit_test(tree_release_empty),
         unit_test(tree_release_2),
+        unit_test(tree_add_first),
 
         unit_test(tree_mmap_NULL),
         unit_test(tree_mmap_first),
