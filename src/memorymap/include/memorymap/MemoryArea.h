@@ -36,6 +36,7 @@ typedef enum {
 
 typedef struct {
     ///MemoryFlag flags;                /// unused
+    //TODO: can be optimized to startOffset, endOffset
     size_t offset;
     size_t size;
     ///unsigned char* data;             /// unused

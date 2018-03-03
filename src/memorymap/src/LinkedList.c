@@ -163,9 +163,44 @@ void* list_mmap(LinkedList* list, void *vaddr, unsigned int size) {
 }
 
 void list_munmap(LinkedList* list, void *vaddr) {
-    //TODO: implement
+    if (list == NULL) {
+        return ;
+    }
+    if (list->root==NULL) {
+        return ;
+    }
 
-    /// find pointed segment
+    /// finding proper element
+
+    const size_t voffset = (size_t)vaddr;
+
+    LinkedListItem* first = list->root;
+    if (voffset < first->area.offset) {
+        /// before first segment
+        return ;
+    }
+    if (voffset < (first->area.offset+first->area.size)) {
+        /// inside first segment
+        list->root = first->next;
+        free(first);
+        return ;
+    }
+
+    LinkedListItem* prev = first;
+    LinkedListItem* curr = NULL;
+    while( (curr = prev->next) != NULL ) {
+        if (voffset < curr->area.offset) {
+            /// between segments - return
+            return ;
+        }
+        if (voffset < (curr->area.offset+curr->area.size)) {
+            /// inside segment
+            prev->next = curr->next;
+            free(curr);
+            return ;
+        }
+        prev = curr;
+    }
 }
 
 int list_init(LinkedList* list) {

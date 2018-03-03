@@ -29,7 +29,7 @@
 #include <cmocka.h>
 
 
-static void list_mmap_param_NULL(void **state) {
+static void list_mmap_NULL(void **state) {
     (void) state; /* unused */
 
     const void* ret = list_mmap(NULL, NULL, 0);
@@ -79,7 +79,7 @@ static void list_mmap_segmented(void **state) {
     list_release(&list);
 }
 
-static void list_munmap_param_NULL(void **state) {
+static void list_munmap_NULL(void **state) {
     (void) state; /* unused */
 
     list_munmap(NULL, NULL);
@@ -87,7 +87,50 @@ static void list_munmap_param_NULL(void **state) {
     assert_true( 1 );
 }
 
-static void list_init_param_NULL(void **state) {
+static void list_munmap_empty(void **state) {
+    (void) state; /* unused */
+
+    LinkedList list;
+    list_init(&list);
+
+    list_munmap(&list, NULL);
+
+    list_release(&list);
+}
+
+static void list_munmap_badaddr(void **state) {
+    (void) state; /* unused */
+
+    LinkedList list;
+    list_init(&list);
+    list_mmap(&list, (void*)100, 64);
+
+    list_munmap(&list, (void*)50);
+
+    const size_t ret = list_size(&list);
+    assert_int_equal( ret, 1 );
+
+    list_release(&list);
+}
+
+static void list_munmap_freed(void **state) {
+    (void) state; /* unused */
+
+    LinkedList list;
+    list_init(&list);
+
+    list_mmap(&list, (void*)100, 64);
+    list_mmap(&list, (void*)200, 64);
+
+    list_munmap(&list, (void*)120);
+
+    const size_t ret = list_size(&list);
+    assert_int_equal( ret, 1 );
+
+    list_release(&list);
+}
+
+static void list_init_NULL(void **state) {
     (void) state; /* unused */
 
     const int ret = list_init(NULL);
@@ -106,7 +149,7 @@ static void list_init_valid(void **state) {
 /// ==================================================
 
 
-static void list_release_param_NULL(void **state) {
+static void list_release_NULL(void **state) {
     (void) state; /* unused */
 
     const int ret = list_release(NULL);
@@ -216,7 +259,7 @@ static void list_add_middle(void **state) {
 
 int main(void) {
     const struct UnitTest tests[] = {
-        unit_test(list_release_param_NULL),
+        unit_test(list_release_NULL),
         unit_test(list_release_list),
         unit_test(list_release_2),
         unit_test(list_add_first),
@@ -225,12 +268,17 @@ int main(void) {
         unit_test(list_size_NULL),
         unit_test(list_size_0),
 
-        unit_test(list_mmap_param_NULL),
+        unit_test(list_mmap_NULL),
         unit_test(list_mmap_first),
         unit_test(list_mmap_second),
         unit_test(list_mmap_segmented),
-        unit_test(list_munmap_param_NULL),
-        unit_test(list_init_param_NULL),
+
+        unit_test(list_munmap_NULL),
+        unit_test(list_munmap_empty),
+        unit_test(list_munmap_badaddr),
+        unit_test(list_munmap_freed),
+
+        unit_test(list_init_NULL),
         unit_test(list_init_valid)
     };
 
