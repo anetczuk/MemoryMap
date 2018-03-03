@@ -59,7 +59,7 @@ size_t tree_size(RBTree* tree) {
     return tree_sizeSubtree(tree->root);
 }
 
-//void* tree_addMemoryToLeft(RBTreeItem* node, MemoryArea* area) {
+//static void* tree_addMemoryToLeft(RBTreeItem* node, MemoryArea* area) {
 //    //TODO: impleent
 //
 //    if ( node->left == NULL ) {
@@ -103,12 +103,12 @@ size_t tree_size(RBTree* tree) {
 //    return NULL;
 //}
 //
-//void* tree_addMemoryToRight(RBTreeItem* node, MemoryArea* area) {
+//static void* tree_addMemoryToRight(RBTreeItem* node, MemoryArea* area) {
 //    //TODO: impleent
 //    return NULL;
 //}
 
-void* tree_addMemory(RBTree* tree, MemoryArea* area) {
+static void* tree_addMemory(RBTree* tree, MemoryArea* area) {
     assert( tree != NULL );
     assert( area != NULL );
 
@@ -146,7 +146,7 @@ int tree_add(RBTree* tree, const size_t address, const size_t size) {
     return 0;
 }
 
-int tree_releaseNodes(RBTreeItem* tree) {
+static int tree_releaseNodes(RBTreeItem* tree) {
     if (tree == NULL) {
         return -1;
     }

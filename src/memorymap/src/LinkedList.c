@@ -61,13 +61,13 @@ const MemoryArea* list_get(LinkedList* list, const size_t index) {
     return &(curr->area);
 }
 
-void list_insertNode(LinkedListItem** node) {
+static void list_insertNode(LinkedListItem** node) {
     LinkedListItem* old = *node;
     (*node) = calloc( 1, sizeof(LinkedListItem) );
     (*node)->next = old;
 }
 
-void* list_addMemory(LinkedList* list, MemoryArea* area) {
+static void* list_addMemory(LinkedList* list, MemoryArea* area) {
     assert( list != NULL );
     assert( area != NULL );
 
@@ -118,7 +118,7 @@ int list_add(LinkedList* list, const size_t address, const size_t size) {
     return 0;
 }
 
-int list_releaseNodes(LinkedListItem* list) {
+static int list_releaseNodes(LinkedListItem* list) {
     if (list == NULL) {
         return -1;
     }

@@ -34,7 +34,7 @@ void memory_release( MemoryArea* area ) {
     //TODO: implement
 }
 
-int memory_doesFitBefore(const MemoryArea* area, const MemoryArea* check) {
+static int memory_doesFitBefore(const MemoryArea* area, const MemoryArea* check) {
     assert( check != NULL );
     if (area == NULL) {
         return 0;
