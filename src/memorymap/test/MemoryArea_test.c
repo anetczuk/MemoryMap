@@ -112,6 +112,74 @@ static void memory_fitBetween_second_NULL_moved(void **state) {
     assert_int_equal( check.offset, 200 );
 }
 
+static void memory_fitAfter_NULL(void **state) {
+    (void) state; /* unused */
+
+    const int ret = memory_fitAfter(NULL, NULL);
+    assert_int_equal( ret, -1 );
+}
+
+static void memory_fitAfter_NULL_range(void **state) {
+    (void) state; /* unused */
+
+    MemoryArea check;
+    check.offset = 50;
+    check.size = 10;
+
+    const int ret = memory_fitAfter(NULL, &check);
+    assert_int_equal( ret, 0 );
+    assert_int_equal( check.offset, 50 );
+}
+
+static void memory_fitAfter_before(void **state) {
+    (void) state; /* unused */
+
+    MemoryArea segment;
+    segment.offset = 100;
+    segment.size = 100;
+
+    MemoryArea check;
+    check.offset = 50;
+    check.size = 10;
+
+    const int ret = memory_fitAfter(&segment, &check);
+    assert_int_equal( ret, 0 );
+    assert_int_equal( check.offset, 200 );
+}
+
+static void memory_fitAfter_inside(void **state) {
+    (void) state; /* unused */
+
+    MemoryArea secgment;
+    secgment.offset = 100;
+    secgment.size = 100;
+
+    MemoryArea check;
+    check.offset = 150;
+    check.size = 10;
+
+    const int ret = memory_fitAfter(&secgment, &check);
+    assert_int_equal( ret, 0 );
+    assert_int_equal( check.offset, 200 );
+}
+
+static void memory_fitAfter_after(void **state) {
+    (void) state; /* unused */
+
+    MemoryArea segment;
+    segment.offset = 20;
+    segment.size = 100;
+
+    MemoryArea check;
+    check.offset = 200;
+    check.size = 10;
+
+    const int ret = memory_fitAfter(&segment, &check);
+    assert_int_equal( ret, 0 );
+    assert_int_equal( check.offset, 200 );
+}
+
+
 
 
 int main(void) {
@@ -122,6 +190,12 @@ int main(void) {
         unit_test(memory_fitBetween_first_NULL_fail),
         unit_test(memory_fitBetween_second_NULL),
         unit_test(memory_fitBetween_second_NULL_moved),
+
+        unit_test(memory_fitAfter_NULL),
+        unit_test(memory_fitAfter_NULL_range),
+        unit_test(memory_fitAfter_before),
+        unit_test(memory_fitAfter_inside),
+        unit_test(memory_fitAfter_after),
     };
 
     return run_group_tests(tests);

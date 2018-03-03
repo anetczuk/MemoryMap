@@ -103,13 +103,11 @@ void* list_addMemory(LinkedList* list, MemoryArea* area) {
     }
 
     /// curr points to last element
+    memory_fitAfter(&(curr->area), area);
+
     list_insertNode( &(curr->next) );
     curr->next->area = *area;
-    const size_t addrAfterEnd = curr->area.offset + curr->area.size;
-    if (area->offset<addrAfterEnd) {
-        curr->next->area.offset = addrAfterEnd;
-    }
-    return (void*)curr->next->area.offset;
+    return (void*)(curr->next->area.offset);
 }
 
 int list_add(LinkedList* list, const size_t address, const size_t size) {
@@ -166,6 +164,8 @@ void* list_mmap(LinkedList* list, void *vaddr, unsigned int size) {
 
 void list_munmap(LinkedList* list, void *vaddr) {
     //TODO: implement
+
+    /// find pointed segment
 }
 
 int list_init(LinkedList* list) {

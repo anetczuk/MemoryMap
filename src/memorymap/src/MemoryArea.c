@@ -46,17 +46,17 @@ int memory_doesFitBefore(const MemoryArea* area, const MemoryArea* check) {
     return 0;
 }
 
-int memory_doesFitAfter(const MemoryArea* area, const MemoryArea* check) {
-    assert( check != NULL );
-    if (area == NULL) {
-        return 0;
-    }
-    const size_t addrAfterEnd = area->offset + area->size;
-    if (check->offset < addrAfterEnd) {
-        return -1;
-    }
-    return 0;
-}
+//int memory_doesFitAfter(const MemoryArea* area, const MemoryArea* check) {
+//    assert( check != NULL );
+//    if (area == NULL) {
+//        return 0;
+//    }
+//    const size_t addrAfterEnd = area->offset + area->size;
+//    if (check->offset < addrAfterEnd) {
+//        return -1;
+//    }
+//    return 0;
+//}
 
 int memory_fitBetween(const MemoryArea* first, const MemoryArea* second, MemoryArea* check) {
     if (check==NULL) {
@@ -71,7 +71,7 @@ int memory_fitBetween(const MemoryArea* first, const MemoryArea* second, MemoryA
         return 0;
     }
     const size_t addrAfterEnd = first->offset + first->size;
-    if (check->offset >= addrAfterEnd) {
+    if (addrAfterEnd <= check->offset) {
         /// fits without changing
         return 0;
     }
@@ -85,6 +85,21 @@ int memory_fitBetween(const MemoryArea* first, const MemoryArea* second, MemoryA
         }
     }
     /// there is space
+    check->offset = addrAfterEnd;
+    return 0;
+}
+
+int memory_fitAfter(const MemoryArea* segment, MemoryArea* check) {
+    if (check==NULL) {
+        return -1;
+    }
+    if (segment==NULL) {
+        return 0;
+    }
+    const size_t addrAfterEnd = segment->offset + segment->size;
+    if (addrAfterEnd <= check->offset) {
+        return 0;
+    }
     check->offset = addrAfterEnd;
     return 0;
 }

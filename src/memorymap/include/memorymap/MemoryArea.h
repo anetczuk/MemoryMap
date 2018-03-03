@@ -54,5 +54,7 @@ void memory_release( MemoryArea* area );
  */
 int memory_fitBetween(const MemoryArea* first, const MemoryArea* second, MemoryArea* check);
 
+int memory_fitAfter(const MemoryArea* segment, MemoryArea* check);
+
 
 #endif /* MEMORYAREA_H_ */
