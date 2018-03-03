@@ -211,7 +211,7 @@ static void list_add_first(void **state) {
 
     const MemoryArea* mem = list_get(&list, 0);
     assert_non_null( mem );
-    assert_int_equal( mem->offset, 1 );
+    assert_int_equal( mem->start, 1 );
 
     list_release(&list);
 }
@@ -229,7 +229,7 @@ static void list_add_last(void **state) {
 
     const MemoryArea* mem = list_get(&list, 1);
     assert_non_null( mem );
-    assert_int_equal( mem->offset, 5 );
+    assert_int_equal( mem->start, 5 );
 
     list_release(&list);
 }
@@ -248,7 +248,7 @@ static void list_add_middle(void **state) {
 
     const MemoryArea* mem = list_get(&list, 1);
     assert_non_null( mem );
-    assert_int_equal( mem->offset, 3 );
+    assert_int_equal( mem->start, 3 );
 
     list_release(&list);
 }

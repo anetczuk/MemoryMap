@@ -40,41 +40,33 @@ static void memory_fitBetween_NULL(void **state) {
 static void memory_fitBetween_NULL_range(void **state) {
     (void) state; /* unused */
 
-    MemoryArea check;
-    check.offset = 50;
-    check.size = 10;
+    MemoryArea check = memory_create(50, 10);
 
     const int ret = memory_fitBetween(NULL, NULL, &check);
     assert_int_equal( ret, 0 );
-    assert_int_equal( check.offset, 50 );
+    assert_int_equal( check.start, 50 );
+    assert_int_equal( check.end, 60 );
 }
 
 static void memory_fitBetween_first_NULL(void **state) {
     (void) state; /* unused */
 
-    MemoryArea second;
-    second.offset = 100;
-    second.size = 100;
+    const MemoryArea second = memory_create(100, 100);
 
-    MemoryArea check;
-    check.offset = 50;
-    check.size = 10;
+    MemoryArea check = memory_create(50, 10);
 
     const int ret = memory_fitBetween(NULL, &second, &check);
     assert_int_equal( ret, 0 );
-    assert_int_equal( check.offset, 50 );
+    assert_int_equal( check.start, 50 );
+    assert_int_equal( check.end, 60 );
 }
 
 static void memory_fitBetween_first_NULL_fail(void **state) {
     (void) state; /* unused */
 
-    MemoryArea second;
-    second.offset = 100;
-    second.size = 100;
+    const MemoryArea second = memory_create(100, 200);
 
-    MemoryArea check;
-    check.offset = 150;
-    check.size = 10;
+    MemoryArea check = memory_create(150, 10);
 
     const int ret = memory_fitBetween(NULL, &second, &check);
     assert_int_equal( ret, -1 );
@@ -83,33 +75,27 @@ static void memory_fitBetween_first_NULL_fail(void **state) {
 static void memory_fitBetween_second_NULL(void **state) {
     (void) state; /* unused */
 
-    MemoryArea first;
-    first.offset = 20;
-    first.size = 100;
+    const MemoryArea first = memory_create(20, 100);
 
-    MemoryArea check;
-    check.offset = 100;
-    check.size = 10;
+    MemoryArea check = memory_create(100, 10);
 
     const int ret = memory_fitBetween(&first, NULL, &check);
     assert_int_equal( ret, 0 );
-    assert_int_equal( check.offset, 120 );
+    assert_int_equal( check.start, 120 );
+    assert_int_equal( check.end, 130 );
 }
 
 static void memory_fitBetween_second_NULL_moved(void **state) {
     (void) state; /* unused */
 
-    MemoryArea first;
-    first.offset = 100;
-    first.size = 100;
+    const MemoryArea first = memory_create(100, 100);
 
-    MemoryArea check;
-    check.offset = 50;
-    check.size = 10;
+    MemoryArea check = memory_create(50, 10);
 
     const int ret = memory_fitBetween(&first, NULL, &check);
     assert_int_equal( ret, 0 );
-    assert_int_equal( check.offset, 200 );
+    assert_int_equal( check.start, 200 );
+    assert_int_equal( check.end, 210 );
 }
 
 static void memory_fitAfter_NULL(void **state) {
@@ -122,61 +108,51 @@ static void memory_fitAfter_NULL(void **state) {
 static void memory_fitAfter_NULL_range(void **state) {
     (void) state; /* unused */
 
-    MemoryArea check;
-    check.offset = 50;
-    check.size = 10;
+    MemoryArea check = memory_create(50, 10);
 
     const int ret = memory_fitAfter(NULL, &check);
     assert_int_equal( ret, 0 );
-    assert_int_equal( check.offset, 50 );
+    assert_int_equal( check.start, 50 );
+    assert_int_equal( check.end, 60 );
 }
 
 static void memory_fitAfter_before(void **state) {
     (void) state; /* unused */
 
-    MemoryArea segment;
-    segment.offset = 100;
-    segment.size = 100;
+    const MemoryArea segment = memory_create(100, 100);
 
-    MemoryArea check;
-    check.offset = 50;
-    check.size = 10;
+    MemoryArea check = memory_create(50, 10);
 
     const int ret = memory_fitAfter(&segment, &check);
     assert_int_equal( ret, 0 );
-    assert_int_equal( check.offset, 200 );
+    assert_int_equal( check.start, 200 );
+    assert_int_equal( check.end, 210 );
 }
 
 static void memory_fitAfter_inside(void **state) {
     (void) state; /* unused */
 
-    MemoryArea secgment;
-    secgment.offset = 100;
-    secgment.size = 100;
+    const MemoryArea segment = memory_create(100, 100);
 
-    MemoryArea check;
-    check.offset = 150;
-    check.size = 10;
+    MemoryArea check = memory_create(150, 10);
 
-    const int ret = memory_fitAfter(&secgment, &check);
+    const int ret = memory_fitAfter(&segment, &check);
     assert_int_equal( ret, 0 );
-    assert_int_equal( check.offset, 200 );
+    assert_int_equal( check.start, 200 );
+    assert_int_equal( check.end, 210 );
 }
 
 static void memory_fitAfter_after(void **state) {
     (void) state; /* unused */
 
-    MemoryArea segment;
-    segment.offset = 20;
-    segment.size = 100;
+    const MemoryArea segment = memory_create(20, 100);
 
-    MemoryArea check;
-    check.offset = 200;
-    check.size = 10;
+    MemoryArea check = memory_create(200, 10);
 
     const int ret = memory_fitAfter(&segment, &check);
     assert_int_equal( ret, 0 );
-    assert_int_equal( check.offset, 200 );
+    assert_int_equal( check.start, 200 );
+    assert_int_equal( check.end, 210 );
 }
 
 

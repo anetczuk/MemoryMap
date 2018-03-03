@@ -79,7 +79,7 @@ void* list_addMemory(LinkedList* list, MemoryArea* area) {
     if (list->root == NULL) {
         list_insertNode(&(list->root));
         list->root->area = *area;
-        return (void*)list->root->area.offset;
+        return (void*)list->root->area.start;
     }
 
     /// compare with first element
@@ -87,7 +87,7 @@ void* list_addMemory(LinkedList* list, MemoryArea* area) {
     if (doesFit == 0) {
         list_insertNode(&(list->root));
         list->root->area = *area;
-        return (void*)list->root->area.offset;
+        return (void*)list->root->area.start;
     }
 
     /// compare with middle elements
@@ -97,7 +97,7 @@ void* list_addMemory(LinkedList* list, MemoryArea* area) {
         if (doesFit == 0) {
             list_insertNode(&(curr->next));
             curr->next->area = *area;
-            return (void*)curr->next->area.offset;
+            return (void*)curr->next->area.start;
         }
         curr = curr->next;
     }
@@ -107,7 +107,7 @@ void* list_addMemory(LinkedList* list, MemoryArea* area) {
 
     list_insertNode( &(curr->next) );
     curr->next->area = *area;
-    return (void*)(curr->next->area.offset);
+    return (void*)(curr->next->area.start);
 }
 
 int list_add(LinkedList* list, const size_t address, const size_t size) {
@@ -115,9 +115,7 @@ int list_add(LinkedList* list, const size_t address, const size_t size) {
         return -1;
     }
 
-    MemoryArea area;
-    area.offset = address;
-    area.size = size;
+    MemoryArea area = memory_create(address, size);
 
     if (list_addMemory(list, &area) == NULL) {
         return -1;
@@ -155,10 +153,7 @@ void* list_mmap(LinkedList* list, void *vaddr, unsigned int size) {
         return NULL;
     }
 
-    MemoryArea area;
-    area.offset = (size_t)vaddr;
-    area.size = size;
-
+    MemoryArea area = memory_create( (size_t)vaddr, size );
     return list_addMemory(list, &area);
 }
 
@@ -175,11 +170,11 @@ void list_munmap(LinkedList* list, void *vaddr) {
     const size_t voffset = (size_t)vaddr;
 
     LinkedListItem* first = list->root;
-    if (voffset < first->area.offset) {
+    if (voffset < first->area.start) {
         /// before first segment
         return ;
     }
-    if (voffset < (first->area.offset+first->area.size)) {
+    if (voffset < first->area.end) {
         /// inside first segment
         list->root = first->next;
         free(first);
@@ -189,11 +184,11 @@ void list_munmap(LinkedList* list, void *vaddr) {
     LinkedListItem* prev = first;
     LinkedListItem* curr = NULL;
     while( (curr = prev->next) != NULL ) {
-        if (voffset < curr->area.offset) {
+        if (voffset < curr->area.start) {
             /// between segments - return
             return ;
         }
-        if (voffset < (curr->area.offset+curr->area.size)) {
+        if (voffset < curr->area.end) {
             /// inside segment
             prev->next = curr->next;
             free(curr);

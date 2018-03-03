@@ -36,15 +36,21 @@ typedef enum {
 
 typedef struct {
     ///MemoryFlag flags;                /// unused
-    //TODO: can be optimized to startOffset, endOffset
-    size_t offset;
-    size_t size;
+    size_t start;
+    size_t end;
     ///unsigned char* data;             /// unused
 } MemoryArea;
 
 
 /// ====================================================
 
+
+static inline MemoryArea memory_create( const size_t start, const size_t size ) {
+    MemoryArea area;
+    area.start = start;
+    area.end   = start + size;
+    return area;
+}
 
 void memory_init( MemoryArea* area );
 
