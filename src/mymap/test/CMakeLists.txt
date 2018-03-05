@@ -34,5 +34,5 @@ foreach(test_filename IN LISTS cpp_test_files)
 	add_test( mymap/${test_name} ${test_name} )
 	
 	## generate bash script
-	configure_file( ${GENERATOR_FILE} "${test_name}.sh" @ONLY )
+	configure_file( ${GENERATOR_FILE} "test_${test_name}.sh" @ONLY )
 endforeach()
