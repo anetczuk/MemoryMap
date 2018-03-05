@@ -112,9 +112,7 @@ int list_add(LinkedList* list, const size_t address, const size_t size) {
 
     MemoryArea area = memory_create(address, size);
 
-    if (list_addMemory(list, &area) == NULL) {
-        return -1;
-    }
+    list_addMemory(list, &area);			/// always adds
     return 0;
 }
 

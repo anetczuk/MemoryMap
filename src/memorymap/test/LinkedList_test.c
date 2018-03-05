@@ -113,7 +113,7 @@ static void list_munmap_badaddr(void **state) {
     list_release(&list);
 }
 
-static void list_munmap_freed(void **state) {
+static void list_munmap_first(void **state) {
     (void) state; /* unused */
 
     LinkedList list;
@@ -126,6 +126,42 @@ static void list_munmap_freed(void **state) {
 
     const size_t ret = list_size(&list);
     assert_int_equal( ret, 1 );
+
+    list_release(&list);
+}
+
+static void list_munmap_second(void **state) {
+    (void) state; /* unused */
+
+    LinkedList list;
+    list_init(&list);
+
+    list_mmap(&list, (void*)100, 64);
+    list_mmap(&list, (void*)200, 64);
+    list_mmap(&list, (void*)300, 64);
+
+    list_munmap(&list, (void*)220);
+
+    const size_t ret = list_size(&list);
+    assert_int_equal( ret, 2 );
+
+    list_release(&list);
+}
+
+static void list_munmap_between(void **state) {
+    (void) state; /* unused */
+
+    LinkedList list;
+    list_init(&list);
+
+    list_mmap(&list, (void*)100, 64);
+    list_mmap(&list, (void*)200, 64);
+    list_mmap(&list, (void*)300, 64);
+
+    list_munmap(&list, (void*)290);
+
+    const size_t ret = list_size(&list);
+    assert_int_equal( ret, 3 );
 
     list_release(&list);
 }
@@ -198,6 +234,10 @@ static void list_size_0(void **state) {
     list_release(&list);
 }
 
+static void list_add_NULL(void **state) {
+    list_add(NULL, 3, 1);
+}
+
 static void list_add_first(void **state) {
     (void) state; /* unused */
 
@@ -262,6 +302,7 @@ int main(void) {
         unit_test(list_release_NULL),
         unit_test(list_release_list),
         unit_test(list_release_2),
+        unit_test(list_add_NULL),
         unit_test(list_add_first),
         unit_test(list_add_middle),
         unit_test(list_add_last),
@@ -276,7 +317,9 @@ int main(void) {
         unit_test(list_munmap_NULL),
         unit_test(list_munmap_empty),
         unit_test(list_munmap_badaddr),
-        unit_test(list_munmap_freed),
+        unit_test(list_munmap_first),
+        unit_test(list_munmap_second),
+        unit_test(list_munmap_between),
 
         unit_test(list_init_NULL),
         unit_test(list_init_valid)
