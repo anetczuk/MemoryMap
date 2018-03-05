@@ -303,7 +303,7 @@ static RBTreeItem* tree_findNode(RBTreeItem* node, const size_t adress) {
 	return NULL;
 }
 
-static RBTreeItem* tree_getLeftSibiling(RBTreeItem* node) {
+static RBTreeItem* tree_getLeftDescendant(RBTreeItem* node) {
 	RBTreeItem* curr = node;
 	while (curr->left != NULL) {
 		curr = curr->left;
@@ -311,7 +311,7 @@ static RBTreeItem* tree_getLeftSibiling(RBTreeItem* node) {
 	return curr;
 }
 
-static RBTreeItem* tree_getRightSibiling(RBTreeItem* node) {
+static RBTreeItem* tree_getRightDescendant(RBTreeItem* node) {
 	RBTreeItem* curr = node;
 	while (curr->right != NULL) {
 		curr = curr->right;
@@ -320,7 +320,7 @@ static RBTreeItem* tree_getRightSibiling(RBTreeItem* node) {
 }
 
 static inline void tree_reconnectToRight(RBTreeItem* node, RBTreeItem* subtree) {
-	RBTreeItem* mostNode = tree_getRightSibiling(node);			/// can return 'node', never NULL
+	RBTreeItem* mostNode = tree_getRightDescendant(node);			/// can return 'node', never NULL
 	mostNode->right = subtree;
 	subtree->parent = mostNode;
 }
@@ -363,7 +363,7 @@ void tree_munmap(RBTree* tree, void *vaddr) {
     }
 
     /// there is right subtree
-    RBTreeItem* nextNode = tree_getLeftSibiling(node->right);		/// never NULL
+    RBTreeItem* nextNode = tree_getLeftDescendant(node->right);		/// never NULL
     RBTreeItem* rightParent = nextNode->parent;						/// can be 'node'
     if (rightParent != node) {
 		rightParent->left = NULL;
