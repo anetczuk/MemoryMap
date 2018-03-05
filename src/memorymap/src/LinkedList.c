@@ -120,7 +120,7 @@ int list_add(LinkedList* list, const size_t address, const size_t size) {
 
 static int list_releaseNodes(LinkedListItem* list) {
     if (list == NULL) {
-        return -1;
+        return 0;
     }
     /**
      * Done in recursive manner. In case of very large lists consider
@@ -135,8 +135,7 @@ int list_release(LinkedList* list) {
     if (list == NULL) {
         return -1;
     }
-    const int released = list_releaseNodes(list->root);
-    return released+1;
+    return list_releaseNodes(list->root);
 }
 
 

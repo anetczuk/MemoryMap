@@ -36,6 +36,7 @@ typedef enum {
 
 
 typedef struct RBTreeNode {
+    struct RBTreeNode* parent;
     struct RBTreeNode* left;
     struct RBTreeNode* right;
     MemoryArea area;
@@ -50,7 +51,10 @@ static size_t tree_sizeSubtree(RBTreeItem* tree) {
     if (tree==NULL) {
         return 0;
     }
-    return tree_sizeSubtree(tree->left) + tree_sizeSubtree(tree->right) + 1;
+
+    const size_t leftSize = tree_sizeSubtree(tree->left);
+    const size_t rightSize = tree_sizeSubtree(tree->right);
+    return leftSize + rightSize + 1;
 }
 
 size_t tree_size(RBTree* tree) {
@@ -59,54 +63,214 @@ size_t tree_size(RBTree* tree) {
     return tree_sizeSubtree(tree->root);
 }
 
-//static void* tree_addMemoryToLeft(RBTreeItem* node, MemoryArea* area) {
-//    //TODO: impleent
+//static inline int tree_fitBetween(const InsertionState* state, MemoryArea* area) {
+//    const MemoryArea* smallerArea = NULL;
+//    if (state->smaller!=NULL) {
+//        smallerArea = &(state->smaller->area);
+//    }
+//    const MemoryArea* greaterArea = NULL;
+//    if (state->greater!=NULL) {
+//        greaterArea = &(state->greater->area);
+//    }
+//    return memory_fitBetween(smallerArea, greaterArea, area);
+//}
+
+//static inline void tree_insertLeft(RBTreeItem* node, const MemoryArea* area) {
+//    RBTreeItem* old = node->left;
+//    node->left = calloc( 1, sizeof(RBTreeItem) );
+//    RBTreeItem* newNode = node->left;
+//    newNode->area = *area;
+//    newNode->left = old;
+//    /// right is NULL
+//}
 //
-//    if ( node->left == NULL ) {
-//        /// compare with first element
-//        const int doesFit = memory_fitBetween(NULL, &(node->area), area);
-//        if (doesFit == 0) {
-//            node->left = calloc( 1, sizeof(RBTreeItem) );
-//            node->left->area = *area;
-//            return (void*)node->left->area.start;
-//        }
+//static inline void tree_insertRight(RBTreeItem* node, const MemoryArea* area) {
+//    RBTreeItem* old = node->right;
+//    node->right = calloc( 1, sizeof(RBTreeItem) );
+//    RBTreeItem* newNode = node->left;
+//    newNode->area = *area;
+//    newNode->right = old;
+//    /// left is NULL
+//}
+
+//static RBTreeItem* tree_getPreviousSegment(RBTreeItem* node) {
+//    assert(node!=NULL);
+//    if (node->right==NULL) {
 //        return NULL;
 //    }
-//
-////    /// compare with first element
-////    const int doesFit = memory_fitBetween(NULL, &(list->root->area), area);
-////    if (doesFit == 0) {
-////        list_insertNode(&(list->root));
-////        list->root->area = *area;
-////        return (void*)list->root->area.start;
-////    }
-////
-////    /// compare with middle elements
-////    LinkedListItem* curr = list->root;
-////    while( curr->next != NULL ) {
-////        const int doesFit = memory_fitBetween(&(curr->area), &(curr->next->area), area);
-////        if (doesFit == 0) {
-////            list_insertNode(&(curr->next));
-////            curr->next->area = *area;
-////            return (void*)curr->next->area.start;
-////        }
-////        curr = curr->next;
-////    }
-////
-////    /// curr points to last element
-////    memory_fitAfter(&(curr->area), area);
-////
-////    list_insertNode( &(curr->next) );
-////    curr->next->area = *area;
-////    return (void*)(curr->next->area.start);
-//
-//    return NULL;
+//    RBTreeItem* next = node->right;
+//    while(next->left!=NULL) {
+//        next = next->left;
+//    }
+//    return next;
 //}
 //
-//static void* tree_addMemoryToRight(RBTreeItem* node, MemoryArea* area) {
-//    //TODO: impleent
-//    return NULL;
+//static RBTreeItem* tree_getNextSegment(RBTreeItem* node) {
+//    assert(node!=NULL);
+//    if (node->left==NULL) {
+//        return NULL;
+//    }
+//    RBTreeItem* prev = node->left;
+//    while(prev->right!=NULL) {
+//        prev = prev->right;
+//    }
+//    return prev;
 //}
+
+static const RBTreeItem* tree_getRightAncestor(RBTreeItem* node) {
+	const RBTreeItem* child = node;
+	const RBTreeItem* curr = node->parent;
+	while( curr != NULL ) {
+		if (curr->left == child) {
+			return curr;
+		}
+		child = curr;
+		curr = curr->parent;
+	}
+	/// root found
+	return NULL;
+}
+
+static const RBTreeItem* tree_getLeftAncestor(RBTreeItem* node) {
+	const RBTreeItem* child = node;
+	const RBTreeItem* curr = node->parent;
+	while( curr != NULL ) {
+		if (curr->right == child) {
+			return curr;
+		}
+		child = curr;
+		curr = curr->parent;
+	}
+	/// root found
+	return NULL;
+}
+
+static void* tree_addMemoryToNode(RBTreeItem* node, MemoryArea* area);
+
+static void* tree_addMemoryToRight(RBTreeItem* node, MemoryArea* area);
+
+static void* tree_addMemoryToLeft(RBTreeItem* node, MemoryArea* area) {
+    if (area->end > node->area.start) {
+        /// could not add on left side
+    	return NULL;
+    }
+
+	const MemoryArea* leftArea = NULL;
+    if ( node->left == NULL ) {
+    	const RBTreeItem* leftAncestor = tree_getLeftAncestor(node);
+    	if (leftAncestor == NULL) {
+    		/// leaf case -- add node
+			node->left = calloc( 1, sizeof(RBTreeItem) );
+			node->left->parent = node;
+			node->left->area = *area;
+			return (void*)node->left->area.start;
+    	}
+		leftArea = &(leftAncestor->area);
+    } else {
+    	leftArea = &(node->left->area);
+    }
+
+    if (area->start < leftArea->end) {
+    	/// could not add on left side
+    	return NULL;
+    }
+
+    /// check free space
+    const size_t spaceBetween = node->area.start - leftArea->end;
+    const size_t areaSize = memory_size( area );
+    if (spaceBetween < areaSize) {
+    	/// could not add to left side
+    	return NULL;
+    }
+
+    /// fits between -- check if there are nodes between
+
+    if ( node->left == NULL ) {
+    	/// leaf case -- can add, no more between
+		node->left = calloc( 1, sizeof(RBTreeItem) );
+		node->left->parent = node;
+		node->left->area = *area;
+		return (void*)node->left->area.start;
+    }
+
+	/// regular case -- check subtree
+    if (node->left->right == NULL) {
+    	/// no subtree -- add between
+    	RBTreeItem* old = node->left;
+		node->left = calloc( 1, sizeof(RBTreeItem) );
+		node->left->parent = node;
+		node->left->area = *area;
+		node->left->left = old;
+		return (void*)node->left->area.start;
+    }
+
+	return tree_addMemoryToRight(node->left, area);
+}
+
+static inline size_t tree_startAdderes(const MemoryArea* leftArea, const MemoryArea* check) {
+	if (check->start < leftArea->end) {
+		return leftArea->end;
+	} else {
+		return check->start;
+	}
+}
+
+static void* tree_addMemoryToRight(RBTreeItem* node, MemoryArea* area) {
+    if ( node->right == NULL ) {
+    	const RBTreeItem* rightAncestor = tree_getRightAncestor(node);
+    	if (rightAncestor == NULL) {
+    		/// leaf case -- add node
+    		memory_fitAfter(&(node->area), area);
+			node->right = calloc( 1, sizeof(RBTreeItem) );
+			node->right->parent = node;
+			node->right->area = *area;
+			return (void*)node->right->area.start;
+    	}
+		/// leaf case -- check space
+		const int doesFit = memory_fitBetween(&(node->area), &(rightAncestor->area), area);
+		if (doesFit == 0) {
+			node->right = calloc( 1, sizeof(RBTreeItem) );
+			node->right->parent = node;
+			node->right->area = *area;
+			return (void*)node->right->area.start;
+		}
+		/// no space -- return
+		return NULL;
+    }
+
+    const MemoryArea* rightArea = &(node->right->area);
+    const size_t minStart = tree_startAdderes(&(node->area), area );
+    const size_t spaceBetween = rightArea->start - minStart;
+	const size_t areaSize = memory_size( area );
+	if (areaSize>spaceBetween) {
+		/// no space -- go to next node
+		return tree_addMemoryToRight(node->right, area);
+	}
+	if ( node->right->left == NULL ) {
+		// no subtree -- add between
+		area->start = minStart;
+		area->end = minStart + areaSize;
+
+		RBTreeItem* old = node->right;
+		node->right = calloc( 1, sizeof(RBTreeItem) );
+		node->right->parent = node;
+		node->right->area = *area;
+		node->right->right = old;
+		return (void*)node->right->area.start;
+	}
+	return tree_addMemoryToLeft(node->right, area);
+}
+
+static void* tree_addMemoryToNode(RBTreeItem* node, MemoryArea* area) {
+	void* ret = tree_addMemoryToLeft(node, area);
+	if (ret!=NULL) {
+		return ret;
+	}
+    /// else: ends inside or after current area
+
+    /// go to right, called on root should always work
+    return tree_addMemoryToRight(node, area);
+}
 
 static void* tree_addMemory(RBTree* tree, MemoryArea* area) {
     assert( tree != NULL );
@@ -114,41 +278,25 @@ static void* tree_addMemory(RBTree* tree, MemoryArea* area) {
 
     if (tree->root == NULL) {
         tree->root = calloc( 1, sizeof(RBTreeItem) );
+        ///tree->root->parent = NULL;
         tree->root->area = *area;
         return (void*)tree->root->area.start;
     }
 
-    return NULL;
-
-//    RBTreeItem* curr = tree->root;
-//    if (area->start < curr->area.start) {
-//        /// go to left
-//        void* found = tree_addMemoryToLeft( curr, area );
-//        if (found != NULL) {
-//            return found;
-//        }
-//        /// can happen that could not find free block, then check right side
-//    }
-//    /// go to right
-//    return tree_addMemoryToRight( curr, area );          /// always finds (at worst after last segment)
+    return tree_addMemoryToNode(tree->root, area);
 }
 
-int tree_add(RBTree* tree, const size_t address, const size_t size) {
+size_t tree_add(RBTree* tree, const size_t address, const size_t size) {
     if (tree == NULL) {
-        return -1;
+        return 0;
     }
-
     MemoryArea area = memory_create(address, size);
-
-    if (tree_addMemory(tree, &area) == NULL) {
-        return -1;
-    }
-    return 0;
+    return (size_t)tree_addMemory(tree, &area);
 }
 
 static int tree_releaseNodes(RBTreeItem* tree) {
     if (tree == NULL) {
-        return -1;
+        return 0;
     }
     /**
      * Done in recursive manner. In case of very large structures consider
@@ -164,7 +312,7 @@ int tree_release(RBTree* tree) {
     if (tree==NULL) {
         return -1;
     }
-    return tree_releaseNodes(tree->root)+1;
+    return tree_releaseNodes(tree->root);
 }
 
 
@@ -172,8 +320,12 @@ int tree_release(RBTree* tree) {
 
 
 void* tree_mmap(RBTree* tree, void *vaddr, unsigned int size) {
-    //TODO: implement
-    return NULL;
+    if (tree == NULL) {
+        return NULL;
+    }
+
+    MemoryArea area = memory_create( (size_t)vaddr, size );
+    return tree_addMemory(tree, &area);
 }
 
 void tree_munmap(RBTree* tree, void *vaddr) {

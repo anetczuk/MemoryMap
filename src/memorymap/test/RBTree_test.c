@@ -63,7 +63,23 @@ static void tree_mmap_second(void **state) {
     tree_release(&tree);
 }
 
-static void tree_mmap_segmented(void **state) {
+static void tree_mmap_segmented_toLeft(void **state) {
+    (void) state; /* unused */
+
+    RBTree tree;
+    tree_init(&tree);
+
+    tree_mmap(&tree, (void*)200, 64);
+    /// small space between segments
+    tree_mmap(&tree, (void*)100, 64);
+
+    const void* ret = tree_mmap(&tree, (void*)128, 64);
+    assert_int_equal( ret, 264 );
+
+    tree_release(&tree);
+}
+
+static void tree_mmap_segmented_toRight(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -179,11 +195,12 @@ static void tree_release_2(void **state) {
     assert_int_equal( ret, 2 );
 }
 
-static void tree_add_first(void **state) {
+static void tree_add_left(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
     tree_init(&tree);
+
     tree_add(&tree, 3, 1);
     tree_add(&tree, 1, 1);
 
@@ -192,6 +209,60 @@ static void tree_add_first(void **state) {
 
     tree_release(&tree);
 }
+
+static void tree_add_right(void **state) {
+    (void) state; /* unused */
+
+    RBTree tree;
+    tree_init(&tree);
+
+    tree_add(&tree, 3, 1);
+    tree_add(&tree, 6, 1);
+
+    const size_t lSize = tree_size(&tree);
+    assert_int_equal( lSize, 2 );
+
+    tree_release(&tree);
+}
+
+static void tree_add_subtree(void **state) {
+    (void) state; /* unused */
+
+    RBTree tree;
+    tree_init(&tree);
+
+    tree_add(&tree, 13, 1);
+    tree_add(&tree, 8, 1);
+    tree_add(&tree, 1, 1);
+    tree_add(&tree, 6, 1);
+    tree_add(&tree, 11, 1);
+
+    tree_add(&tree, 17, 1);
+    tree_add(&tree, 15, 1);
+    tree_add(&tree, 25, 1);
+    tree_add(&tree, 22, 1);
+    tree_add(&tree, 27, 1);
+
+    const size_t lSize = tree_size(&tree);
+    assert_int_equal( lSize, 10 );
+
+    tree_release(&tree);
+}
+
+//static void tree_add_subtree2(void **state) {
+//    (void) state; /* unused */
+//
+//    RBTree tree;
+//    tree_init(&tree);
+//
+//    const size_t a1 = tree_add(&tree, 3, 1);
+//    assert_int_equal( a1, 3 );
+//
+//    const size_t lSize = tree_size(&tree);
+//    assert_int_equal( lSize, 10 );
+//
+//    tree_release(&tree);
+//}
 
 
 /// ==================================================
@@ -202,12 +273,15 @@ int main(void) {
         unit_test(tree_release_NULL),
         unit_test(tree_release_empty),
         unit_test(tree_release_2),
-        unit_test(tree_add_first),
+        unit_test(tree_add_left),
+        unit_test(tree_add_right),
+        unit_test(tree_add_subtree),
 
         unit_test(tree_mmap_NULL),
         unit_test(tree_mmap_first),
         unit_test(tree_mmap_second),
-        unit_test(tree_mmap_segmented),
+        unit_test(tree_mmap_segmented_toLeft),
+        unit_test(tree_mmap_segmented_toRight),
 
         unit_test(tree_munmap_NULL),
         unit_test(tree_munmap_empty),

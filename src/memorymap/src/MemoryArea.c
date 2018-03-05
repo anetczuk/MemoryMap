@@ -77,7 +77,7 @@ int memory_fitBetween(const MemoryArea* first, const MemoryArea* second, MemoryA
     /// check space between
     if (second != NULL) {
         const size_t spaceBetween = second->start - first->end;
-        const size_t checkSize = check->end - check->start;
+        const size_t checkSize = memory_size( check );
         if (spaceBetween < checkSize) {
             /// no enough free space
             return -1;
@@ -90,18 +90,16 @@ int memory_fitBetween(const MemoryArea* first, const MemoryArea* second, MemoryA
     return 0;
 }
 
-int memory_fitAfter(const MemoryArea* segment, MemoryArea* check) {
-    if (check==NULL) {
-        return -1;
-    }
-    if (segment==NULL) {
-        return 0;
-    }
+void memory_fitAfter(const MemoryArea* segment, MemoryArea* check) {
+	assert( check != NULL );
+
+	if ( segment == NULL ) {
+		return ;
+	}
     if (segment->end <= check->start) {
-        return 0;
+        return;
     }
     const size_t diff = segment->end - check->start;
     check->start += diff;
     check->end += diff;
-    return 0;
 }

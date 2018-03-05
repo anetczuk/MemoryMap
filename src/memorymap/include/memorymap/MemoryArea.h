@@ -52,6 +52,10 @@ static inline MemoryArea memory_create( const size_t start, const size_t size ) 
     return area;
 }
 
+static inline size_t memory_size( const MemoryArea* area ) {
+	return area->end - area->start;
+}
+
 void memory_init( MemoryArea* area );
 
 void memory_release( MemoryArea* area );
@@ -61,7 +65,7 @@ void memory_release( MemoryArea* area );
  */
 int memory_fitBetween(const MemoryArea* first, const MemoryArea* second, MemoryArea* check);
 
-int memory_fitAfter(const MemoryArea* segment, MemoryArea* check);
+void memory_fitAfter(const MemoryArea* segment, MemoryArea* check);
 
 
 #endif /* MEMORYAREA_H_ */

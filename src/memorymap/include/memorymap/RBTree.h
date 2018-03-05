@@ -53,7 +53,7 @@ int tree_init(RBTree* tree);
 
 size_t tree_size(RBTree* tree);
 
-int tree_add(RBTree* tree, const size_t address, const size_t size);
+size_t tree_add(RBTree* tree, const size_t address, const size_t size);
 
 /**
  * List has to be initialized before releasing.
