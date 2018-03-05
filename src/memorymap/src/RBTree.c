@@ -63,59 +63,24 @@ size_t tree_size(RBTree* tree) {
     return tree_sizeSubtree(tree->root);
 }
 
-//static inline int tree_fitBetween(const InsertionState* state, MemoryArea* area) {
-//    const MemoryArea* smallerArea = NULL;
-//    if (state->smaller!=NULL) {
-//        smallerArea = &(state->smaller->area);
-//    }
-//    const MemoryArea* greaterArea = NULL;
-//    if (state->greater!=NULL) {
-//        greaterArea = &(state->greater->area);
-//    }
-//    return memory_fitBetween(smallerArea, greaterArea, area);
-//}
+size_t tree_depthSubtree(RBTreeItem* tree) {
+	if (tree == NULL) {
+		return 0;
+	}
+	const size_t dLeft = tree_depthSubtree(tree->left);
+	const size_t dRight = tree_depthSubtree(tree->right);
+	if (dLeft>dRight) {
+		return dLeft+1;
+	} else {
+		return dRight+1;
+	}
+}
 
-//static inline void tree_insertLeft(RBTreeItem* node, const MemoryArea* area) {
-//    RBTreeItem* old = node->left;
-//    node->left = calloc( 1, sizeof(RBTreeItem) );
-//    RBTreeItem* newNode = node->left;
-//    newNode->area = *area;
-//    newNode->left = old;
-//    /// right is NULL
-//}
-//
-//static inline void tree_insertRight(RBTreeItem* node, const MemoryArea* area) {
-//    RBTreeItem* old = node->right;
-//    node->right = calloc( 1, sizeof(RBTreeItem) );
-//    RBTreeItem* newNode = node->left;
-//    newNode->area = *area;
-//    newNode->right = old;
-//    /// left is NULL
-//}
-
-//static RBTreeItem* tree_getPreviousSegment(RBTreeItem* node) {
-//    assert(node!=NULL);
-//    if (node->right==NULL) {
-//        return NULL;
-//    }
-//    RBTreeItem* next = node->right;
-//    while(next->left!=NULL) {
-//        next = next->left;
-//    }
-//    return next;
-//}
-//
-//static RBTreeItem* tree_getNextSegment(RBTreeItem* node) {
-//    assert(node!=NULL);
-//    if (node->left==NULL) {
-//        return NULL;
-//    }
-//    RBTreeItem* prev = node->left;
-//    while(prev->right!=NULL) {
-//        prev = prev->right;
-//    }
-//    return prev;
-//}
+size_t tree_depth(RBTree* tree) {
+    if (tree==NULL)
+        return 0;
+    return tree_depthSubtree(tree->root);
+}
 
 static const RBTreeItem* tree_getRightAncestor(RBTreeItem* node) {
 	const RBTreeItem* child = node;
@@ -179,11 +144,6 @@ static void* tree_addMemoryToLeft(RBTreeItem* node, MemoryArea* area) {
 		leftArea = &(leftAncestor->area);
     } else {
     	leftArea = &(node->left->area);
-    }
-
-    if (area->start < leftArea->end) {
-    	/// could not add on left side
-    	return NULL;
     }
 
     /// check free space
