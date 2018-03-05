@@ -30,6 +30,13 @@
 
 
 
+static void memory_size_valid(void **state) {
+	const MemoryArea check = memory_create(50, 10);
+
+	const size_t ret = memory_size(&check);
+	assert_int_equal( ret, 10 );
+}
+
 static void memory_fitBetween_NULL(void **state) {
     (void) state; /* unused */
 
@@ -98,6 +105,46 @@ static void memory_fitBetween_second_NULL_moved(void **state) {
     assert_int_equal( check.end, 210 );
 }
 
+static void memory_fitBetween_between_exact(void **state) {
+    (void) state; /* unused */
+
+    const MemoryArea first  = memory_create(100, 20);
+    const MemoryArea second = memory_create(200, 20);
+
+    MemoryArea check = memory_create(150, 10);
+
+    const int ret = memory_fitBetween(&first, &second, &check);
+    assert_int_equal( ret, 0 );
+    assert_int_equal( check.start, 150 );
+    assert_int_equal( check.end, 160 );
+}
+
+static void memory_fitBetween_between_moved(void **state) {
+    (void) state; /* unused */
+
+    const MemoryArea first  = memory_create(100, 20);
+    const MemoryArea second = memory_create(200, 20);
+
+    MemoryArea check = memory_create(110, 10);
+
+    const int ret = memory_fitBetween(&first, &second, &check);
+    assert_int_equal( ret, 0 );
+    assert_int_equal( check.start, 120 );
+    assert_int_equal( check.end, 130 );
+}
+
+static void memory_fitBetween_between_nospace(void **state) {
+    (void) state; /* unused */
+
+    const MemoryArea first  = memory_create(100, 20);
+    const MemoryArea second = memory_create(200, 20);
+
+    MemoryArea check = memory_create(110, 85);
+
+    const int ret = memory_fitBetween(&first, &second, &check);
+    assert_int_equal( ret, -1 );
+}
+
 static void memory_fitAfter_NULL(void **state) {
     (void) state; /* unused */
 
@@ -149,12 +196,16 @@ static void memory_fitAfter_after(void **state) {
 
 int main(void) {
     const struct UnitTest tests[] = {
+        unit_test(memory_size_valid),
         unit_test(memory_fitBetween_NULL),
         unit_test(memory_fitBetween_NULL_range),
         unit_test(memory_fitBetween_first_NULL),
         unit_test(memory_fitBetween_first_NULL_fail),
         unit_test(memory_fitBetween_second_NULL),
         unit_test(memory_fitBetween_second_NULL_moved),
+        unit_test(memory_fitBetween_between_exact),
+        unit_test(memory_fitBetween_between_moved),
+        unit_test(memory_fitBetween_between_nospace),
 
         unit_test(memory_fitAfter_NULL),
         unit_test(memory_fitAfter_before),

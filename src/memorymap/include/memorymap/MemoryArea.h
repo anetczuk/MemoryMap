@@ -56,10 +56,6 @@ static inline size_t memory_size( const MemoryArea* area ) {
 	return area->end - area->start;
 }
 
-void memory_init( MemoryArea* area );
-
-void memory_release( MemoryArea* area );
-
 /**
  * Return 0 if successful, otherwise false.
  */

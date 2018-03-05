@@ -26,14 +26,6 @@
 #include <assert.h>
 
 
-void memory_init( MemoryArea* area ) {
-    //TODO: implement
-}
-
-void memory_release( MemoryArea* area ) {
-    //TODO: implement
-}
-
 static int memory_doesFitBefore(const MemoryArea* area, const MemoryArea* check) {
     assert( check != NULL );
     if (area == NULL) {
