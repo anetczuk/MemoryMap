@@ -28,6 +28,8 @@
 # This file was automatically generated from '@GENERATOR_FILE@'. All changes will be lost.
 #
 
+set -e
+
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -44,18 +46,40 @@ esac
 done
 
 
+if [ ! -z "$checkTool" ]; then
+	echo "Running tool: $checkTool"
+fi
+
+
 case "$checkTool" in
-    "")            ## no tool, just run test suite
-                   $SCRIPT_DIR/@test_name@ $@
-                   exit $?;;
+    "")              ## no tool, just run test suite
+                     $SCRIPT_DIR/@test_name@ $@
+                     exit $?;;
                     
-    memcheck)      valgrind --leak-check=full --show-leak-kinds=all $SCRIPT_DIR/@test_name@ $@
-                   exit $?;;
+    memcheck)        valgrind --leak-check=full --show-leak-kinds=all $SCRIPT_DIR/@test_name@ $@
+                     exit $?;;
                    
-    callgrind)     valgrind --tool=callgrind $SCRIPT_DIR/@test_name@ $@
-                   exit $?;;
+    callgrind)       valgrind --tool=callgrind $SCRIPT_DIR/@test_name@ $@
+                     exit $?;;
+                   
+    cover|coverage)  ## prepare coverage
+                     coverage_dir=$SCRIPT_DIR/@test_name@_coverage
+                     rm -rf $coverage_dir
+                     mkdir -p $coverage_dir
+                     lcov --base-directory . --directory . --zerocounters -q
+                     
+                     ## execute tests
+                     $SCRIPT_DIR/@test_name@ $@
+                     exitCode=$?
+                     
+                     ## generate report
+                     lcov --base-directory . --directory . -c -o $coverage_dir/test.info
+                     genhtml -o $coverage_dir -t "@test_name@ test coverage" --num-spaces 4 $coverage_dir/test.info
+                     
+                     echo -e "\nReport file: $coverage_dir/index.html"
+                     exit $exitCode;;
     
-    *)             echo "Unknown tool: '$checkTool'"
-                   exit 1;; 
+    *)               echo "Unknown tool: '$checkTool'"
+                     exit 1;; 
 esac
 

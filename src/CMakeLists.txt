@@ -39,6 +39,22 @@ set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic" )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long" )
 
 
+## option for code coverage
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+	option(CODE_COVERAGE "Code coverage (for GCC)" OFF )
+	if ( CODE_COVERAGE )
+		## to check compilation parameters run "make VERBOSE=1"
+		## to test is program is compiled properly call "strings test.exe | grep gcda"
+		
+		set( COVERAGE_COMPILER_FLAGS "-g -O0 --coverage -fprofile-arcs -ftest-coverage" )
+		set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COVERAGE_COMPILER_FLAGS}" )
+		set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COVERAGE_COMPILER_FLAGS}" )
+	endif()
+else()
+	message( STATUS "Code coverage unavailable for your compiler: '${CMAKE_C_COMPILER_ID}'" )
+endif()
+
+
 ## enable CTest utility
 enable_testing()
 
