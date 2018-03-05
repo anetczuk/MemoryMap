@@ -261,6 +261,46 @@ static void tree_add_right(void **state) {
     tree_release(&tree);
 }
 
+static void tree_add_subtree_left(void **state) {
+    (void) state; /* unused */
+
+    RBTree tree;
+    tree_init(&tree);
+
+    tree_add(&tree, 50, 1);
+    tree_add(&tree, 20, 1);
+    tree_add(&tree, 30, 1);
+    tree_add(&tree, 40, 1);
+
+    const size_t lSize = tree_size(&tree);
+    assert_int_equal( lSize, 4 );
+
+    const size_t depth = tree_depth(&tree);
+    assert_int_equal( depth, 3 );
+
+    tree_release(&tree);
+}
+
+static void tree_add_subtree_right(void **state) {
+    (void) state; /* unused */
+
+    RBTree tree;
+    tree_init(&tree);
+
+    tree_add(&tree, 50, 1);
+    tree_add(&tree, 80, 1);
+    tree_add(&tree, 70, 1);
+    tree_add(&tree, 60, 1);
+
+    const size_t lSize = tree_size(&tree);
+    assert_int_equal( lSize, 4 );
+
+    const size_t depth = tree_depth(&tree);
+    assert_int_equal( depth, 3 );
+
+    tree_release(&tree);
+}
+
 static void tree_add_subtree(void **state) {
     (void) state; /* unused */
 
@@ -284,46 +324,6 @@ static void tree_add_subtree(void **state) {
 
     const size_t depth = tree_depth(&tree);
     assert_int_equal( depth, 4 );
-
-    tree_release(&tree);
-}
-
-static void tree_add_subtree2(void **state) {
-    (void) state; /* unused */
-
-    RBTree tree;
-    tree_init(&tree);
-
-    tree_add(&tree, 50, 1);
-    tree_add(&tree, 20, 1);
-    tree_add(&tree, 30, 1);
-    tree_add(&tree, 40, 1);
-
-    const size_t lSize = tree_size(&tree);
-    assert_int_equal( lSize, 4 );
-
-    const size_t depth = tree_depth(&tree);
-    assert_int_equal( depth, 3 );
-
-    tree_release(&tree);
-}
-
-static void tree_add_subtree3(void **state) {
-    (void) state; /* unused */
-
-    RBTree tree;
-    tree_init(&tree);
-
-    tree_add(&tree, 50, 1);
-    tree_add(&tree, 80, 1);
-    tree_add(&tree, 70, 1);
-    tree_add(&tree, 60, 1);
-
-    const size_t lSize = tree_size(&tree);
-    assert_int_equal( lSize, 4 );
-
-    const size_t depth = tree_depth(&tree);
-    assert_int_equal( depth, 3 );
 
     tree_release(&tree);
 }
@@ -412,9 +412,9 @@ int main(void) {
         unit_test(tree_add_NULL),
         unit_test(tree_add_left),
         unit_test(tree_add_right),
+        unit_test(tree_add_subtree_left),
+        unit_test(tree_add_subtree_right),
         unit_test(tree_add_subtree),
-        unit_test(tree_add_subtree2),
-        unit_test(tree_add_subtree3),
         unit_test(tree_add_subtree_space),
 
         unit_test(tree_size_NULL),

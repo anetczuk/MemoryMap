@@ -30,8 +30,8 @@
 
 
 typedef enum {
-    BLACK = 0,
-    RED
+    RBTREE_BLACK = 0,
+    RBTREE_RED
 } NodeColor;
 
 
@@ -114,6 +114,7 @@ void tree_insertLeftNode(RBTreeItem* node) {
 	RBTreeItem* oldLeft = node->left;
 	node->left = calloc( 1, sizeof(RBTreeItem) );
 	node->left->parent = node;
+	node->left->color = RBTREE_RED;						/// default color of new node
 	node->left->left = oldLeft;
 }
 
@@ -121,6 +122,7 @@ void tree_insertRightNode(RBTreeItem* node) {
 	RBTreeItem* oldLeft = node->right;
 	node->right = calloc( 1, sizeof(RBTreeItem) );
 	node->right->parent = node;
+	node->left->color = RBTREE_RED;						/// default color of new node
 	node->right->right = oldLeft;
 }
 
@@ -230,6 +232,7 @@ static void* tree_addMemory(RBTree* tree, MemoryArea* area) {
     if (tree->root == NULL) {
         tree->root = calloc( 1, sizeof(RBTreeItem) );
         ///tree->root->parent = NULL;
+        ///tree->root->color = RBTREE_BLACK;
         tree->root->area = *area;
         return (void*)tree->root->area.start;
     }
