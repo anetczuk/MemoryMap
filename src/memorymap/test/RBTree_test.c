@@ -129,7 +129,7 @@ static void tree_munmap_badaddr(void **state) {
     tree_release(&tree);
 }
 
-static void tree_munmap_freed(void **state) {
+static void tree_munmap_root(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -142,6 +142,59 @@ static void tree_munmap_freed(void **state) {
 
     const size_t ret = tree_size(&tree);
     assert_int_equal( ret, 1 );
+
+    tree_release(&tree);
+}
+
+static void tree_munmap_root2(void **state) {
+    (void) state; /* unused */
+
+    RBTree tree;
+    tree_init(&tree);
+
+    tree_mmap(&tree, (void*)100, 64);
+    tree_mmap(&tree, (void*)20, 64);
+    tree_mmap(&tree, (void*)200, 64);
+
+    tree_munmap(&tree, (void*)120);
+
+    const size_t ret = tree_size(&tree);
+    assert_int_equal( ret, 2 );
+
+    tree_release(&tree);
+}
+
+static void tree_munmap_right(void **state) {
+    (void) state; /* unused */
+
+    RBTree tree;
+    tree_init(&tree);
+
+    tree_mmap(&tree, (void*)100, 64);
+    tree_mmap(&tree, (void*)200, 64);
+
+    tree_munmap(&tree, (void*)220);
+
+    const size_t ret = tree_size(&tree);
+    assert_int_equal( ret, 1 );
+
+    tree_release(&tree);
+}
+
+static void tree_munmap_right2(void **state) {
+    (void) state; /* unused */
+
+    RBTree tree;
+    tree_init(&tree);
+
+    tree_mmap(&tree, (void*)100, 64);
+    tree_mmap(&tree, (void*)20, 64);
+    tree_mmap(&tree, (void*)200, 64);
+
+    tree_munmap(&tree, (void*)220);
+
+    const size_t ret = tree_size(&tree);
+    assert_int_equal( ret, 2 );
 
     tree_release(&tree);
 }
@@ -286,7 +339,10 @@ int main(void) {
         unit_test(tree_munmap_NULL),
         unit_test(tree_munmap_empty),
         unit_test(tree_munmap_badaddr),
-        unit_test(tree_munmap_freed),
+        unit_test(tree_munmap_root),
+        unit_test(tree_munmap_root2),
+        unit_test(tree_munmap_right),
+        unit_test(tree_munmap_right2),
 
         unit_test(tree_init_NULL),
         unit_test(tree_init_valid)

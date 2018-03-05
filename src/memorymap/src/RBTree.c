@@ -325,8 +325,97 @@ void* tree_mmap(RBTree* tree, void *vaddr, unsigned int size) {
     return tree_addMemory(tree, &area);
 }
 
+static RBTreeItem* tree_findNode(RBTreeItem* node, const size_t adress) {
+	RBTreeItem* curr = node;
+	while (curr != NULL) {
+		if (adress < curr->area.start) {
+			curr = curr->left;
+		} else if (adress < curr->area.end) {
+			return curr;
+		} else {
+			curr = curr->right;
+		}
+	}
+	/// not found
+	return NULL;
+}
+
+static RBTreeItem* tree_getLeftSibiling(RBTreeItem* node) {
+	RBTreeItem* curr = node;
+	while (curr->left != NULL) {
+		curr = curr->left;
+	}
+	return curr;
+}
+
+static RBTreeItem* tree_getRightSibiling(RBTreeItem* node) {
+	RBTreeItem* curr = node;
+	while (curr->right != NULL) {
+		curr = curr->right;
+	}
+	return curr;
+}
+
+static inline void tree_reconnectToRight(RBTreeItem* node, RBTreeItem* subtree) {
+	RBTreeItem* mostNode = tree_getRightSibiling(node);			/// can return 'node', never NULL
+	mostNode->right = subtree;
+	subtree->parent = mostNode;
+}
+
+static inline void tree_connectToLeft(RBTreeItem* node, RBTreeItem* subtree) {
+	node->left = subtree;
+	if (subtree != NULL) {
+		subtree->parent = node;
+	}
+}
+
 void tree_munmap(RBTree* tree, void *vaddr) {
-    //TODO: implement
+    if (tree == NULL) {
+        return ;
+    }
+    if (tree->root==NULL) {
+        return ;
+    }
+
+    const size_t voffset = (size_t)vaddr;
+    RBTreeItem* node = tree_findNode( tree->root, voffset );
+    if (node == NULL) {
+    	/// node not found -- nothing to remove
+    	return;
+    }
+
+    if (node->right == NULL) {
+    	/// just remove
+    	if ( node->parent != NULL ) {
+    		node->parent->right = NULL;
+    	} else {
+    		/// removing root
+    		tree->root = node->left;
+    		if (node->left != NULL) {
+    			node->left->parent = NULL;
+    		}
+    	}
+    	free(node);
+    	return;
+    }
+
+    /// there is right subtree
+    RBTreeItem* nextNode = tree_getLeftSibiling(node->right);		/// never NULL
+    RBTreeItem* rightParent = nextNode->parent;						/// can be 'node'
+    if (rightParent != node) {
+		rightParent->left = NULL;
+		tree_reconnectToRight(nextNode, rightParent);
+    }
+	tree_connectToLeft(nextNode, node->left);
+	if (node->parent != NULL) {
+		node->parent->right = nextNode;
+		nextNode->parent = node->parent;
+	} else {
+		/// removing root
+		tree->root = nextNode;
+		nextNode->parent = NULL;
+	}
+	free(node);
 }
 
 int tree_init(RBTree* tree) {
