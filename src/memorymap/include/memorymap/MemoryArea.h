@@ -53,6 +53,9 @@ static inline MemoryArea memory_create( const size_t start, const size_t size ) 
 }
 
 static inline size_t memory_size( const MemoryArea* area ) {
+	if (area == NULL) {
+		return 0;
+	}
 	return area->end - area->start;
 }
 

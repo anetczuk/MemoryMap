@@ -29,8 +29,16 @@
 #include <cmocka.h>
 
 
+static void memory_size_NULL(void **state) {
+    (void) state; /* unused */
+
+	const size_t ret = memory_size(NULL);
+	assert_int_equal( ret, 0 );
+}
 
 static void memory_size_valid(void **state) {
+    (void) state; /* unused */
+
 	const MemoryArea check = memory_create(50, 10);
 
 	const size_t ret = memory_size(&check);
@@ -196,6 +204,7 @@ static void memory_fitAfter_after(void **state) {
 
 int main(void) {
     const struct UnitTest tests[] = {
+        unit_test(memory_size_NULL),
         unit_test(memory_size_valid),
         unit_test(memory_fitBetween_NULL),
         unit_test(memory_fitBetween_NULL_range),
