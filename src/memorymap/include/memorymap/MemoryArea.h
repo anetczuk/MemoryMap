@@ -59,6 +59,15 @@ static inline size_t memory_size( const MemoryArea* area ) {
 	return area->end - area->start;
 }
 
+static inline int memory_isValid( const MemoryArea* area ) {
+    if (area==NULL) {
+        return 0;
+    }
+    if (area->start < area->end)
+        return 0;
+    return -1;
+}
+
 /**
  * Return 0 if successful, otherwise false.
  */
