@@ -46,6 +46,8 @@ static void tree_mmap_first(void **state) {
     const void* ret = tree_mmap(&tree, (void*)128, 64);
     assert_int_equal( ret, 128 );
 
+    assert_int_equal( tree_isValid(&tree), 0 );
+
     tree_release(&tree);
 }
 
@@ -59,6 +61,8 @@ static void tree_mmap_second(void **state) {
 
     const void* ret = tree_mmap(&tree, (void*)128, 64);
     assert_int_equal( ret, 224 );
+
+    assert_int_equal( tree_isValid(&tree), 0 );
 
     tree_release(&tree);
 }
@@ -76,6 +80,8 @@ static void tree_mmap_segmented_toLeft(void **state) {
     const void* ret = tree_mmap(&tree, (void*)128, 64);
     assert_int_equal( ret, 264 );
 
+    assert_int_equal( tree_isValid(&tree), 0 );
+
     tree_release(&tree);
 }
 
@@ -91,6 +97,8 @@ static void tree_mmap_segmented_toRight(void **state) {
 
     const void* ret = tree_mmap(&tree, (void*)128, 64);
     assert_int_equal( ret, 264 );
+
+    assert_int_equal( tree_isValid(&tree), 0 );
 
     tree_release(&tree);
 }
@@ -126,6 +134,8 @@ static void tree_munmap_badaddr(void **state) {
     const size_t ret = tree_size(&tree);
     assert_int_equal( ret, 1 );
 
+    assert_int_equal( tree_isValid(&tree), 0 );
+
     tree_release(&tree);
 }
 
@@ -142,6 +152,8 @@ static void tree_munmap_root(void **state) {
 
     const size_t ret = tree_size(&tree);
     assert_int_equal( ret, 1 );
+
+    assert_int_equal( tree_isValid(&tree), 0 );
 
     tree_release(&tree);
 }
@@ -161,6 +173,8 @@ static void tree_munmap_root2(void **state) {
     const size_t ret = tree_size(&tree);
     assert_int_equal( ret, 2 );
 
+    assert_int_equal( tree_isValid(&tree), 0 );
+
     tree_release(&tree);
 }
 
@@ -177,6 +191,8 @@ static void tree_munmap_right(void **state) {
 
     const size_t ret = tree_size(&tree);
     assert_int_equal( ret, 1 );
+
+    assert_int_equal( tree_isValid(&tree), 0 );
 
     tree_release(&tree);
 }
@@ -196,6 +212,8 @@ static void tree_munmap_right2(void **state) {
     const size_t ret = tree_size(&tree);
     assert_int_equal( ret, 2 );
 
+    assert_int_equal( tree_isValid(&tree), 0 );
+
     tree_release(&tree);
 }
 
@@ -213,6 +231,8 @@ static void tree_munmap_left(void **state) {
 
     const size_t ret = tree_size(&tree);
     assert_int_equal( ret, 2 );
+
+    assert_int_equal( tree_isValid(&tree), 0 );
 
     tree_release(&tree);
 }
@@ -233,6 +253,8 @@ static void tree_munmap_left2(void **state) {
     const size_t ret = tree_size(&tree);
     assert_int_equal( ret, 2 );
 
+    assert_int_equal( tree_isValid(&tree), 0 );
+
     tree_release(&tree);
 }
 
@@ -249,6 +271,10 @@ static void tree_init_valid(void **state) {
     RBTree tree;
     const int ret = tree_init(&tree);
     assert_int_equal( ret, 0 );
+
+    assert_int_equal( tree_isValid(&tree), 0 );
+
+    tree_release(&tree);
 }
 
 
@@ -277,6 +303,8 @@ static void tree_add_left(void **state) {
     const size_t depth = tree_depth(&tree);
     assert_int_equal( depth, 2 );
 
+    assert_int_equal( tree_isValid(&tree), 0 );
+
     tree_release(&tree);
 }
 
@@ -294,6 +322,8 @@ static void tree_add_right(void **state) {
 
     const size_t depth = tree_depth(&tree);
     assert_int_equal( depth, 2 );
+
+    assert_int_equal( tree_isValid(&tree), 0 );
 
     tree_release(&tree);
 }
@@ -315,6 +345,8 @@ static void tree_add_subtree_left(void **state) {
     const size_t depth = tree_depth(&tree);
     assert_int_equal( depth, 3 );
 
+    assert_int_equal( tree_isValid(&tree), 0 );
+
     tree_release(&tree);
 }
 
@@ -334,6 +366,8 @@ static void tree_add_subtree_right(void **state) {
 
     const size_t depth = tree_depth(&tree);
     assert_int_equal( depth, 3 );
+
+    assert_int_equal( tree_isValid(&tree), 0 );
 
     tree_release(&tree);
 }
@@ -362,6 +396,8 @@ static void tree_add_subtree(void **state) {
     const size_t depth = tree_depth(&tree);
     assert_int_equal( depth, 4 );
 
+    assert_int_equal( tree_isValid(&tree), 0 );
+
     tree_release(&tree);
 }
 
@@ -380,6 +416,8 @@ static void tree_add_subtree_space(void **state) {
 
     const size_t depth = tree_depth(&tree);
     assert_int_equal( depth, 2 );
+
+    assert_int_equal( tree_isValid(&tree), 0 );
 
     tree_release(&tree);
 }

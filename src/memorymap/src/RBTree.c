@@ -83,6 +83,11 @@ size_t tree_depth(RBTree* tree) {
     return tree_depthSubtree(tree->root);
 }
 
+int tree_isValid(RBTree* tree) {
+    //TODO: implement
+    return 0;
+}
+
 static const RBTreeItem* tree_getRightAncestor(RBTreeItem* node) {
 	const RBTreeItem* child = node;
 	const RBTreeItem* curr = node->parent;
@@ -367,7 +372,9 @@ size_t tree_add(RBTree* tree, const size_t address, const size_t size) {
         return 0;
     }
     MemoryArea area = memory_create(address, size);
-    return (size_t)tree_addMemory(tree, &area);
+    void* retAddr = tree_addMemory(tree, &area);
+    assert( tree_isValid(tree) == 0 );
+    return (size_t)retAddr;
 }
 
 void tree_printSubtree(RBTreeItem* node) {
@@ -423,7 +430,9 @@ void* tree_mmap(RBTree* tree, void *vaddr, unsigned int size) {
     }
 
     MemoryArea area = memory_create( (size_t)vaddr, size );
-    return tree_addMemory(tree, &area);
+    void* retAddr = tree_addMemory(tree, &area);
+    assert( tree_isValid(tree) == 0 );
+    return retAddr;
 }
 
 static RBTreeItem* tree_findNode(RBTreeItem* node, const size_t adress) {
@@ -546,6 +555,7 @@ void tree_munmap(RBTree* tree, void *vaddr) {
 
     const size_t voffset = (size_t)vaddr;
     tree_delete(tree, voffset);
+    assert( tree_isValid(tree) == 0 );
 }
 
 int tree_init(RBTree* tree) {
