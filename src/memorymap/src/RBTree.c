@@ -48,7 +48,7 @@ typedef struct RBTreeNode {
 /// ===================================================
 
 
-static size_t tree_sizeSubtree(RBTreeItem* tree) {
+static size_t tree_sizeSubtree(const RBTreeItem* tree) {
     if (tree==NULL) {
         return 0;
     }
@@ -58,13 +58,13 @@ static size_t tree_sizeSubtree(RBTreeItem* tree) {
     return leftSize + rightSize + 1;
 }
 
-size_t tree_size(RBTree* tree) {
+size_t tree_size(const RBTree* tree) {
     if (tree==NULL)
         return 0;
     return tree_sizeSubtree(tree->root);
 }
 
-size_t tree_depthSubtree(RBTreeItem* tree) {
+size_t tree_depthSubtree(const RBTreeItem* tree) {
 	if (tree == NULL) {
 		return 0;
 	}
@@ -77,13 +77,13 @@ size_t tree_depthSubtree(RBTreeItem* tree) {
 	}
 }
 
-size_t tree_depth(RBTree* tree) {
+size_t tree_depth(const RBTree* tree) {
     if (tree==NULL)
         return 0;
     return tree_depthSubtree(tree->root);
 }
 
-int tree_isValid(RBTree* tree) {
+int tree_isValid(const RBTree* tree) {
     //TODO: implement
     return 0;
 }
@@ -377,7 +377,7 @@ size_t tree_add(RBTree* tree, const size_t address, const size_t size) {
     return (size_t)retAddr;
 }
 
-void tree_printSubtree(RBTreeItem* node) {
+void tree_printSubtree(const RBTreeItem* node) {
     if (node == NULL) {
         return ;
     }
@@ -386,7 +386,7 @@ void tree_printSubtree(RBTreeItem* node) {
     tree_printSubtree(node->right);
 }
 
-void tree_print(RBTree* tree) {
+void tree_print(const RBTree* tree) {
     if (tree == NULL) {
         printf("%s", "[NULL]");
         return ;

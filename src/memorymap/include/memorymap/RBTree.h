@@ -51,15 +51,15 @@ int tree_init(RBTree* tree);
 /// =============================================
 
 
-size_t tree_size(RBTree* tree);
+size_t tree_size(const RBTree* tree);
 
-size_t tree_depth(RBTree* tree);
+size_t tree_depth(const RBTree* tree);
 
-int tree_isValid(RBTree* tree);
+int tree_isValid(const RBTree* tree);
 
 size_t tree_add(RBTree* tree, const size_t address, const size_t size);
 
-void tree_print(RBTree* tree);
+void tree_print(const RBTree* tree);
 
 /**
  * List has to be initialized before releasing.
