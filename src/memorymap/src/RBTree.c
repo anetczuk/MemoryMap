@@ -48,7 +48,10 @@ typedef struct RBTreeElement {
 /// ===================================================
 
 
-static const RBTreeNode* tree_getLeftDescendant(const RBTreeNode* node) {
+static const RBTreeNode* tree_getLeftmostNode(const RBTreeNode* node) {
+    if (node == NULL) {
+        return NULL;
+    }
     const RBTreeNode* curr = node;
     while (curr->left != NULL) {
         curr = curr->left;
@@ -56,12 +59,23 @@ static const RBTreeNode* tree_getLeftDescendant(const RBTreeNode* node) {
     return curr;
 }
 
-static const RBTreeNode* tree_getRightDescendant(const RBTreeNode* node) {
+static const RBTreeNode* tree_getRightmostNode(const RBTreeNode* node) {
+    if (node == NULL) {
+        return NULL;
+    }
     const RBTreeNode* curr = node;
     while (curr->right != NULL) {
         curr = curr->right;
     }
     return curr;
+}
+
+static const RBTreeNode* tree_getLeftDescendant(const RBTreeNode* node) {
+    return tree_getLeftmostNode(node->right);
+}
+
+static const RBTreeNode* tree_getRightDescendant(const RBTreeNode* node) {
+    return tree_getRightmostNode(node->left);
 }
 
 /**
@@ -143,7 +157,7 @@ size_t tree_startAddress(const RBTree* tree) {
     if (tree->root==NULL)
         return 0;
 
-    const RBTreeNode* node = tree_getLeftDescendant(tree->root);
+    const RBTreeNode* node = tree_getLeftmostNode(tree->root);
     return node->area.start;
 }
 
@@ -153,7 +167,7 @@ size_t tree_endAddress(const RBTree* tree) {
     if (tree->root==NULL)
         return 0;
 
-    const RBTreeNode* node = tree_getRightDescendant(tree->root);
+    const RBTreeNode* node = tree_getRightmostNode(tree->root);
     return node->area.end;
 }
 
@@ -219,20 +233,16 @@ static int tree_isValid_checkSorted(const RBTreeNode* node) {
         }
     }
 
-    if (node->left != NULL) {
-        const RBTreeNode* prevBottom = tree_getRightDescendant(node->left);
-        if (prevBottom != NULL) {
-            if ( prevBottom->area.end > node->area.start) {
-                return -2;
-            }
+    const RBTreeNode* prevBottom = tree_getRightDescendant(node);
+    if (prevBottom != NULL) {
+        if ( prevBottom->area.end > node->area.start) {
+            return -2;
         }
     }
-    if (node->right != NULL) {
-        const RBTreeNode* nextBottom = tree_getLeftDescendant(node->right);
-        if (nextBottom != NULL) {
-            if ( nextBottom->area.start < node->area.end) {
-                return -4;
-            }
+    const RBTreeNode* nextBottom = tree_getLeftDescendant(node);
+    if (nextBottom != NULL) {
+        if ( nextBottom->area.start < node->area.end) {
+            return -4;
         }
     }
 
@@ -280,6 +290,8 @@ static int tree_isValidSubTree(const RBTreeNode* node) {
         return validOrder;
     }
 
+    //TODO: finish
+
     /// checking red-black properties
 
 //    /// root is black
@@ -288,7 +300,7 @@ static int tree_isValidSubTree(const RBTreeNode* node) {
 //        if (node->color != RBTREE_BLACK)
 //            return -1;
 //    }
-//
+
 //    /// if a node is red, then both its children are black
 //    if (node->color == RBTREE_RED) {
 //        if (node->left != NULL) {
@@ -658,9 +670,11 @@ static RBTreeNode* tree_findNode(RBTreeNode* node, const size_t adress) {
 	return NULL;
 }
 
-static inline void tree_reconnectToRight(RBTreeNode* node, RBTreeNode* subtree) {
+static inline void tree_reconnectToRight(RBTreeNode* node) {
+    RBTreeNode* subtree = node->parent;
+    tree_setLeftChild(subtree, NULL);
     /// can return 'node', never NULL
-	RBTreeNode* mostNode = (RBTreeNode*) tree_getRightDescendant(node);
+	RBTreeNode* mostNode = (RBTreeNode*) tree_getRightmostNode(node);
 	tree_setRightChild(mostNode, subtree);
 }
 
@@ -671,10 +685,9 @@ void tree_delete(RBTree* tree, const size_t address) {
         return;
     }
 
-    //TODO: repaint tree
-
     if (node->right == NULL) {
         /// simple case -- just remove
+        //TODO: repaint tree
         if ( node->parent != NULL ) {
             if (node->parent->right == node) {
                 tree_setRightChild(node->parent, node->left);
@@ -694,6 +707,7 @@ void tree_delete(RBTree* tree, const size_t address) {
 
     if (node->left == NULL) {
         /// simple case -- just reconnect
+        //TODO: repaint tree
         if ( node->parent != NULL ) {
             if (node->parent->right == node) {
                 tree_setRightChild(node->parent, NULL);
@@ -711,12 +725,12 @@ void tree_delete(RBTree* tree, const size_t address) {
         return;
     }
 
+    /// have both children
     /// there is right subtree
-    RBTreeNode* nextNode = (RBTreeNode*) tree_getLeftDescendant(node->right);     /// never NULL
-    RBTreeNode* rightParent = nextNode->parent;                                   /// can be 'node'
-    if (rightParent != node) {
-        tree_setLeftChild(rightParent, NULL);
-        tree_reconnectToRight(nextNode, rightParent);
+
+    RBTreeNode* nextNode = (RBTreeNode*) tree_getLeftDescendant(node);      /// never NULL
+    if (nextNode->parent != node) {                                         /// can be 'node'
+        tree_reconnectToRight(nextNode);
     }
     tree_setLeftChild(nextNode, node->left);
     if (node->parent != NULL) {
