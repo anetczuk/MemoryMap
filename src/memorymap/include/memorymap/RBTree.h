@@ -55,9 +55,15 @@ size_t tree_size(const RBTree* tree);
 
 size_t tree_depth(const RBTree* tree);
 
+size_t tree_startAddress(const RBTree* tree);
+
+size_t tree_endAddress(const RBTree* tree);
+
 int tree_isValid(const RBTree* tree);
 
 size_t tree_add(RBTree* tree, const size_t address, const size_t size);
+
+void tree_delete(RBTree* tree, const size_t address);
 
 void tree_print(const RBTree* tree);
 

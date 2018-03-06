@@ -23,6 +23,13 @@
 
 #include "memorymap/RBTree.h"
 
+#include <time.h>
+#include <stdlib.h>
+#include <stdio.h>                              /// printf
+
+/// for cmocka to mock system functions
+#define UNIT_TESTING 1
+
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
@@ -448,6 +455,64 @@ static void tree_depth_0(void **state) {
     tree_release(&tree);
 }
 
+static void tree_startAddress_valid(void **state) {
+    (void) state; /* unused */
+
+    {
+        const size_t ret = tree_startAddress(NULL);
+        assert_int_equal( ret, 0 );
+    }
+    {
+        RBTree tree;
+        tree_init(&tree);
+
+        const size_t ret = tree_startAddress(&tree);
+        assert_int_equal( ret, 0 );
+
+        tree_release(&tree);
+    }
+    {
+        RBTree tree;
+        tree_init(&tree);
+        tree_add(&tree, 5, 10);
+        tree_add(&tree, 35, 10);
+
+        const size_t ret = tree_startAddress(&tree);
+        assert_int_equal( ret, 5 );
+
+        tree_release(&tree);
+    }
+}
+
+static void tree_endAddress_valid(void **state) {
+    (void) state; /* unused */
+
+    {
+        const size_t ret = tree_endAddress(NULL);
+        assert_int_equal( ret, 0 );
+    }
+    {
+        RBTree tree;
+        tree_init(&tree);
+
+        const size_t ret = tree_endAddress(&tree);
+        assert_int_equal( ret, 0 );
+
+        tree_release(&tree);
+    }
+    {
+        RBTree tree;
+        tree_init(&tree);
+        tree_add(&tree, 5, 10);
+        tree_add(&tree, 35, 10);
+
+        const size_t ret = tree_endAddress(&tree);
+        assert_int_equal( ret, 45 );
+
+        tree_release(&tree);
+    }
+}
+
 static void tree_release_NULL(void **state) {
     (void) state; /* unused */
 
@@ -478,6 +543,45 @@ static void tree_release_2(void **state) {
     assert_int_equal( ret, 2 );
 }
 
+static void tree_randomTest1(void **state) {
+    (void) state; /* unused */
+
+    //const unsigned int seed = time(NULL);
+    const unsigned int seed = 3;
+    srand( seed );
+
+    RBTree tree;
+    tree_init(&tree);
+
+    for(size_t i = 0; i< 100; ++i) {
+        const size_t addr = rand() % 2000;
+        const size_t msize = rand() % 20 +1;
+
+        tree_add(&tree, addr, msize);
+
+        ///printf("Iteration %lu\n", i);
+        const int valid = tree_isValid(&tree);
+        assert_int_equal( valid, 0 );
+    }
+
+    const size_t startAddress = tree_startAddress(&tree);
+    const size_t endAddress = tree_endAddress(&tree);
+    const size_t addressSpace = endAddress - startAddress;
+
+    for(size_t i = 0; i< 100; ++i) {
+        const size_t addr = rand() % addressSpace + startAddress;
+
+        tree_delete(&tree, addr);
+
+        printf("Iteration %lu\n", i);
+        const int valid = tree_isValid(&tree);
+        assert_int_equal( valid, 0 );
+    }
+
+    printf("Releasing\n");
+    tree_release(&tree);
+}
+
 
 /// ==================================================
 
@@ -495,6 +599,8 @@ int main(void) {
         unit_test(tree_size_NULL),
         unit_test(tree_depth_NULL),
         unit_test(tree_depth_0),
+        unit_test(tree_startAddress_valid),
+        unit_test(tree_endAddress_valid),
 
         unit_test(tree_release_NULL),
         unit_test(tree_release_empty),
@@ -517,7 +623,9 @@ int main(void) {
         unit_test(tree_munmap_left2),
 
         unit_test(tree_init_NULL),
-        unit_test(tree_init_valid)
+        unit_test(tree_init_valid),
+
+        unit_test(tree_randomTest1),
     };
 
     return run_group_tests(tests);
