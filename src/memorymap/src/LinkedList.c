@@ -36,19 +36,24 @@ typedef struct LinkedListNode {
 /// ===================================================
 
 
-size_t list_size(LinkedList* list) {
+size_t list_size(const LinkedList* list) {
     if (list==NULL)
         return 0;
 
     /// iterating to last element
     size_t retSize = 0;
-    LinkedListItem* curr = list->root;
+    const LinkedListItem* curr = list->root;
     while( curr != NULL ) {
         curr = curr->next;
         ++retSize;
     }
 
     return retSize;
+}
+
+int list_isValid(const LinkedList* list) {
+    //TODO: implement
+    return 0;
 }
 
 const MemoryArea* list_get(LinkedList* list, const size_t index) {
@@ -113,6 +118,7 @@ int list_add(LinkedList* list, const size_t address, const size_t size) {
     MemoryArea area = memory_create(address, size);
 
     list_addMemory(list, &area);			/// always adds
+    assert( list_isValid(list) == 0 );
     return 0;
 }
 
@@ -146,10 +152,12 @@ void* list_mmap(LinkedList* list, void *vaddr, unsigned int size) {
     }
 
     MemoryArea area = memory_create( (size_t)vaddr, size );
-    return list_addMemory(list, &area);
+    void* retAddr = list_addMemory(list, &area);
+    assert( list_isValid(list) == 0 );
+    return retAddr;
 }
 
-void list_munmap(LinkedList* list, void *vaddr) {
+static void list_delete(LinkedList* list, const size_t addr) {
     if (list == NULL) {
         return ;
     }
@@ -159,14 +167,12 @@ void list_munmap(LinkedList* list, void *vaddr) {
 
     /// finding proper element
 
-    const size_t voffset = (size_t)vaddr;
-
     LinkedListItem* first = list->root;
-    if (voffset < first->area.start) {
+    if (addr < first->area.start) {
         /// before first segment
         return ;
     }
-    if (voffset < first->area.end) {
+    if (addr < first->area.end) {
         /// inside first segment
         list->root = first->next;
         free(first);
@@ -176,11 +182,11 @@ void list_munmap(LinkedList* list, void *vaddr) {
     LinkedListItem* prev = first;
     LinkedListItem* curr = NULL;
     while( (curr = prev->next) != NULL ) {
-        if (voffset < curr->area.start) {
+        if (addr < curr->area.start) {
             /// between segments - return
             return ;
         }
-        if (voffset < curr->area.end) {
+        if (addr < curr->area.end) {
             /// inside segment
             prev->next = curr->next;
             free(curr);
@@ -188,6 +194,12 @@ void list_munmap(LinkedList* list, void *vaddr) {
         }
         prev = curr;
     }
+}
+
+void list_munmap(LinkedList* list, void *vaddr) {
+    const size_t voffset = (size_t)vaddr;
+    list_delete(list, voffset);
+    assert( list_isValid(list) == 0 );
 }
 
 int list_init(LinkedList* list) {

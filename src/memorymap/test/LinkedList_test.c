@@ -46,6 +46,8 @@ static void list_mmap_first(void **state) {
     const void* ret = list_mmap(&list, (void*)128, 64);
     assert_int_equal( ret, 128 );
 
+    assert_int_equal( list_isValid(&list), 0 );
+
     list_release(&list);
 }
 
@@ -59,6 +61,8 @@ static void list_mmap_second(void **state) {
 
     const void* ret = list_mmap(&list, (void*)128, 64);
     assert_int_equal( ret, 224 );
+
+    assert_int_equal( list_isValid(&list), 0 );
 
     list_release(&list);
 }
@@ -75,6 +79,8 @@ static void list_mmap_segmented(void **state) {
 
     const void* ret = list_mmap(&list, (void*)128, 64);
     assert_int_equal( ret, 264 );
+
+    assert_int_equal( list_isValid(&list), 0 );
 
     list_release(&list);
 }
@@ -95,6 +101,8 @@ static void list_munmap_empty(void **state) {
 
     list_munmap(&list, NULL);
 
+    assert_int_equal( list_isValid(&list), 0 );
+
     list_release(&list);
 }
 
@@ -109,6 +117,8 @@ static void list_munmap_badaddr(void **state) {
 
     const size_t ret = list_size(&list);
     assert_int_equal( ret, 1 );
+
+    assert_int_equal( list_isValid(&list), 0 );
 
     list_release(&list);
 }
@@ -126,6 +136,8 @@ static void list_munmap_first(void **state) {
 
     const size_t ret = list_size(&list);
     assert_int_equal( ret, 1 );
+
+    assert_int_equal( list_isValid(&list), 0 );
 
     list_release(&list);
 }
@@ -145,6 +157,8 @@ static void list_munmap_second(void **state) {
     const size_t ret = list_size(&list);
     assert_int_equal( ret, 2 );
 
+    assert_int_equal( list_isValid(&list), 0 );
+
     list_release(&list);
 }
 
@@ -162,6 +176,8 @@ static void list_munmap_between(void **state) {
 
     const size_t ret = list_size(&list);
     assert_int_equal( ret, 3 );
+
+    assert_int_equal( list_isValid(&list), 0 );
 
     list_release(&list);
 }
@@ -211,6 +227,8 @@ static void list_release_2(void **state) {
     list_add(&list, 1, 1);
     list_add(&list, 2, 1);
 
+    assert_int_equal( list_isValid(&list), 0 );
+
     const int ret = list_release(&list);
     assert_int_equal( ret, 2 );
 }
@@ -235,6 +253,8 @@ static void list_size_0(void **state) {
 }
 
 static void list_add_NULL(void **state) {
+    (void) state; /* unused */
+
     list_add(NULL, 3, 1);
 }
 
@@ -248,6 +268,8 @@ static void list_add_first(void **state) {
 
     const size_t lSize = list_size(&list);
     assert_int_equal( lSize, 2 );
+
+    assert_int_equal( list_isValid(&list), 0 );
 
     const MemoryArea* mem = list_get(&list, 0);
     assert_non_null( mem );
@@ -267,6 +289,8 @@ static void list_add_last(void **state) {
     const size_t lSize = list_size(&list);
     assert_int_equal( lSize, 2 );
 
+    assert_int_equal( list_isValid(&list), 0 );
+
     const MemoryArea* mem = list_get(&list, 1);
     assert_non_null( mem );
     assert_int_equal( mem->start, 5 );
@@ -285,6 +309,8 @@ static void list_add_middle(void **state) {
 
     const size_t lSize = list_size(&list);
     assert_int_equal( lSize, 3 );
+
+    assert_int_equal( list_isValid(&list), 0 );
 
     const MemoryArea* mem = list_get(&list, 1);
     assert_non_null( mem );

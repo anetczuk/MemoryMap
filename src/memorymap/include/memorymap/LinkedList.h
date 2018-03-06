@@ -53,7 +53,9 @@ int list_init(LinkedList* list);
 /// =============================================
 
 
-size_t list_size(LinkedList* list);
+size_t list_size(const LinkedList* list);
+
+int list_isValid(const LinkedList* list);
 
 const MemoryArea* list_get(LinkedList* list, const size_t index);
 
