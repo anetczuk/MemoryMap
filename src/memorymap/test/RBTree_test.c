@@ -429,6 +429,28 @@ static void tree_add_subtree_space(void **state) {
     tree_release(&tree);
 }
 
+static void tree_add_subtree_startAddr(void **state) {
+    (void) state; /* unused */
+
+    RBTree tree;
+    tree_init(&tree);
+
+    tree_add(&tree, 1383, 7);
+    tree_add(&tree, 777, 16);
+    tree_add(&tree, 1793, 16);
+    tree_add(&tree, 1386, 13);
+
+    const size_t lSize = tree_size(&tree);
+    assert_int_equal( lSize, 4 );
+
+    const size_t depth = tree_depth(&tree);
+    assert_int_equal( depth, 3 );
+
+    assert_int_equal( tree_isValid(&tree), 0 );
+
+    tree_release(&tree);
+}
+
 static void tree_size_NULL(void **state) {
     (void) state; /* unused */
 
@@ -546,8 +568,8 @@ static void tree_release_2(void **state) {
 static void tree_randomTest1(void **state) {
     (void) state; /* unused */
 
-    //const unsigned int seed = time(NULL);
-    const unsigned int seed = 3;
+    const unsigned int seed = time(NULL);
+    /// const unsigned int seed = 0;
     srand( seed );
 
     RBTree tree;
@@ -557,9 +579,10 @@ static void tree_randomTest1(void **state) {
         const size_t addr = rand() % 2000;
         const size_t msize = rand() % 20 +1;
 
+        /// printf("Iteration %lu: adding (%lu, %lu)\n", i, addr, msize);
+
         tree_add(&tree, addr, msize);
 
-        ///printf("Iteration %lu\n", i);
         const int valid = tree_isValid(&tree);
         assert_int_equal( valid, 0 );
     }
@@ -568,17 +591,17 @@ static void tree_randomTest1(void **state) {
     const size_t endAddress = tree_endAddress(&tree);
     const size_t addressSpace = endAddress - startAddress;
 
-    for(size_t i = 0; i< 100; ++i) {
-        const size_t addr = rand() % addressSpace + startAddress;
+//    for(size_t i = 0; i< 100; ++i) {
+//        const size_t addr = rand() % addressSpace + startAddress;
+//
+//        tree_delete(&tree, addr);
+//
+//        printf("Iteration %lu\n", i);
+//        const int valid = tree_isValid(&tree);
+//        assert_int_equal( valid, 0 );
+//    }
 
-        tree_delete(&tree, addr);
-
-        printf("Iteration %lu\n", i);
-        const int valid = tree_isValid(&tree);
-        assert_int_equal( valid, 0 );
-    }
-
-    printf("Releasing\n");
+    ///printf("Releasing\n");
     tree_release(&tree);
 }
 
@@ -595,6 +618,7 @@ int main(void) {
         unit_test(tree_add_subtree_right),
         unit_test(tree_add_subtree),
         unit_test(tree_add_subtree_space),
+        unit_test(tree_add_subtree_startAddr),
 
         unit_test(tree_size_NULL),
         unit_test(tree_depth_NULL),
