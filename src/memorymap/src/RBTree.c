@@ -477,13 +477,15 @@ void tree_delete(RBTree* tree, const size_t address) {
         return;
     }
 
+    //TODO: repaint tree
+
     if (node->right == NULL) {
-        /// just remove
+        /// simple case -- just remove
         if ( node->parent != NULL ) {
             if (node->parent->right == node) {
-                node->parent->right = NULL;
+                node->parent->right = node->left;
             } else {
-                node->parent->left = NULL;
+                node->parent->left = node->left;
             }
         } else {
             /// removing root
@@ -496,11 +498,24 @@ void tree_delete(RBTree* tree, const size_t address) {
         return;
     }
 
-//    if (node->left == NULL) {
-//        /// simple case -- just reconnect
-//        free(node);
-//        return;
-//    }
+    if (node->left == NULL) {
+        /// simple case -- just reconnect
+        if ( node->parent != NULL ) {
+            if (node->parent->right == node) {
+                node->parent->right = NULL;
+            } else {
+                node->parent->left = NULL;
+            }
+        } else {
+            /// removing root
+            tree->root = node->right;
+            if (node->right != NULL) {
+                node->right->parent = NULL;
+            }
+        }
+        free(node);
+        return;
+    }
 
     /// there is right subtree
     RBTreeItem* nextNode = tree_getLeftDescendant(node->right);     /// never NULL
