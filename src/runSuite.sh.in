@@ -69,8 +69,12 @@ case "$checkTool" in
                      lcov --base-directory . --directory . --zerocounters -q
                      
                      ## execute tests
+                     set +e
+                     
                      $SCRIPT_DIR/@test_name@ $@
                      exitCode=$?
+                     
+                     set -e
                      
                      ## generate report
                      lcov --base-directory . --directory . -c -o $coverage_dir/test.info
