@@ -27,10 +27,8 @@
 #include <stddef.h>                 /// NULL, size_t
 
 
-struct RBTree;
-
 typedef struct {
-    struct RBTreeNode* root;
+    struct RBTreeElement* root;
 } RBTree;
 
 

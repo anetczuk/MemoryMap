@@ -36,28 +36,28 @@ typedef enum {
 } NodeColor;
 
 
-typedef struct RBTreeNode {
-    struct RBTreeNode* parent;
-    struct RBTreeNode* left;
-    struct RBTreeNode* right;
+typedef struct RBTreeElement {
+    struct RBTreeElement* parent;
+    struct RBTreeElement* left;
+    struct RBTreeElement* right;
     MemoryArea area;
     NodeColor color;                /// black by default
-} RBTreeItem;
+} RBTreeNode;
 
 
 /// ===================================================
 
 
-static const RBTreeItem* tree_getLeftDescendant(const RBTreeItem* node) {
-    const RBTreeItem* curr = node;
+static const RBTreeNode* tree_getLeftDescendant(const RBTreeNode* node) {
+    const RBTreeNode* curr = node;
     while (curr->left != NULL) {
         curr = curr->left;
     }
     return curr;
 }
 
-static const RBTreeItem* tree_getRightDescendant(const RBTreeItem* node) {
-    const RBTreeItem* curr = node;
+static const RBTreeNode* tree_getRightDescendant(const RBTreeNode* node) {
+    const RBTreeNode* curr = node;
     while (curr->right != NULL) {
         curr = curr->right;
     }
@@ -67,9 +67,9 @@ static const RBTreeItem* tree_getRightDescendant(const RBTreeItem* node) {
 /**
  * Returns ancestor on right side of current node.
  */
-static const RBTreeItem* tree_getRightAncestor(const RBTreeItem* node) {
-    const RBTreeItem* child = node;
-    const RBTreeItem* curr = node->parent;
+static const RBTreeNode* tree_getRightAncestor(const RBTreeNode* node) {
+    const RBTreeNode* child = node;
+    const RBTreeNode* curr = node->parent;
     while( curr != NULL ) {
         if (curr->left == child) {
             return curr;
@@ -84,9 +84,9 @@ static const RBTreeItem* tree_getRightAncestor(const RBTreeItem* node) {
 /**
  * Returns ancestor on left side of current node.
  */
-static const RBTreeItem* tree_getLeftAncestor(const RBTreeItem* node) {
-    const RBTreeItem* child = node;
-    const RBTreeItem* curr = node->parent;
+static const RBTreeNode* tree_getLeftAncestor(const RBTreeNode* node) {
+    const RBTreeNode* child = node;
+    const RBTreeNode* curr = node->parent;
     while( curr != NULL ) {
         if (curr->right == child) {
             return curr;
@@ -102,7 +102,7 @@ static const RBTreeItem* tree_getLeftAncestor(const RBTreeItem* node) {
 /// ===================================================
 
 
-static size_t tree_sizeSubtree(const RBTreeItem* tree) {
+static size_t tree_sizeSubtree(const RBTreeNode* tree) {
     if (tree==NULL) {
         return 0;
     }
@@ -118,7 +118,7 @@ size_t tree_size(const RBTree* tree) {
     return tree_sizeSubtree(tree->root);
 }
 
-static size_t tree_depthSubtree(const RBTreeItem* tree) {
+static size_t tree_depthSubtree(const RBTreeNode* tree) {
 	if (tree == NULL) {
 		return 0;
 	}
@@ -143,7 +143,7 @@ size_t tree_startAddress(const RBTree* tree) {
     if (tree->root==NULL)
         return 0;
 
-    const RBTreeItem* node = tree_getLeftDescendant(tree->root);
+    const RBTreeNode* node = tree_getLeftDescendant(tree->root);
     return node->area.start;
 }
 
@@ -153,11 +153,11 @@ size_t tree_endAddress(const RBTree* tree) {
     if (tree->root==NULL)
         return 0;
 
-    const RBTreeItem* node = tree_getRightDescendant(tree->root);
+    const RBTreeNode* node = tree_getRightDescendant(tree->root);
     return node->area.end;
 }
 
-static int tree_isValid_checkPointers(const RBTreeItem* node, const RBTreeItem* parent) {
+static int tree_isValid_checkPointers(const RBTreeNode* node, const RBTreeNode* parent) {
     if (node == NULL) {
         return 0;
     }
@@ -180,7 +180,7 @@ static int tree_isValid_checkPointers(const RBTreeItem* node, const RBTreeItem* 
     return 0;
 }
 
-static int tree_isValid_checkMemory(const RBTreeItem* node) {
+static int tree_isValid_checkMemory(const RBTreeNode* node) {
     if (node == NULL) {
         return 0;
     }
@@ -201,18 +201,18 @@ static int tree_isValid_checkMemory(const RBTreeItem* node) {
     return 0;
 }
 
-static int tree_isValid_checkSorted(const RBTreeItem* node) {
+static int tree_isValid_checkSorted(const RBTreeNode* node) {
     if (node == NULL) {
         return 0;
     }
 
-    const RBTreeItem* prevTop = tree_getLeftAncestor(node);
+    const RBTreeNode* prevTop = tree_getLeftAncestor(node);
     if (prevTop != NULL) {
         if ( prevTop->area.end > node->area.start) {
             return -1;
         }
     }
-    const RBTreeItem* nextTop = tree_getRightAncestor(node);
+    const RBTreeNode* nextTop = tree_getRightAncestor(node);
     if (nextTop != NULL) {
         if ( nextTop->area.start < node->area.end) {
             return -3;
@@ -220,7 +220,7 @@ static int tree_isValid_checkSorted(const RBTreeItem* node) {
     }
 
     if (node->left != NULL) {
-        const RBTreeItem* prevBottom = tree_getRightDescendant(node->left);
+        const RBTreeNode* prevBottom = tree_getRightDescendant(node->left);
         if (prevBottom != NULL) {
             if ( prevBottom->area.end > node->area.start) {
                 return -2;
@@ -228,7 +228,7 @@ static int tree_isValid_checkSorted(const RBTreeItem* node) {
         }
     }
     if (node->right != NULL) {
-        const RBTreeItem* nextBottom = tree_getLeftDescendant(node->right);
+        const RBTreeNode* nextBottom = tree_getLeftDescendant(node->right);
         if (nextBottom != NULL) {
             if ( nextBottom->area.start < node->area.end) {
                 return -4;
@@ -251,13 +251,13 @@ static int tree_isValid_checkSorted(const RBTreeItem* node) {
  * Every path from a given node to any of its descendant NIL nodes
  * contains the same number of black nodes.
  */
-static int tree_isValid_checkBlackPath(const RBTreeItem* node) {
+static int tree_isValid_checkBlackPath(const RBTreeNode* node) {
     //TODO: implement
     ///if (node == NULL)
     return 0;
 }
 
-static int tree_isValidSubTree(const RBTreeItem* node) {
+static int tree_isValidSubTree(const RBTreeNode* node) {
     if (node==NULL)
         return 0;
 
@@ -321,14 +321,14 @@ int tree_isValid(const RBTree* tree) {
     return tree_isValidSubTree( tree->root );
 }
 
-static RBTreeItem* tree_grandparent(RBTreeItem* node) {
+static RBTreeNode* tree_grandparent(RBTreeNode* node) {
 	if (node->parent == NULL) {
 		return NULL;
 	}
 	return node->parent->parent;
 }
 
-static RBTreeItem* tree_sibling(RBTreeItem* node) {
+static RBTreeNode* tree_sibling(RBTreeNode* node) {
 	if (node->parent == NULL) {
 		return NULL;
 	}
@@ -338,27 +338,27 @@ static RBTreeItem* tree_sibling(RBTreeItem* node) {
 		return node->parent->left;
 }
 
-static inline RBTreeItem* tree_uncle(RBTreeItem* node) {
+static inline RBTreeNode* tree_uncle(RBTreeNode* node) {
 	return tree_sibling(node->parent);
 }
 
-static inline void tree_setLeftChild(RBTreeItem* node, RBTreeItem* child) {
+static inline void tree_setLeftChild(RBTreeNode* node, RBTreeNode* child) {
     node->left = child;
     if (child != NULL) {
         child->parent = node;
     }
 }
 
-static inline void tree_setRightChild(RBTreeItem* node, RBTreeItem* child) {
+static inline void tree_setRightChild(RBTreeNode* node, RBTreeNode* child) {
     node->right = child;
     if (child != NULL) {
         child->parent = node;
     }
 }
 
-static void tree_rotate_left(RBTreeItem* node) {
-    RBTreeItem* parent = node->parent;
-    RBTreeItem* nnew = node->right;
+static void tree_rotate_left(RBTreeNode* node) {
+    RBTreeNode* parent = node->parent;
+    RBTreeNode* nnew = node->right;
     assert(nnew != NULL);                   /// since the leaves of a red-black tree are empty, they cannot become internal nodes
     tree_setRightChild(node, nnew->left);
     tree_setLeftChild(nnew, node);
@@ -373,9 +373,9 @@ static void tree_rotate_left(RBTreeItem* node) {
     }
 }
 
-static void tree_rotate_right(RBTreeItem* node) {
-    RBTreeItem* parent = node->parent;
-    RBTreeItem* nnew = node->left;
+static void tree_rotate_right(RBTreeNode* node) {
+    RBTreeNode* parent = node->parent;
+    RBTreeNode* nnew = node->left;
     assert(nnew != NULL);                   /// since the leaves of a red-black tree are empty, they cannot become internal nodes
     tree_setLeftChild(node, nnew->right);
     tree_setRightChild(nnew, node);
@@ -390,8 +390,8 @@ static void tree_rotate_right(RBTreeItem* node) {
     }
 }
 
-static void tree_repair(RBTreeItem* node) {
-	RBTreeItem* nParent = node->parent;
+static void tree_repair(RBTreeNode* node) {
+	RBTreeNode* nParent = node->parent;
 	if ( nParent == NULL) {
 		node->color = RBTREE_BLACK;
 		return ;
@@ -400,21 +400,21 @@ static void tree_repair(RBTreeItem* node) {
 		/// do nothing
 		return ;
 	}
-	RBTreeItem* uncle = tree_uncle(node);
+	RBTreeNode* uncle = tree_uncle(node);
 	if (uncle != NULL) {
         if (uncle->color == RBTREE_RED) {
             nParent->color = RBTREE_BLACK;
             uncle->color = RBTREE_BLACK;
-            RBTreeItem* grandpa = tree_grandparent(node);		/// never NULL here
+            RBTreeNode* grandpa = tree_grandparent(node);		/// never NULL here
             grandpa->color = RBTREE_RED;
             tree_repair(grandpa);
             return ;
         }
 	}
 
-    RBTreeItem* curr = node;
+    RBTreeNode* curr = node;
 	{
-        RBTreeItem* grandpa = tree_grandparent(curr);		/// never NULL here
+        RBTreeNode* grandpa = tree_grandparent(curr);		/// never NULL here
         if ((grandpa->left != NULL) && (curr == grandpa->left->right)) {
             tree_rotate_left(curr->parent);
             curr = curr->left;
@@ -424,7 +424,7 @@ static void tree_repair(RBTreeItem* node) {
         }
 	}
 	{
-	    RBTreeItem* grandpa = tree_grandparent(curr);       /// never NULL here
+	    RBTreeNode* grandpa = tree_grandparent(curr);       /// never NULL here
         if (curr == curr->parent->left)
             tree_rotate_right(grandpa);
         else
@@ -434,9 +434,9 @@ static void tree_repair(RBTreeItem* node) {
 	}
 }
 
-static RBTreeItem* tree_insertLeftNode(RBTreeItem* node) {
-	RBTreeItem* oldLeft = node->left;
-	RBTreeItem* newNode = calloc( 1, sizeof(RBTreeItem) );
+static RBTreeNode* tree_insertLeftNode(RBTreeNode* node) {
+	RBTreeNode* oldLeft = node->left;
+	RBTreeNode* newNode = calloc( 1, sizeof(RBTreeNode) );
 	tree_setLeftChild(node, newNode);
 	newNode->color = RBTREE_RED;						/// default color of new node
 	tree_setLeftChild(newNode, oldLeft);
@@ -445,9 +445,9 @@ static RBTreeItem* tree_insertLeftNode(RBTreeItem* node) {
 	return newNode;
 }
 
-static RBTreeItem* tree_insertRightNode(RBTreeItem* node) {
-	RBTreeItem* oldLeft = node->right;
-	RBTreeItem* newNode = calloc( 1, sizeof(RBTreeItem) );
+static RBTreeNode* tree_insertRightNode(RBTreeNode* node) {
+	RBTreeNode* oldLeft = node->right;
+	RBTreeNode* newNode = calloc( 1, sizeof(RBTreeNode) );
 	tree_setRightChild(node, newNode);
 	newNode->color = RBTREE_RED;						/// default color of new node
 	newNode->right = oldLeft;
@@ -457,20 +457,20 @@ static RBTreeItem* tree_insertRightNode(RBTreeItem* node) {
 	return newNode;
 }
 
-static void* tree_addMemoryToRight(RBTreeItem* node, MemoryArea* area);
+static void* tree_addMemoryToRight(RBTreeNode* node, MemoryArea* area);
 
-static void* tree_addMemoryToLeft(RBTreeItem* node, MemoryArea* area) {
+static void* tree_addMemoryToLeft(RBTreeNode* node, MemoryArea* area) {
     if (area->end > node->area.start) {
         /// could not add on left side
     	return NULL;
     }
 
-	const RBTreeItem* leftNode = NULL;
+	const RBTreeNode* leftNode = NULL;
     if ( node->left == NULL ) {
-    	const RBTreeItem* leftAncestor = tree_getLeftAncestor(node);
+    	const RBTreeNode* leftAncestor = tree_getLeftAncestor(node);
     	if (leftAncestor == NULL) {
     		/// smallest leaf case -- add node
-    	    RBTreeItem* newNode = tree_insertLeftNode(node);
+    	    RBTreeNode* newNode = tree_insertLeftNode(node);
     	    newNode->area = *area;
 			return (void*)newNode->area.start;
     	}
@@ -496,7 +496,7 @@ static void* tree_addMemoryToLeft(RBTreeItem* node, MemoryArea* area) {
 
     if ( node->left == NULL ) {
     	/// leaf case -- can add, no more between
-        RBTreeItem* newNode = tree_insertLeftNode(node);
+        RBTreeNode* newNode = tree_insertLeftNode(node);
         newNode->area = memory_create( minStart, areaSize );
 		return (void*)newNode->area.start;
     }
@@ -504,20 +504,20 @@ static void* tree_addMemoryToLeft(RBTreeItem* node, MemoryArea* area) {
 	return tree_addMemoryToRight(node->left, area);
 }
 
-static void* tree_addMemoryToRight(RBTreeItem* node, MemoryArea* area) {
+static void* tree_addMemoryToRight(RBTreeNode* node, MemoryArea* area) {
     if ( node->right == NULL ) {
-    	const RBTreeItem* rightAncestor = tree_getRightAncestor(node);
+    	const RBTreeNode* rightAncestor = tree_getRightAncestor(node);
     	if (rightAncestor == NULL) {
     		/// greatest leaf case -- add node
     		memory_fitAfter(&(node->area), area);
-    		RBTreeItem* newNode = tree_insertRightNode(node);
+    		RBTreeNode* newNode = tree_insertRightNode(node);
     		newNode->area = *area;
 			return (void*)newNode->area.start;
     	}
 		/// leaf case -- check space
 		const int doesFit = memory_fitBetween(&(node->area), &(rightAncestor->area), area);
 		if (doesFit == 0) {
-		    RBTreeItem* newNode = tree_insertRightNode(node);
+		    RBTreeNode* newNode = tree_insertRightNode(node);
 		    newNode->area = *area;
 			return (void*)newNode->area.start;
 		}
@@ -543,7 +543,7 @@ static void* tree_addMemoryToRight(RBTreeItem* node, MemoryArea* area) {
 
 static void tree_findRoot(RBTree* tree) {
     /// find the new root to return
-    RBTreeItem* node = tree->root;
+    RBTreeNode* node = tree->root;
     while (node->parent != NULL)
         node = node->parent;
     tree->root = node;
@@ -554,7 +554,7 @@ static void* tree_addMemory(RBTree* tree, MemoryArea* area) {
     assert( area != NULL );
 
     if (tree->root == NULL) {
-        tree->root = calloc( 1, sizeof(RBTreeItem) );
+        tree->root = calloc( 1, sizeof(RBTreeNode) );
         ///tree->root->parent = NULL;
         ///tree->root->color = RBTREE_BLACK;
         tree->root->area = *area;
@@ -585,7 +585,7 @@ size_t tree_add(RBTree* tree, const size_t address, const size_t size) {
     return (size_t)retAddr;
 }
 
-static void tree_printSubtree(const RBTreeItem* node) {
+static void tree_printSubtree(const RBTreeNode* node) {
     if (node == NULL) {
         return ;
     }
@@ -607,7 +607,7 @@ void tree_print(const RBTree* tree) {
     printf("%s", "\n");
 }
 
-static int tree_releaseNodes(RBTreeItem* tree) {
+static int tree_releaseNodes(RBTreeNode* tree) {
     if (tree == NULL) {
         return 0;
     }
@@ -643,8 +643,8 @@ void* tree_mmap(RBTree* tree, void *vaddr, unsigned int size) {
     return retAddr;
 }
 
-static RBTreeItem* tree_findNode(RBTreeItem* node, const size_t adress) {
-	RBTreeItem* curr = node;
+static RBTreeNode* tree_findNode(RBTreeNode* node, const size_t adress) {
+	RBTreeNode* curr = node;
 	while (curr != NULL) {
 		if (adress < curr->area.start) {
 			curr = curr->left;
@@ -658,14 +658,14 @@ static RBTreeItem* tree_findNode(RBTreeItem* node, const size_t adress) {
 	return NULL;
 }
 
-static inline void tree_reconnectToRight(RBTreeItem* node, RBTreeItem* subtree) {
+static inline void tree_reconnectToRight(RBTreeNode* node, RBTreeNode* subtree) {
     /// can return 'node', never NULL
-	RBTreeItem* mostNode = (RBTreeItem*) tree_getRightDescendant(node);
+	RBTreeNode* mostNode = (RBTreeNode*) tree_getRightDescendant(node);
 	tree_setRightChild(mostNode, subtree);
 }
 
 void tree_delete(RBTree* tree, const size_t address) {
-    RBTreeItem* node = tree_findNode( tree->root, address );
+    RBTreeNode* node = tree_findNode( tree->root, address );
     if (node == NULL) {
         /// node not found -- nothing to remove
         return;
@@ -712,8 +712,8 @@ void tree_delete(RBTree* tree, const size_t address) {
     }
 
     /// there is right subtree
-    RBTreeItem* nextNode = (RBTreeItem*) tree_getLeftDescendant(node->right);     /// never NULL
-    RBTreeItem* rightParent = nextNode->parent;                                   /// can be 'node'
+    RBTreeNode* nextNode = (RBTreeNode*) tree_getLeftDescendant(node->right);     /// never NULL
+    RBTreeNode* rightParent = nextNode->parent;                                   /// can be 'node'
     if (rightParent != node) {
         tree_setLeftChild(rightParent, NULL);
         tree_reconnectToRight(nextNode, rightParent);
