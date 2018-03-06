@@ -29,10 +29,8 @@
 #include "memorymap/MemoryArea.h"
 
 
-struct LinkedListNode;
-
 typedef struct {
-    struct LinkedListNode* root;
+    struct LinkedListElement* root;
 } LinkedList;
 
 

@@ -27,10 +27,10 @@
 #include <assert.h>
 
 
-typedef struct LinkedListNode {
+typedef struct LinkedListElement {
     MemoryArea area;
-    struct LinkedListNode* next;
-} LinkedListItem;
+    struct LinkedListElement* next;
+} LinkedListNode;
 
 
 /// ===================================================
@@ -42,7 +42,7 @@ size_t list_size(const LinkedList* list) {
 
     /// iterating to last element
     size_t retSize = 0;
-    const LinkedListItem* curr = list->root;
+    const LinkedListNode* curr = list->root;
     while( curr != NULL ) {
         curr = curr->next;
         ++retSize;
@@ -66,7 +66,7 @@ size_t list_endAddress(const LinkedList* list) {
         return 0;
 
     /// iterating to last element
-    const LinkedListItem* curr = list->root;
+    const LinkedListNode* curr = list->root;
     while( curr->next != NULL ) {
         curr = curr->next;
     }
@@ -81,7 +81,7 @@ int list_isValid(const LinkedList* list) {
         return 0;
 
     /// check if memory segments are valid
-    const LinkedListItem* curr = list->root;
+    const LinkedListNode* curr = list->root;
     while( curr != NULL ) {
         const int validMem = memory_isValid( &(curr->area) );
         if ( validMem != 0) {
@@ -92,7 +92,7 @@ int list_isValid(const LinkedList* list) {
     }
 
     /// check if list is sorted
-    const LinkedListItem* prev = list->root;
+    const LinkedListNode* prev = list->root;
     curr = prev->next;
     while( curr != NULL ) {
         if ( prev->area.end > curr->area.start ) {
@@ -111,16 +111,16 @@ int list_isValid(const LinkedList* list) {
 const MemoryArea* list_get(LinkedList* list, const size_t index) {
     assert( list != NULL );
 
-    LinkedListItem* curr = list->root;
+    LinkedListNode* curr = list->root;
     for(size_t i=0; i<index; ++i) {
         curr = curr->next;
     }
     return &(curr->area);
 }
 
-static void list_insertNode(LinkedListItem** node) {
-    LinkedListItem* old = *node;
-    (*node) = calloc( 1, sizeof(LinkedListItem) );
+static void list_insertNode(LinkedListNode** node) {
+    LinkedListNode* old = *node;
+    (*node) = calloc( 1, sizeof(LinkedListNode) );
     (*node)->next = old;
 }
 
@@ -143,7 +143,7 @@ static void* list_addMemory(LinkedList* list, MemoryArea* area) {
     }
 
     /// compare with middle elements
-    LinkedListItem* curr = list->root;
+    LinkedListNode* curr = list->root;
     while( curr->next != NULL ) {
         const int doesFit = memory_fitBetween(&(curr->area), &(curr->next->area), area);
         if (doesFit == 0) {
@@ -173,7 +173,7 @@ int list_add(LinkedList* list, const size_t address, const size_t size) {
     return 0;
 }
 
-static int list_releaseNodes(LinkedListItem* list) {
+static int list_releaseNodes(LinkedListNode* list) {
     if (list == NULL) {
         return 0;
     }
@@ -218,7 +218,7 @@ void list_delete(LinkedList* list, const size_t addr) {
 
     /// finding proper element
 
-    LinkedListItem* first = list->root;
+    LinkedListNode* first = list->root;
     if (addr < first->area.start) {
         /// before first segment
         return ;
@@ -230,8 +230,8 @@ void list_delete(LinkedList* list, const size_t addr) {
         return ;
     }
 
-    LinkedListItem* prev = first;
-    LinkedListItem* curr = NULL;
+    LinkedListNode* prev = first;
+    LinkedListNode* curr = NULL;
     while( (curr = prev->next) != NULL ) {
         if (addr < curr->area.start) {
             /// between segments - return
