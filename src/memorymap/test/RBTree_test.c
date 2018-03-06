@@ -199,6 +199,24 @@ static void tree_munmap_right2(void **state) {
     tree_release(&tree);
 }
 
+static void tree_munmap_left(void **state) {
+    (void) state; /* unused */
+
+    RBTree tree;
+    tree_init(&tree);
+
+    tree_mmap(&tree, (void*)200, 64);
+    tree_mmap(&tree, (void*)100, 64);
+    tree_mmap(&tree, (void*)300, 64);
+
+    tree_munmap(&tree, (void*)120);
+
+    const size_t ret = tree_size(&tree);
+    assert_int_equal( ret, 2 );
+
+    tree_release(&tree);
+}
+
 static void tree_init_NULL(void **state) {
     (void) state; /* unused */
 
@@ -438,6 +456,7 @@ int main(void) {
         unit_test(tree_munmap_root2),
         unit_test(tree_munmap_right),
         unit_test(tree_munmap_right2),
+        unit_test(tree_munmap_left),
 
         unit_test(tree_init_NULL),
         unit_test(tree_init_valid)

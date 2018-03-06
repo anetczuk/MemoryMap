@@ -470,6 +470,57 @@ static inline void tree_connectToLeft(RBTreeItem* node, RBTreeItem* subtree) {
 	}
 }
 
+void tree_delete(RBTree* tree, const size_t address) {
+    RBTreeItem* node = tree_findNode( tree->root, address );
+    if (node == NULL) {
+        /// node not found -- nothing to remove
+        return;
+    }
+
+    if (node->right == NULL) {
+        /// just remove
+        if ( node->parent != NULL ) {
+            if (node->parent->right == node) {
+                node->parent->right = NULL;
+            } else {
+                node->parent->left = NULL;
+            }
+        } else {
+            /// removing root
+            tree->root = node->left;
+            if (node->left != NULL) {
+                node->left->parent = NULL;
+            }
+        }
+        free(node);
+        return;
+    }
+
+//    if (node->left == NULL) {
+//        /// simple case -- just reconnect
+//        free(node);
+//        return;
+//    }
+
+    /// there is right subtree
+    RBTreeItem* nextNode = tree_getLeftDescendant(node->right);     /// never NULL
+    RBTreeItem* rightParent = nextNode->parent;                     /// can be 'node'
+    if (rightParent != node) {
+        rightParent->left = NULL;
+        tree_reconnectToRight(nextNode, rightParent);
+    }
+    tree_connectToLeft(nextNode, node->left);
+    if (node->parent != NULL) {
+        node->parent->right = nextNode;
+        nextNode->parent = node->parent;
+    } else {
+        /// removing root
+        tree->root = nextNode;
+        nextNode->parent = NULL;
+    }
+    free(node);
+}
+
 void tree_munmap(RBTree* tree, void *vaddr) {
     if (tree == NULL) {
         return ;
@@ -479,44 +530,7 @@ void tree_munmap(RBTree* tree, void *vaddr) {
     }
 
     const size_t voffset = (size_t)vaddr;
-    RBTreeItem* node = tree_findNode( tree->root, voffset );
-    if (node == NULL) {
-    	/// node not found -- nothing to remove
-    	return;
-    }
-
-    if (node->right == NULL) {
-    	/// just remove
-    	if ( node->parent != NULL ) {
-    		node->parent->right = NULL;
-    	} else {
-    		/// removing root
-    		tree->root = node->left;
-    		if (node->left != NULL) {
-    			node->left->parent = NULL;
-    		}
-    	}
-    	free(node);
-    	return;
-    }
-
-    /// there is right subtree
-    RBTreeItem* nextNode = tree_getLeftDescendant(node->right);		/// never NULL
-    RBTreeItem* rightParent = nextNode->parent;						/// can be 'node'
-    if (rightParent != node) {
-		rightParent->left = NULL;
-		tree_reconnectToRight(nextNode, rightParent);
-    }
-	tree_connectToLeft(nextNode, node->left);
-	if (node->parent != NULL) {
-		node->parent->right = nextNode;
-		nextNode->parent = node->parent;
-	} else {
-		/// removing root
-		tree->root = nextNode;
-		nextNode->parent = NULL;
-	}
-	free(node);
+    tree_delete(tree, voffset);
 }
 
 int tree_init(RBTree* tree) {
