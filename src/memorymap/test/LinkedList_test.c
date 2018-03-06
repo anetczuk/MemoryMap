@@ -25,7 +25,7 @@
 
 #include <time.h>
 #include <stdlib.h>
-#include <stdio.h>
+#include <stdio.h>                              /// printf
 
 /// for cmocka to mock system functions
 #define UNIT_TESTING 1
@@ -386,7 +386,6 @@ static void list_endAddress_valid(void **state) {
 
 static void list_randomTest1(void **state) {
     (void) state; /* unused */
-
 
     const unsigned int seed = time(NULL);
     srand( seed );
