@@ -51,8 +51,60 @@ size_t list_size(const LinkedList* list) {
     return retSize;
 }
 
+size_t list_startAddress(const LinkedList* list) {
+    if (list==NULL)
+        return 0;
+    if (list->root==NULL)
+        return 0;
+    return list->root->area.start;
+}
+
+size_t list_endAddress(const LinkedList* list) {
+    if (list==NULL)
+        return 0;
+    if (list->root==NULL)
+        return 0;
+
+    /// iterating to last element
+    const LinkedListItem* curr = list->root;
+    while( curr->next != NULL ) {
+        curr = curr->next;
+    }
+
+    return curr->area.end;
+}
+
 int list_isValid(const LinkedList* list) {
-    //TODO: implement
+    if (list==NULL)
+        return 0;
+    if (list->root==NULL)
+        return 0;
+
+    /// check if memory segments are valid
+    const LinkedListItem* curr = list->root;
+    while( curr != NULL ) {
+        const int validMem = memory_isValid( &(curr->area) );
+        if ( validMem != 0) {
+            /// invalid memory segment
+            return validMem;
+        }
+        curr = curr->next;
+    }
+
+    /// check if list is sorted
+    const LinkedListItem* prev = list->root;
+    curr = prev->next;
+    while( curr != NULL ) {
+        if ( prev->area.end > curr->area.start ) {
+            /// list is not sorted
+            return -2;
+        }
+        prev = curr;
+        curr = curr->next;
+    }
+
+    //TODO: detect cycles
+
     return 0;
 }
 
@@ -118,7 +170,6 @@ int list_add(LinkedList* list, const size_t address, const size_t size) {
     MemoryArea area = memory_create(address, size);
 
     list_addMemory(list, &area);			/// always adds
-    assert( list_isValid(list) == 0 );
     return 0;
 }
 
@@ -157,7 +208,7 @@ void* list_mmap(LinkedList* list, void *vaddr, unsigned int size) {
     return retAddr;
 }
 
-static void list_delete(LinkedList* list, const size_t addr) {
+void list_delete(LinkedList* list, const size_t addr) {
     if (list == NULL) {
         return ;
     }

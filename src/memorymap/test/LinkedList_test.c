@@ -23,6 +23,13 @@
 
 #include "memorymap/LinkedList.h"
 
+#include <time.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+/// for cmocka to mock system functions
+#define UNIT_TESTING 1
+
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
@@ -233,25 +240,6 @@ static void list_release_2(void **state) {
     assert_int_equal( ret, 2 );
 }
 
-static void list_size_NULL(void **state) {
-    (void) state; /* unused */
-
-    const size_t ret = list_size(NULL);
-    assert_int_equal( ret, 0 );
-}
-
-static void list_size_0(void **state) {
-    (void) state; /* unused */
-
-    LinkedList list;
-    list_init(&list);
-
-    const size_t ret = list_size(&list);
-    assert_int_equal( ret, 0 );
-
-    list_release(&list);
-}
-
 static void list_add_NULL(void **state) {
     (void) state; /* unused */
 
@@ -319,6 +307,121 @@ static void list_add_middle(void **state) {
     list_release(&list);
 }
 
+static void list_size_NULL(void **state) {
+    (void) state; /* unused */
+
+    const size_t ret = list_size(NULL);
+    assert_int_equal( ret, 0 );
+}
+
+static void list_size_0(void **state) {
+    (void) state; /* unused */
+
+    LinkedList list;
+    list_init(&list);
+
+    const size_t ret = list_size(&list);
+    assert_int_equal( ret, 0 );
+
+    list_release(&list);
+}
+
+static void list_startAddress_valid(void **state) {
+    (void) state; /* unused */
+
+    {
+        const size_t ret = list_startAddress(NULL);
+        assert_int_equal( ret, 0 );
+    }
+    {
+        LinkedList list;
+        list_init(&list);
+
+        const size_t ret = list_startAddress(&list);
+        assert_int_equal( ret, 0 );
+
+        list_release(&list);
+    }
+    {
+        LinkedList list;
+        list_init(&list);
+        list_add(&list, 5, 10);
+        list_add(&list, 35, 10);
+
+        const size_t ret = list_startAddress(&list);
+        assert_int_equal( ret, 5 );
+
+        list_release(&list);
+    }
+}
+
+static void list_endAddress_valid(void **state) {
+    (void) state; /* unused */
+
+    {
+        const size_t ret = list_endAddress(NULL);
+        assert_int_equal( ret, 0 );
+    }
+    {
+        LinkedList list;
+        list_init(&list);
+
+        const size_t ret = list_endAddress(&list);
+        assert_int_equal( ret, 0 );
+
+        list_release(&list);
+    }
+    {
+        LinkedList list;
+        list_init(&list);
+        list_add(&list, 5, 10);
+        list_add(&list, 35, 10);
+
+        const size_t ret = list_endAddress(&list);
+        assert_int_equal( ret, 45 );
+
+        list_release(&list);
+    }
+}
+
+static void list_randomTest1(void **state) {
+    (void) state; /* unused */
+
+
+    const unsigned int seed = time(NULL);
+    srand( seed );
+
+    LinkedList list;
+    list_init(&list);
+
+    for(size_t i = 0; i< 100; ++i) {
+        const size_t addr = rand() % 2000;
+        const size_t msize = rand() % 20 +1;
+
+        list_add(&list, addr, msize);
+
+        ///printf("Iteration %lu\n", i);
+        const int valid = list_isValid(&list);
+        assert_int_equal( valid, 0 );
+    }
+
+    const size_t startAddress = list_startAddress(&list);
+    const size_t endAddress = list_endAddress(&list);
+    const size_t addressSpace = endAddress - startAddress;
+
+    for(size_t i = 0; i< 100; ++i) {
+        const size_t addr = rand() % addressSpace + startAddress;
+
+        list_delete(&list, addr);
+
+        ///printf("Iteration %lu\n", i);
+        const int valid = list_isValid(&list);
+        assert_int_equal( valid, 0 );
+    }
+
+    list_release(&list);
+}
+
 
 /// ==================================================
 
@@ -332,8 +435,11 @@ int main(void) {
         unit_test(list_add_first),
         unit_test(list_add_middle),
         unit_test(list_add_last),
+
         unit_test(list_size_NULL),
         unit_test(list_size_0),
+        unit_test(list_startAddress_valid),
+        unit_test(list_endAddress_valid),
 
         unit_test(list_mmap_NULL),
         unit_test(list_mmap_first),
@@ -348,7 +454,9 @@ int main(void) {
         unit_test(list_munmap_between),
 
         unit_test(list_init_NULL),
-        unit_test(list_init_valid)
+        unit_test(list_init_valid),
+
+        unit_test(list_randomTest1)
     };
 
     return run_group_tests(tests);

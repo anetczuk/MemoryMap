@@ -55,11 +55,17 @@ int list_init(LinkedList* list);
 
 size_t list_size(const LinkedList* list);
 
+size_t list_startAddress(const LinkedList* list);
+
+size_t list_endAddress(const LinkedList* list);
+
 int list_isValid(const LinkedList* list);
 
 const MemoryArea* list_get(LinkedList* list, const size_t index);
 
 int list_add(LinkedList* list, const size_t address, const size_t size);
+
+void list_delete(LinkedList* list, const size_t addr);
 
 /**
  * List has to be initialized before releasing.
