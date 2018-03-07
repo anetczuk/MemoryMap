@@ -320,11 +320,10 @@ static int tree_isValidSubTree(const RBTreeNode* node) {
         }
     }
 
-    //TODO: uncomment
-//    const int validPath = tree_isValid_checkBlackPath(node);
-//    if (validPath!=0) {
-//        return validPath;
-//    }
+    const int validPath = tree_isValid_checkBlackPath(node);
+    if (validPath!=0) {
+        return validPath;
+    }
 
     return 0;
 }
