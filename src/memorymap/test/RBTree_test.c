@@ -41,7 +41,7 @@ static RBTree create_default_tree(const size_t nodes) {
     tree_init(&tree);
 
     for(size_t i = 0; i < 16; ++i) {
-        tree_add(&tree, 1, 1);
+        tree_add(&tree, i+1, 1);
 
         const size_t tSize = tree_size(&tree);
         assert_int_equal( tSize, i+1 );
@@ -60,15 +60,11 @@ static RBTree create_random_tree(const unsigned int seed, const size_t nodes) {
     tree_init(&tree);
 
     for(size_t i = 0; i < nodes; ++i) {
-        const size_t addr = rand() % nodes;
-
+        const size_t addr = rand() % nodes +1;
         tree_add(&tree, addr, 1);
 
-        const size_t tSize = tree_size(&tree);
-        assert_int_equal( tSize, i+1 );
-
-        const int valid = tree_isValid(&tree);
-        assert_int_equal( valid, 0 );
+        assert_int_equal( tree_size(&tree), i+1 );
+        assert_int_equal( tree_isValid(&tree), 0 );
     }
 
     return tree;
@@ -372,6 +368,26 @@ static void test_tree_add_NULL(void **state) {
     assert_int_equal( ret, 0 );
 }
 
+static void test_tree_add_0(void **state) {
+    (void) state; /* unused */
+
+    RBTree tree;
+    tree_init(&tree);
+
+    const size_t retAddr = tree_add(&tree, 0, 1);
+    assert_int_equal( retAddr, 0 );
+
+    const size_t lSize = tree_size(&tree);
+    assert_int_equal( lSize, 0 );
+
+    const size_t depth = tree_depth(&tree);
+    assert_int_equal( depth, 0 );
+
+    assert_int_equal( tree_isValid(&tree), 0 );
+
+    tree_release(&tree);
+}
+
 static void test_tree_add_left(void **state) {
     (void) state; /* unused */
 
@@ -662,11 +678,15 @@ static void test_tree_release_2(void **state) {
 static void test_tree_delete_1(void **state) {
     (void) state; /* unused */
 
-    RBTree tree = create_random_tree(0, 16);
+    const size_t treeSize = 16;
+    RBTree tree = create_random_tree(9, 16);
+
+    assert_int_equal( tree_size(&tree), treeSize );
+    assert_int_equal( tree_isValid(&tree), 0 );
 
     /// tree_print(&tree);
 
-    tree_delete(&tree, 1);
+    tree_delete(&tree, 10);
 
     const int valid = tree_isValid(&tree);
     assert_int_equal( valid, 0 );
@@ -777,6 +797,7 @@ int main(void) {
 
     const struct UnitTest tests[] = {
         unit_test(test_tree_add_NULL),
+        unit_test(test_tree_add_0),
         unit_test(test_tree_add_left),
         unit_test(test_tree_add_right),
         unit_test(test_tree_add_subtree_left),
@@ -823,7 +844,7 @@ int main(void) {
         unit_test(test_tree_randomTest2),
     };
 
-///    return run_test( test_delete_1 );
+    return run_test( test_tree_delete_1 );
 
     return run_group_tests(tests);
 }

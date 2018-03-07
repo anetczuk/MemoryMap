@@ -577,6 +577,9 @@ static void tree_findRoot(RBTree* tree) {
 static void* tree_addMemory(RBTree* tree, MemoryArea* area) {
     assert( tree != NULL );
     assert( area != NULL );
+    if (area->start == 0) {
+        return NULL;
+    }
 
     if (tree->root == NULL) {
         tree->root = calloc( 1, sizeof(RBTreeNode) );
