@@ -77,6 +77,8 @@ size_t tree_endAddress(const RBTree* tree);
 
 int tree_isValid(const RBTree* tree);
 
+RBTreeNode* tree_findNode(const RBTree* tree, const size_t adress);
+
 size_t tree_add(RBTree* tree, const size_t address, const size_t size);
 
 void tree_delete(RBTree* tree, const size_t address);
@@ -104,6 +106,8 @@ RBTreeNode* node_makeFull(RBTreeNode* left, RBTreeNode* right, MemoryArea area, 
 void node_init(RBTreeNode* node);
 
 void node_release(RBTreeNode* node);
+
+size_t node_index(const RBTreeNode* node);
 
 void node_setArea(RBTreeNode* node, const MemoryArea* area);
 

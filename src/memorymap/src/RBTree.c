@@ -610,13 +610,50 @@ size_t tree_add(RBTree* tree, const size_t address, const size_t size) {
     return (size_t)retAddr;
 }
 
-static void tree_printSubtree(const RBTreeNode* node) {
+size_t node_index(const RBTreeNode* node) {
+    if (node == NULL) {
+        return -1;
+    }
+
+    const size_t subIndex = tree_sizeSubtree(node->left);
+    const RBTreeNode* leftNode = tree_getLeftAncestor(node);
+    if (leftNode == NULL) {
+        return subIndex;
+    }
+    return node_index(leftNode) + 1 + subIndex;
+}
+
+static void tree_printLevel(const RBTreeNode* node, const size_t level, int* previousNodeIndex) {
     if (node == NULL) {
         return ;
     }
-    tree_printSubtree(node->left);
-    printf("(%lu,%lu) ", node->area.start, node->area.end);
-    tree_printSubtree(node->right);
+
+    if (level > 0) {
+        tree_printLevel(node->left, level-1, previousNodeIndex);
+        tree_printLevel(node->right, level-1, previousNodeIndex);
+        return ;
+    }
+
+    const size_t pos = node_index(node);
+    const size_t diff = (pos==0) ? 0 : (pos - *previousNodeIndex) - 1;
+
+    /// print empty space on left
+    for(size_t i=0; i<diff; ++i) {
+        printf("           ");
+    }
+
+    switch(node->color) {
+    case RBTREE_BLACK: {
+        printf("(B,%3lu,%3lu)", node->area.start, node->area.end);
+        break;
+    }
+    case RBTREE_RED: {
+        printf("(R,%3lu,%3lu)", node->area.start, node->area.end);
+        break;
+    }
+    }
+
+    *previousNodeIndex = pos;
 }
 
 void tree_print(const RBTree* tree) {
@@ -628,8 +665,12 @@ void tree_print(const RBTree* tree) {
         printf("%s", "(NULL)");
         return ;
     }
-    tree_printSubtree(tree->root);
-    printf("%s", "\n");
+    const size_t depth = tree_depth(tree);
+    for(size_t l = 0; l < depth; ++l) {
+        int previousNodeIndex = -1;
+        tree_printLevel(tree->root, l, &previousNodeIndex);
+        printf("%s", "\n");
+    }
 }
 
 static int tree_releaseNodes(RBTreeNode* node) {
@@ -670,8 +711,11 @@ void* tree_mmap(RBTree* tree, void *vaddr, unsigned int size) {
     return retAddr;
 }
 
-static RBTreeNode* tree_findNode(RBTreeNode* node, const size_t adress) {
-	RBTreeNode* curr = node;
+RBTreeNode* tree_findNode(const RBTree* tree, const size_t adress) {
+    if (tree == NULL) {
+        return NULL;
+    }
+	RBTreeNode* curr = tree->root;
 	while (curr != NULL) {
 		if (adress < curr->area.start) {
 			curr = curr->left;
@@ -824,7 +868,7 @@ static void tree_repair_delete(RBTreeNode* node) {
 }
 
 void tree_delete(RBTree* tree, const size_t address) {
-    RBTreeNode* node = tree_findNode( tree->root, address );
+    RBTreeNode* node = tree_findNode( tree, address );
     if (node == NULL) {
         /// node not found -- nothing to remove
         return;

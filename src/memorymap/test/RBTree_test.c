@@ -36,6 +36,48 @@
 #include <cmocka.h>
 
 
+static RBTree create_default_tree(const size_t nodes) {
+    RBTree tree;
+    tree_init(&tree);
+
+    for(size_t i = 0; i < 16; ++i) {
+        tree_add(&tree, 1, 1);
+
+        const size_t tSize = tree_size(&tree);
+        assert_int_equal( tSize, i+1 );
+
+        const int valid = tree_isValid(&tree);
+        assert_int_equal( valid, 0 );
+    }
+
+    return tree;
+}
+
+static RBTree create_random_tree(const unsigned int seed, const size_t nodes) {
+    srand( seed );
+
+    RBTree tree;
+    tree_init(&tree);
+
+    for(size_t i = 0; i < nodes; ++i) {
+        const size_t addr = rand() % nodes;
+
+        tree_add(&tree, addr, 1);
+
+        const size_t tSize = tree_size(&tree);
+        assert_int_equal( tSize, i+1 );
+
+        const int valid = tree_isValid(&tree);
+        assert_int_equal( valid, 0 );
+    }
+
+    return tree;
+}
+
+
+/// ======================================================
+
+
 static void tree_mmap_NULL(void **state) {
     (void) state; /* unused */
 
@@ -570,6 +612,23 @@ static void tree_endAddress_valid(void **state) {
     }
 }
 
+static void test_node_index(void **state) {
+    (void) state; /* unused */
+
+    const size_t treeSize = 16;
+    RBTree tree = create_default_tree(treeSize);
+
+    for(size_t i = 0; i < treeSize; ++i) {
+        RBTreeNode* node = tree_findNode(&tree, i+1);
+        assert_non_null( node );
+
+        const size_t ind = node_index(node);
+        assert_int_equal( ind+1, node->area.start );
+    }
+
+    tree_release(&tree);
+}
+
 static void tree_release_NULL(void **state) {
     (void) state; /* unused */
 
@@ -598,6 +657,22 @@ static void tree_release_2(void **state) {
 
     const int ret = tree_release(&tree);
     assert_int_equal( ret, 2 );
+}
+
+static void tree_delete_1(void **state) {
+    (void) state; /* unused */
+
+    RBTree tree = create_random_tree(0, 16);
+
+    /// tree_print(&tree);
+
+    tree_delete(&tree, 1);
+
+    const int valid = tree_isValid(&tree);
+    assert_int_equal( valid, 0 );
+
+    ///printf("Releasing\n");
+    tree_release(&tree);
 }
 
 static void tree_randomTest1(void **state) {
@@ -697,6 +772,9 @@ static void tree_randomTest2(void **state) {
 
 
 int main(void) {
+
+    //TODO: add selective run
+
     const struct UnitTest tests[] = {
         unit_test(tree_add_NULL),
         unit_test(tree_add_left),
@@ -713,9 +791,13 @@ int main(void) {
         unit_test(tree_startAddress_valid),
         unit_test(tree_endAddress_valid),
 
+        unit_test(test_node_index),
+
         unit_test(tree_release_NULL),
         unit_test(tree_release_empty),
         unit_test(tree_release_2),
+
+        unit_test(tree_delete_1),
 
         unit_test(tree_mmap_NULL),
         unit_test(tree_mmap_first),
@@ -740,6 +822,8 @@ int main(void) {
         unit_test(tree_randomTest1),
         unit_test(tree_randomTest2),
     };
+
+///    return run_test( test_delete_1 );
 
     return run_group_tests(tests);
 }
