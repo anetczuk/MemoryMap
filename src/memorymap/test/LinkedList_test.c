@@ -397,9 +397,13 @@ static void list_randomTest1(void **state) {
         const size_t addr = rand() % 2000;
         const size_t msize = rand() % 20 +1;
 
+        ///printf("Iteration %lu\n", i);
+
         list_add(&list, addr, msize);
 
-        ///printf("Iteration %lu\n", i);
+        const size_t lSize = list_size(&list);
+        assert_int_equal( lSize, i+1 );
+
         const int valid = list_isValid(&list);
         assert_int_equal( valid, 0 );
     }
