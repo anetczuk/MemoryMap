@@ -92,6 +92,8 @@ size_t tree_startAddress(const RBTree* tree);
 
 size_t tree_endAddress(const RBTree* tree);
 
+MemoryArea tree_area(const RBTree* tree);
+
 RBTreeValidationError tree_isValid(const RBTree* tree);
 
 RBTreeNode* tree_findNode(const RBTree* tree, const size_t adress);

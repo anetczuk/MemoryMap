@@ -67,6 +67,27 @@ static RBTree create_random_tree(const unsigned int seed, const size_t nodes) {
     return tree;
 }
 
+static RBTree create_random_tree_map(const unsigned int seed, const size_t nodes, const size_t addressRange, const size_t sizeRange) {
+    srand( seed );
+
+    RBTree tree;
+    tree_init(&tree);
+
+    for(size_t i = 0; i < nodes; ++i) {
+        const size_t addr = rand() % addressRange;
+        const size_t msize = rand() % sizeRange +1;
+
+        /// printf("Iteration %lu: adding (%lu, %lu)\n", i, addr, msize);
+
+        tree_add(&tree, addr, msize);
+
+//        assert_int_equal( tree_size(&tree), i+1 );
+//        assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
+    }
+
+    return tree;
+}
+
 
 /// ======================================================
 
@@ -631,7 +652,7 @@ static void test_node_index(void **state) {
     const size_t treeSize = 16;
     RBTree tree = create_default_tree(treeSize);
 
-    tree_print(&tree);
+    /// tree_print(&tree);
 
     assert_int_equal( tree_size(&tree), treeSize );
     assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
@@ -677,7 +698,7 @@ static void test_tree_release_2(void **state) {
     assert_int_equal( ret, 2 );
 }
 
-static void test_tree_delete_1(void **state) {
+static void test_tree_delete_R_both(void **state) {
     (void) state; /* unused */
 
     const size_t treeSize = 16;
@@ -690,8 +711,164 @@ static void test_tree_delete_1(void **state) {
 
     tree_delete(&tree, 10);
 
-    const RBTreeValidationError valid = tree_isValid(&tree);
-    assert_int_equal( valid, RBTREE_INVALID_OK );
+    /// tree_print(&tree);
+
+    assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
+
+    tree_release(&tree);
+}
+
+static void test_tree_delete_R2(void **state) {
+    (void) state; /* unused */
+
+    const unsigned int seed = 1520453854;
+    const size_t treeSize = 16;
+    RBTree tree = create_random_tree(seed, 16);
+
+    assert_int_equal( tree_size(&tree), treeSize );
+    assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
+
+//    tree_print(&tree);
+
+    const MemoryArea area = tree_area(&tree);
+    const size_t addr = rand() % memory_size(&area) + area.start;
+
+//    printf("seed: %u deleting: %lu\n", seed, addr);
+
+    tree_delete(&tree, addr);
+
+//    tree_print(&tree);
+
+    assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
+
+    tree_release(&tree);
+}
+
+static void test_tree_delete_R3(void **state) {
+    (void) state; /* unused */
+
+    const unsigned int seed = 1520461234;
+    const size_t treeSize = 16;
+    RBTree tree = create_random_tree(seed, 16);
+
+    assert_int_equal( tree_size(&tree), treeSize );
+    assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
+
+//    tree_print(&tree);
+
+    const MemoryArea area = tree_area(&tree);
+    const size_t addr = rand() % memory_size(&area) + area.start;
+
+//    printf("seed: %u deleting: %lu\n", seed, addr);
+
+    tree_delete(&tree, addr);
+
+//    tree_print(&tree);
+
+    assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
+
+    tree_release(&tree);
+}
+
+static void test_tree_delete_R4(void **state) {
+    (void) state; /* unused */
+
+    const unsigned int seed = 1520461635;
+    const size_t treeSize = 16;
+    RBTree tree = create_random_tree(seed, 16);
+
+    assert_int_equal( tree_size(&tree), treeSize );
+    assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
+
+//    tree_print(&tree);
+
+    const MemoryArea area = tree_area(&tree);
+    const size_t addr = rand() % memory_size(&area) + area.start;
+
+//    printf("seed: %u deleting: %lu\n", seed, addr);
+
+    tree_delete(&tree, addr);
+
+//    tree_print(&tree);
+
+    assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
+
+    tree_release(&tree);
+}
+
+static void test_tree_delete_random(void **state) {
+    (void) state; /* unused */
+
+    const unsigned int seed = time(NULL);
+    const size_t treeSize = 16;
+    RBTree tree = create_random_tree(seed, 16);
+
+    assert_int_equal( tree_size(&tree), treeSize );
+    assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
+
+    /// tree_print(&tree);
+
+    const MemoryArea area = tree_area(&tree);
+    const size_t addr = rand() % memory_size(&area) + area.start;
+
+//    printf("seed: %u deleting: %lu\n", seed, addr);
+
+    tree_delete(&tree, addr);
+
+    /// tree_print(&tree);
+
+    assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
+
+    tree_release(&tree);
+}
+
+static void test_tree_randomT1(void **state) {
+    (void) state; /* unused */
+
+    const unsigned int seed = 1520463781;
+    static const size_t nodes_num = 10;
+
+    RBTree tree = create_random_tree_map(seed, nodes_num, 200, 20);
+
+    const MemoryArea area = tree_area(&tree);
+
+    for(size_t i = 0; i < nodes_num; ++i) {
+        const size_t addr = rand() % memory_size(&area) + area.start;
+
+//        tree_print(&tree);
+
+        /// printf("Iteration %lu: removing %lu\n", i, addr);
+
+        tree_delete(&tree, addr);
+
+        assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
+    }
+
+    ///printf("Releasing\n");
+    tree_release(&tree);
+}
+
+static void test_tree_randomT2(void **state) {
+    (void) state; /* unused */
+
+    const unsigned int seed = 1520465042;
+    static const size_t nodes_num = 10;
+
+    RBTree tree = create_random_tree_map(seed, nodes_num, 200, 20);
+
+    const MemoryArea area = tree_area(&tree);
+
+    for(size_t i = 0; i < nodes_num; ++i) {
+        const size_t addr = rand() % memory_size(&area) + area.start;
+
+//        tree_print(&tree);
+
+        /// printf("Iteration %lu: removing %lu\n", i, addr);
+
+        tree_delete(&tree, addr);
+
+        assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
+    }
 
     ///printf("Releasing\n");
     tree_release(&tree);
@@ -701,41 +878,32 @@ static void test_tree_randomTest1(void **state) {
     (void) state; /* unused */
 
     const unsigned int seed = time(NULL);
-    /// const unsigned int seed = 0;
-    srand( seed );
-
-    RBTree tree;
-    tree_init(&tree);
-
+//    printf("seed: %u\n", seed);
     static const size_t nodes_num = 10;
 
-    for(size_t i = 0; i < nodes_num; ++i) {
-        const size_t addr = rand() % 200;
-        const size_t msize = rand() % 20 +1;
+    RBTree tree = create_random_tree_map(seed, nodes_num, 200, 20);
 
-        /// printf("Iteration %lu: adding (%lu, %lu)\n", i, addr, msize);
-
-        tree_add(&tree, addr, msize);
-
-        const size_t tSize = tree_size(&tree);
-        assert_int_equal( tSize, i+1 );
-
-        const RBTreeValidationError valid = tree_isValid(&tree);
-        assert_int_equal( valid, RBTREE_INVALID_OK );
+    const size_t treeSize = tree_size(&tree);
+    if (treeSize != nodes_num) {
+        printf("seed: %u\n", seed);
     }
+    assert_int_equal( treeSize, nodes_num );
+    assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
 
-    const size_t startAddress = tree_startAddress(&tree);
-    const size_t endAddress = tree_endAddress(&tree);
-    const size_t addressSpace = endAddress - startAddress;
+    const MemoryArea area = tree_area(&tree);
 
     for(size_t i = 0; i < nodes_num; ++i) {
-        const size_t addr = rand() % addressSpace + startAddress;
+        const size_t addr = rand() % memory_size(&area) + area.start;
 
         /// printf("Iteration %lu: removing %lu\n", i, addr);
 
         tree_delete(&tree, addr);
 
         const RBTreeValidationError valid = tree_isValid(&tree);
+        if (valid != RBTREE_INVALID_OK) {
+            printf("seed: %u\n", seed);
+            printf("Iteration %lu: removing %lu\n", i, addr);
+        }
         assert_int_equal( valid, RBTREE_INVALID_OK );
     }
 
@@ -747,41 +915,31 @@ static void test_tree_randomTest2(void **state) {
     (void) state; /* unused */
 
     const unsigned int seed = time(NULL);
-    /// const unsigned int seed = 0;
-    srand( seed );
-
-    RBTree tree;
-    tree_init(&tree);
-
+//    printf("seed: %u\n", seed);
     static const size_t nodes_num = 10;
 
-    for(size_t i = 0; i < nodes_num; ++i) {
-        const size_t addr = rand() % 2000;
-        const size_t msize = rand() % 20 +1;
+    RBTree tree = create_random_tree_map(seed, nodes_num, 2000, 20);
 
-        /// printf("Iteration %lu: adding (%lu, %lu)\n", i, addr, msize);
-
-        tree_add(&tree, addr, msize);
-
-        const size_t tSize = tree_size(&tree);
-        assert_int_equal( tSize, i+1 );
-
-        const RBTreeValidationError valid = tree_isValid(&tree);
-        assert_int_equal( valid, RBTREE_INVALID_OK );
+    const size_t treeSize = tree_size(&tree);
+    if (treeSize != nodes_num) {
+        printf("seed: %u\n", seed);
     }
+    assert_int_equal( treeSize, nodes_num );
 
-    const size_t startAddress = tree_startAddress(&tree);
-    const size_t endAddress = tree_endAddress(&tree);
-    const size_t addressSpace = endAddress - startAddress;
+    const MemoryArea area = tree_area(&tree);
 
     for(size_t i = 0; i < nodes_num; ++i) {
-        const size_t addr = rand() % addressSpace + startAddress;
+        const size_t addr = rand() % memory_size(&area) + area.start;
 
         /// printf("Iteration %lu: removing %lu\n", i, addr);
 
         tree_delete(&tree, addr);
 
         const RBTreeValidationError valid = tree_isValid(&tree);
+        if (valid != RBTREE_INVALID_OK) {
+            printf("seed: %u\n", seed);
+            printf("Iteration %lu: removing %lu\n", i, addr);
+        }
         assert_int_equal( valid, RBTREE_INVALID_OK );
     }
 
@@ -820,7 +978,11 @@ int main(void) {
         unit_test(test_tree_release_empty),
         unit_test(test_tree_release_2),
 
-        unit_test(test_tree_delete_1),
+        unit_test(test_tree_delete_R_both),
+        unit_test(test_tree_delete_R2),
+        unit_test(test_tree_delete_R3),
+        unit_test(test_tree_delete_R4),
+        unit_test(test_tree_delete_random),
 
         unit_test(test_tree_mmap_NULL),
         unit_test(test_tree_mmap_first),
@@ -842,11 +1004,14 @@ int main(void) {
         unit_test(test_tree_init_NULL),
         unit_test(test_tree_init_valid),
 
+        unit_test(test_tree_randomT1),
+        unit_test(test_tree_randomT2),
         unit_test(test_tree_randomTest1),
         unit_test(test_tree_randomTest2),
     };
 
-//    return run_test( test_tree_delete_1 );
+//    return run_test( test_tree_randomT2 );
+//    return run_test( test_tree_delete_random );
 
     return run_group_tests(tests);
 }
