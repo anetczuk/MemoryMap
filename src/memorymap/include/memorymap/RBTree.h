@@ -31,8 +31,8 @@
 
 
 typedef enum {
-    RBTREE_BLACK = 0,
-    RBTREE_RED
+    RBTREE_COLOR_BLACK = 0,
+    RBTREE_COLOR_RED
 } NodeColor;
 
 
@@ -50,7 +50,24 @@ typedef struct {
 } RBTree;
 
 
-/// =============================================
+typedef enum {
+    RBTREE_INVALID_OK = 0,                        /// tree is valid
+
+    /// binary tree properties
+    RBTREE_INVALID_ROOT_PARENT = 1,
+    RBTREE_INVALID_NODE_PARENT = 2,
+    RBTREE_INVALID_SAME_CHILD = 3,                /// 'left' and 'right' points to the same node
+    RBTREE_INVALID_BAD_MEMORY_SEGMENT = 4,
+    RBTREE_INVALID_NOT_SORTED = 5,
+
+    /// red-black tree properties
+    RBTREE_INVALID_RED_ROOT = 6,
+    RBTREE_INVALID_BLACK_CHILDREN = 7,            /// when node is red, then children have to be black
+    RBTREE_INVALID_BLACK_PATH = 8                 /// invalid number of black nodes on paths
+} RBTreeValidationError;
+
+
+/// ===========================================================================
 
 
 void* tree_mmap(RBTree* tree, void *vaddr, unsigned int size);
@@ -75,7 +92,7 @@ size_t tree_startAddress(const RBTree* tree);
 
 size_t tree_endAddress(const RBTree* tree);
 
-int tree_isValid(const RBTree* tree);
+RBTreeValidationError tree_isValid(const RBTree* tree);
 
 RBTreeNode* tree_findNode(const RBTree* tree, const size_t adress);
 
