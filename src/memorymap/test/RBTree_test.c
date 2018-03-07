@@ -78,7 +78,7 @@ static RBTree create_random_tree(const unsigned int seed, const size_t nodes) {
 /// ======================================================
 
 
-static void tree_mmap_NULL(void **state) {
+static void test_tree_mmap_NULL(void **state) {
     (void) state; /* unused */
 
     const void* ret = tree_mmap(NULL, NULL, 0);
@@ -86,7 +86,7 @@ static void tree_mmap_NULL(void **state) {
     assert_null( ret );
 }
 
-static void tree_mmap_first(void **state) {
+static void test_tree_mmap_first(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -100,7 +100,7 @@ static void tree_mmap_first(void **state) {
     tree_release(&tree);
 }
 
-static void tree_mmap_second(void **state) {
+static void test_tree_mmap_second(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -116,7 +116,7 @@ static void tree_mmap_second(void **state) {
     tree_release(&tree);
 }
 
-static void tree_mmap_segmented_toLeft(void **state) {
+static void test_tree_mmap_segmented_toLeft(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -134,7 +134,7 @@ static void tree_mmap_segmented_toLeft(void **state) {
     tree_release(&tree);
 }
 
-static void tree_mmap_segmented_toRight(void **state) {
+static void test_tree_mmap_segmented_toRight(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -152,7 +152,7 @@ static void tree_mmap_segmented_toRight(void **state) {
     tree_release(&tree);
 }
 
-static void tree_munmap_NULL(void **state) {
+static void test_tree_munmap_NULL(void **state) {
     (void) state; /* unused */
 
     tree_munmap(NULL, NULL);
@@ -160,7 +160,7 @@ static void tree_munmap_NULL(void **state) {
     assert_true( 1 );
 }
 
-static void tree_munmap_empty(void **state) {
+static void test_tree_munmap_empty(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -171,7 +171,7 @@ static void tree_munmap_empty(void **state) {
     tree_release(&tree);
 }
 
-static void tree_munmap_badaddr(void **state) {
+static void test_tree_munmap_badaddr(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -188,7 +188,7 @@ static void tree_munmap_badaddr(void **state) {
     tree_release(&tree);
 }
 
-static void tree_munmap_root(void **state) {
+static void test_tree_munmap_root(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -207,7 +207,7 @@ static void tree_munmap_root(void **state) {
     tree_release(&tree);
 }
 
-static void tree_munmap_root2(void **state) {
+static void test_tree_munmap_root2(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -227,7 +227,7 @@ static void tree_munmap_root2(void **state) {
     tree_release(&tree);
 }
 
-static void tree_munmap_right(void **state) {
+static void test_tree_munmap_right(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -246,7 +246,7 @@ static void tree_munmap_right(void **state) {
     tree_release(&tree);
 }
 
-static void tree_munmap_right2(void **state) {
+static void test_tree_munmap_right2(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -266,7 +266,7 @@ static void tree_munmap_right2(void **state) {
     tree_release(&tree);
 }
 
-static void tree_munmap_left(void **state) {
+static void test_tree_munmap_left(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -286,7 +286,7 @@ static void tree_munmap_left(void **state) {
     tree_release(&tree);
 }
 
-static void tree_munmap_left2(void **state) {
+static void test_tree_munmap_left2(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -310,7 +310,7 @@ static void tree_munmap_left2(void **state) {
     tree_release(&tree);
 }
 
-static void tree_munmap_subtree(void **state) {
+static void test_tree_munmap_subtree(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -342,14 +342,14 @@ static void tree_munmap_subtree(void **state) {
     tree_release(&tree);
 }
 
-static void tree_init_NULL(void **state) {
+static void test_tree_init_NULL(void **state) {
     (void) state; /* unused */
 
     const int ret = tree_init(NULL);
     assert_int_equal( ret, -1 );
 }
 
-static void tree_init_valid(void **state) {
+static void test_tree_init_valid(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -365,14 +365,14 @@ static void tree_init_valid(void **state) {
 /// ==================================================
 
 
-static void tree_add_NULL(void **state) {
+static void test_tree_add_NULL(void **state) {
     (void) state; /* unused */
 
     const size_t ret = tree_add(NULL, 3, 1);
     assert_int_equal( ret, 0 );
 }
 
-static void tree_add_left(void **state) {
+static void test_tree_add_left(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -392,7 +392,7 @@ static void tree_add_left(void **state) {
     tree_release(&tree);
 }
 
-static void tree_add_right(void **state) {
+static void test_tree_add_right(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -412,7 +412,7 @@ static void tree_add_right(void **state) {
     tree_release(&tree);
 }
 
-static void tree_add_subtree_left(void **state) {
+static void test_tree_add_subtree_left(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -434,7 +434,7 @@ static void tree_add_subtree_left(void **state) {
     tree_release(&tree);
 }
 
-static void tree_add_subtree_right(void **state) {
+static void test_tree_add_subtree_right(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -456,7 +456,7 @@ static void tree_add_subtree_right(void **state) {
     tree_release(&tree);
 }
 
-static void tree_add_subtree(void **state) {
+static void test_tree_add_subtree(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -485,7 +485,7 @@ static void tree_add_subtree(void **state) {
     tree_release(&tree);
 }
 
-static void tree_add_subtree_space(void **state) {
+static void test_tree_add_subtree_space(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -506,7 +506,7 @@ static void tree_add_subtree_space(void **state) {
     tree_release(&tree);
 }
 
-static void tree_add_subtree_startAddr(void **state) {
+static void test_tree_add_subtree_startAddr(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -528,21 +528,21 @@ static void tree_add_subtree_startAddr(void **state) {
     tree_release(&tree);
 }
 
-static void tree_size_NULL(void **state) {
+static void test_tree_size_NULL(void **state) {
     (void) state; /* unused */
 
     const size_t ret = tree_size(NULL);
     assert_int_equal( ret, 0 );
 }
 
-static void tree_depth_NULL(void **state) {
+static void test_tree_depth_NULL(void **state) {
     (void) state; /* unused */
 
     const size_t ret = tree_depth(NULL);
     assert_int_equal( ret, 0 );
 }
 
-static void tree_depth_0(void **state) {
+static void test_tree_depth_0(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -554,7 +554,7 @@ static void tree_depth_0(void **state) {
     tree_release(&tree);
 }
 
-static void tree_startAddress_valid(void **state) {
+static void test_tree_startAddress_valid(void **state) {
     (void) state; /* unused */
 
     {
@@ -583,7 +583,7 @@ static void tree_startAddress_valid(void **state) {
     }
 }
 
-static void tree_endAddress_valid(void **state) {
+static void test_tree_endAddress_valid(void **state) {
     (void) state; /* unused */
 
     {
@@ -629,14 +629,14 @@ static void test_node_index(void **state) {
     tree_release(&tree);
 }
 
-static void tree_release_NULL(void **state) {
+static void test_tree_release_NULL(void **state) {
     (void) state; /* unused */
 
     const int ret = tree_release(NULL);
     assert_int_equal( ret, -1 );
 }
 
-static void tree_release_empty(void **state) {
+static void test_tree_release_empty(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -645,7 +645,7 @@ static void tree_release_empty(void **state) {
     assert_int_equal( ret, 0 );
 }
 
-static void tree_release_2(void **state) {
+static void test_tree_release_2(void **state) {
     (void) state; /* unused */
 
     RBTree tree;
@@ -659,7 +659,7 @@ static void tree_release_2(void **state) {
     assert_int_equal( ret, 2 );
 }
 
-static void tree_delete_1(void **state) {
+static void test_tree_delete_1(void **state) {
     (void) state; /* unused */
 
     RBTree tree = create_random_tree(0, 16);
@@ -675,7 +675,7 @@ static void tree_delete_1(void **state) {
     tree_release(&tree);
 }
 
-static void tree_randomTest1(void **state) {
+static void test_tree_randomTest1(void **state) {
     (void) state; /* unused */
 
     const unsigned int seed = time(NULL);
@@ -721,7 +721,7 @@ static void tree_randomTest1(void **state) {
     tree_release(&tree);
 }
 
-static void tree_randomTest2(void **state) {
+static void test_tree_randomTest2(void **state) {
     (void) state; /* unused */
 
     const unsigned int seed = time(NULL);
@@ -776,51 +776,51 @@ int main(void) {
     //TODO: add selective run
 
     const struct UnitTest tests[] = {
-        unit_test(tree_add_NULL),
-        unit_test(tree_add_left),
-        unit_test(tree_add_right),
-        unit_test(tree_add_subtree_left),
-        unit_test(tree_add_subtree_right),
-        unit_test(tree_add_subtree),
-        unit_test(tree_add_subtree_space),
-        unit_test(tree_add_subtree_startAddr),
+        unit_test(test_tree_add_NULL),
+        unit_test(test_tree_add_left),
+        unit_test(test_tree_add_right),
+        unit_test(test_tree_add_subtree_left),
+        unit_test(test_tree_add_subtree_right),
+        unit_test(test_tree_add_subtree),
+        unit_test(test_tree_add_subtree_space),
+        unit_test(test_tree_add_subtree_startAddr),
 
-        unit_test(tree_size_NULL),
-        unit_test(tree_depth_NULL),
-        unit_test(tree_depth_0),
-        unit_test(tree_startAddress_valid),
-        unit_test(tree_endAddress_valid),
+        unit_test(test_tree_size_NULL),
+        unit_test(test_tree_depth_NULL),
+        unit_test(test_tree_depth_0),
+        unit_test(test_tree_startAddress_valid),
+        unit_test(test_tree_endAddress_valid),
 
         unit_test(test_node_index),
 
-        unit_test(tree_release_NULL),
-        unit_test(tree_release_empty),
-        unit_test(tree_release_2),
+        unit_test(test_tree_release_NULL),
+        unit_test(test_tree_release_empty),
+        unit_test(test_tree_release_2),
 
-        unit_test(tree_delete_1),
+        unit_test(test_tree_delete_1),
 
-        unit_test(tree_mmap_NULL),
-        unit_test(tree_mmap_first),
-        unit_test(tree_mmap_second),
-        unit_test(tree_mmap_segmented_toLeft),
-        unit_test(tree_mmap_segmented_toRight),
+        unit_test(test_tree_mmap_NULL),
+        unit_test(test_tree_mmap_first),
+        unit_test(test_tree_mmap_second),
+        unit_test(test_tree_mmap_segmented_toLeft),
+        unit_test(test_tree_mmap_segmented_toRight),
 
-        unit_test(tree_munmap_NULL),
-        unit_test(tree_munmap_empty),
-        unit_test(tree_munmap_badaddr),
-        unit_test(tree_munmap_root),
-        unit_test(tree_munmap_root2),
-        unit_test(tree_munmap_right),
-        unit_test(tree_munmap_right2),
-        unit_test(tree_munmap_left),
-        unit_test(tree_munmap_left2),
-        unit_test(tree_munmap_subtree),
+        unit_test(test_tree_munmap_NULL),
+        unit_test(test_tree_munmap_empty),
+        unit_test(test_tree_munmap_badaddr),
+        unit_test(test_tree_munmap_root),
+        unit_test(test_tree_munmap_root2),
+        unit_test(test_tree_munmap_right),
+        unit_test(test_tree_munmap_right2),
+        unit_test(test_tree_munmap_left),
+        unit_test(test_tree_munmap_left2),
+        unit_test(test_tree_munmap_subtree),
 
-        unit_test(tree_init_NULL),
-        unit_test(tree_init_valid),
+        unit_test(test_tree_init_NULL),
+        unit_test(test_tree_init_valid),
 
-        unit_test(tree_randomTest1),
-        unit_test(tree_randomTest2),
+        unit_test(test_tree_randomTest1),
+        unit_test(test_tree_randomTest2),
     };
 
 ///    return run_test( test_delete_1 );
