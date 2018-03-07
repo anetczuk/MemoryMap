@@ -26,23 +26,17 @@
 #include <stdlib.h>                     /// free
 #include <assert.h>
 #include <stdio.h>                      /// printf
-
-#include "memorymap/MemoryArea.h"
-
-
-typedef enum {
-    RBTREE_BLACK = 0,
-    RBTREE_RED
-} NodeColor;
+#include <string.h>
 
 
-typedef struct RBTreeElement {
+
+struct RBTreeElement {
     struct RBTreeElement* parent;
     struct RBTreeElement* left;
     struct RBTreeElement* right;
     MemoryArea area;
     NodeColor color;                /// black by default
-} RBTreeNode;
+};
 
 
 /// ===================================================
@@ -925,3 +919,31 @@ int tree_init(RBTree* tree) {
     tree->root = NULL;
     return 0;
 }
+
+
+/// =========================================================
+
+
+void node_init(RBTreeNode* node) {
+    if (node==NULL) {
+        return ;
+    }
+    memset(node, 0x0, sizeof(RBTreeNode));
+}
+
+void node_setArea(RBTreeNode* node, const MemoryArea* area) {
+    //TODO: xxx
+}
+
+void node_setColor(RBTreeNode* node, const NodeColor color) {
+    //TODO: xxx
+}
+
+void node_connectLeft(RBTreeNode* node, RBTreeNode* child) {
+    tree_setLeftChild(node, child);
+}
+
+void node_connectRight(RBTreeNode* node, RBTreeNode* child) {
+    tree_setRightChild(node, child);
+}
+

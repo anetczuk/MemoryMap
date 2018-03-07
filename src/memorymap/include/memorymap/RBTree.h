@@ -24,11 +24,21 @@
 #ifndef RBTREE_H_
 #define RBTREE_H_
 
-#include <stddef.h>                 /// NULL, size_t
+#include <stddef.h>                            /// NULL, size_t
 
+#include "memorymap/MemoryArea.h"
+
+
+
+typedef enum {
+    RBTREE_BLACK = 0,
+    RBTREE_RED
+} NodeColor;
+
+typedef struct RBTreeElement RBTreeNode;       /// pimpl principle
 
 typedef struct {
-    struct RBTreeElement* root;
+    RBTreeNode* root;
 } RBTree;
 
 
@@ -70,5 +80,20 @@ void tree_print(const RBTree* tree);
  * Returns number of released elements (size of list)
  */
 int tree_release(RBTree* tree);
+
+
+/// =================================================================
+
+
+void node_init(RBTreeNode* node);
+
+void node_setArea(RBTreeNode* node, const MemoryArea* area);
+
+void node_setColor(RBTreeNode* node, const NodeColor color);
+
+void node_connectLeft(RBTreeNode* node, RBTreeNode* child);
+
+void node_connectRight(RBTreeNode* node, RBTreeNode* child);
+
 
 #endif /* RBTREE_H_ */
