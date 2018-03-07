@@ -74,12 +74,12 @@ static RBTree create_random_tree_map(const unsigned int seed, const size_t nodes
     tree_init(&tree);
 
     for(size_t i = 0; i < nodes; ++i) {
-        const size_t addr = rand() % addressRange;
+        const size_t addr = rand() % addressRange +1;
         const size_t msize = rand() % sizeRange +1;
 
-        /// printf("Iteration %lu: adding (%lu, %lu)\n", i, addr, msize);
-
         tree_add(&tree, addr, msize);
+
+//        printf("Iteration %lu: adding (%lu, %lu), size: %lu\n", i, addr, msize, tree_size(&tree) );
 
 //        assert_int_equal( tree_size(&tree), i+1 );
 //        assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
@@ -561,6 +561,17 @@ static void test_tree_add_subtree_startAddr(void **state) {
 
     tree_release(&tree);
 }
+static void test_tree_add_subtree1(void **state) {
+    (void) state; /* unused */
+
+    const unsigned int seed = 1520466046;
+    const size_t nodes_num = 16;
+
+    RBTree tree = create_random_tree_map(seed, nodes_num, 200, 20);
+
+    assert_int_equal( tree_size(&tree), nodes_num );
+    assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
+}
 
 static void test_tree_size_NULL(void **state) {
     (void) state; /* unused */
@@ -965,6 +976,7 @@ int main(void) {
         unit_test(test_tree_add_subtree),
         unit_test(test_tree_add_subtree_space),
         unit_test(test_tree_add_subtree_startAddr),
+        unit_test(test_tree_add_subtree1),
 
         unit_test(test_tree_size_NULL),
         unit_test(test_tree_depth_NULL),
@@ -1010,7 +1022,7 @@ int main(void) {
         unit_test(test_tree_randomTest2),
     };
 
-//    return run_test( test_tree_randomT2 );
+//    return run_test( test_tree_add_subtree1 );
 //    return run_test( test_tree_delete_random );
 
     return run_group_tests(tests);
