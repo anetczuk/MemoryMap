@@ -35,13 +35,17 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 
 checkTool=""
+untilFailure=0
 
 for i in "$@"; do
 case $i in
-    --tool=*)       checkTool="${i#*=}"
-                    shift                   # past argument=value
-                    ;;
-    *)              ;;                      # unknown option, ignore
+    --untilfail|-uf)    ## until failure
+                        untilFailure=1
+                        ;;
+    --tool=*)           checkTool="${i#*=}"
+                        shift                   # past argument=value
+                        ;;
+    *)                  ;;                      # unknown option, ignore
 esac
 done
 
@@ -53,6 +57,20 @@ fi
 
 case "$checkTool" in
     "")              ## no tool, just run test suite
+                     if [ $untilFailure -eq 1 ]; then
+                        exitCode=0
+                        counter=0
+                        while [ $exitCode -eq 0 ]; do
+                            $SCRIPT_DIR/@test_name@ $@
+                            exitCode=$?
+                            
+                            counter=$((counter+1))
+                            
+                            echo -e "\n\nNext iteration: $counter"
+                            sleep 1
+                        done
+                        exit $exitCode
+                     fi
                      $SCRIPT_DIR/@test_name@ $@
                      exit $?;;
                     
