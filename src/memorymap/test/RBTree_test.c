@@ -258,7 +258,42 @@ static void tree_munmap_left2(void **state) {
     tree_munmap(&tree, (void*)320);
 
     const size_t ret = tree_size(&tree);
-    assert_int_equal( ret, 2 );
+    assert_int_equal( ret, 3 );
+
+    const size_t depth = tree_depth(&tree);
+    assert_int_equal( depth, 2 );
+
+    assert_int_equal( tree_isValid(&tree), 0 );
+
+    tree_release(&tree);
+}
+
+static void tree_munmap_subtree(void **state) {
+    (void) state; /* unused */
+
+    RBTree tree;
+    tree_init(&tree);
+
+    tree_mmap(&tree, (void*)20, 18);
+    tree_mmap(&tree, (void*)92, 17);
+    tree_mmap(&tree, (void*)72, 19);
+    tree_mmap(&tree, (void*)106, 16);
+    tree_mmap(&tree, (void*)90, 12);
+    tree_mmap(&tree, (void*)46, 16);
+    tree_mmap(&tree, (void*)92, 17);        /// the same once again
+    tree_mmap(&tree, (void*)113, 13);
+    tree_mmap(&tree, (void*)155, 13);
+    tree_mmap(&tree, (void*)110, 18);
+
+    assert_int_equal( tree_size(&tree), 10 );
+
+    tree_munmap(&tree, (void*)96);
+
+    const size_t ret = tree_size(&tree);
+    assert_int_equal( ret, 9 );
+
+    const size_t depth = tree_depth(&tree);
+    assert_int_equal( depth, 4 );
 
     assert_int_equal( tree_isValid(&tree), 0 );
 
@@ -575,13 +610,18 @@ static void tree_randomTest1(void **state) {
     RBTree tree;
     tree_init(&tree);
 
-    for(size_t i = 0; i< 100; ++i) {
-        const size_t addr = rand() % 2000;
+    static const size_t nodes_num = 10;
+
+    for(size_t i = 0; i < nodes_num; ++i) {
+        const size_t addr = rand() % 200;
         const size_t msize = rand() % 20 +1;
 
         /// printf("Iteration %lu: adding (%lu, %lu)\n", i, addr, msize);
 
         tree_add(&tree, addr, msize);
+
+        const size_t tSize = tree_size(&tree);
+        assert_int_equal( tSize, i+1 );
 
         const int valid = tree_isValid(&tree);
         assert_int_equal( valid, 0 );
@@ -591,15 +631,62 @@ static void tree_randomTest1(void **state) {
     const size_t endAddress = tree_endAddress(&tree);
     const size_t addressSpace = endAddress - startAddress;
 
-//    for(size_t i = 0; i< 100; ++i) {
-//        const size_t addr = rand() % addressSpace + startAddress;
-//
-//        tree_delete(&tree, addr);
-//
-//        printf("Iteration %lu\n", i);
-//        const int valid = tree_isValid(&tree);
-//        assert_int_equal( valid, 0 );
-//    }
+    for(size_t i = 0; i < nodes_num; ++i) {
+        const size_t addr = rand() % addressSpace + startAddress;
+
+        /// printf("Iteration %lu: removing %lu\n", i, addr);
+
+        tree_delete(&tree, addr);
+
+        const int valid = tree_isValid(&tree);
+        assert_int_equal( valid, 0 );
+    }
+
+    ///printf("Releasing\n");
+    tree_release(&tree);
+}
+
+static void tree_randomTest2(void **state) {
+    (void) state; /* unused */
+
+    const unsigned int seed = time(NULL);
+    /// const unsigned int seed = 0;
+    srand( seed );
+
+    RBTree tree;
+    tree_init(&tree);
+
+    static const size_t nodes_num = 10;
+
+    for(size_t i = 0; i < nodes_num; ++i) {
+        const size_t addr = rand() % 2000;
+        const size_t msize = rand() % 20 +1;
+
+        /// printf("Iteration %lu: adding (%lu, %lu)\n", i, addr, msize);
+
+        tree_add(&tree, addr, msize);
+
+        const size_t tSize = tree_size(&tree);
+        assert_int_equal( tSize, i+1 );
+
+        const int valid = tree_isValid(&tree);
+        assert_int_equal( valid, 0 );
+    }
+
+    const size_t startAddress = tree_startAddress(&tree);
+    const size_t endAddress = tree_endAddress(&tree);
+    const size_t addressSpace = endAddress - startAddress;
+
+    for(size_t i = 0; i < nodes_num; ++i) {
+        const size_t addr = rand() % addressSpace + startAddress;
+
+        /// printf("Iteration %lu: removing %lu\n", i, addr);
+
+        tree_delete(&tree, addr);
+
+        const int valid = tree_isValid(&tree);
+        assert_int_equal( valid, 0 );
+    }
 
     ///printf("Releasing\n");
     tree_release(&tree);
@@ -645,11 +732,13 @@ int main(void) {
         unit_test(tree_munmap_right2),
         unit_test(tree_munmap_left),
         unit_test(tree_munmap_left2),
+        unit_test(tree_munmap_subtree),
 
         unit_test(tree_init_NULL),
         unit_test(tree_init_valid),
 
         unit_test(tree_randomTest1),
+        unit_test(tree_randomTest2),
     };
 
     return run_group_tests(tests);

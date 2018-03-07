@@ -180,7 +180,7 @@ static int tree_isValid_checkPointers(const RBTreeNode* node, const RBTreeNode* 
     }
     if ((node->left == node->right) && (node->right != NULL)) {
         /// the same child
-        return -1;
+        return -2;
     }
 
     const int validLeft = tree_isValid_checkPointers(node->left, node);
@@ -257,14 +257,40 @@ static int tree_isValid_checkSorted(const RBTreeNode* node) {
     return 0;
 }
 
+static size_t tree_isValid_countBlackPaths(const RBTreeNode* node, int* flag) {
+    if (node == NULL) {
+        return 0;
+    }
+    const size_t validLeft = tree_isValid_countBlackPaths(node->left, flag);
+    if (*flag != 0) {
+        return 0;
+    }
+    const size_t validRight = tree_isValid_countBlackPaths(node->right, flag);
+    if (*flag != 0) {
+        return 0;
+    }
+
+    if (validLeft != validRight) {
+        *flag = 1;
+        return 0;
+    }
+
+    if (node->color == RBTREE_BLACK)
+        return validLeft + 1;
+    return validLeft;
+}
+
 /**
- * Every path from a given node to any of its descendant NIL nodes
+ * Every path from a given node to any of its descendant NULL nodes
  * contains the same number of black nodes.
  */
 static int tree_isValid_checkBlackPath(const RBTreeNode* node) {
-    //TODO: implement
-    ///if (node == NULL)
-    return 0;
+    if (node == NULL) {
+        return 0;
+    }
+    int flag = 0;
+    tree_isValid_countBlackPaths(node, &flag);
+    return flag;
 }
 
 static int tree_isValidSubTree(const RBTreeNode* node) {
@@ -290,35 +316,32 @@ static int tree_isValidSubTree(const RBTreeNode* node) {
         return validOrder;
     }
 
-    //TODO: finish
-
     /// checking red-black properties
+    /// root is black
+    if (node->parent == NULL) {
+        /// root
+        if (node->color != RBTREE_BLACK)
+            return -1;
+    }
 
-//    /// root is black
-//    if (node->parent == NULL) {
-//        /// root
-//        if (node->color != RBTREE_BLACK)
-//            return -1;
-//    }
+    /// if a node is red, then both its children are black
+    if (node->color == RBTREE_RED) {
+        if (node->left != NULL) {
+            if (node->left->color != RBTREE_BLACK) {
+                return -2;
+            }
+        }
+        if (node->right != NULL) {
+            if (node->right->color != RBTREE_BLACK) {
+                return -3;
+            }
+        }
+    }
 
-//    /// if a node is red, then both its children are black
-//    if (node->color == RBTREE_RED) {
-//        if (node->left != NULL) {
-//            if (node->left->color != RBTREE_BLACK) {
-//                return -1;
-//            }
-//        }
-//        if (node->right != NULL) {
-//            if (node->right->color != RBTREE_BLACK) {
-//                return -1;
-//            }
-//        }
-//    }
-//
-//    const int validPath = tree_isValid_checkBlackPath(node);
-//    if (validPath!=0) {
-//        return validPath;
-//    }
+    const int validPath = tree_isValid_checkBlackPath(node);
+    if (validPath!=0) {
+        return validPath;
+    }
 
     return 0;
 }
@@ -368,6 +391,14 @@ static inline void tree_setRightChild(RBTreeNode* node, RBTreeNode* child) {
     }
 }
 
+static inline void tree_changeChild(RBTreeNode* node, RBTreeNode* from, RBTreeNode* to) {
+    if (node->left == from) {
+        tree_setLeftChild(node, to);
+    } else {
+        tree_setRightChild(node, to);
+    }
+}
+
 static void tree_rotate_left(RBTreeNode* node) {
     RBTreeNode* parent = node->parent;
     RBTreeNode* nnew = node->right;
@@ -402,7 +433,7 @@ static void tree_rotate_right(RBTreeNode* node) {
     }
 }
 
-static void tree_repair(RBTreeNode* node) {
+static void tree_repair_insert(RBTreeNode* node) {
 	RBTreeNode* nParent = node->parent;
 	if ( nParent == NULL) {
 		node->color = RBTREE_BLACK;
@@ -419,7 +450,7 @@ static void tree_repair(RBTreeNode* node) {
             uncle->color = RBTREE_BLACK;
             RBTreeNode* grandpa = tree_grandparent(node);		/// never NULL here
             grandpa->color = RBTREE_RED;
-            tree_repair(grandpa);
+            tree_repair_insert(grandpa);
             return ;
         }
 	}
@@ -453,7 +484,7 @@ static RBTreeNode* tree_insertLeftNode(RBTreeNode* node) {
 	newNode->color = RBTREE_RED;						/// default color of new node
 	tree_setLeftChild(newNode, oldLeft);
 
-	tree_repair(newNode);
+	tree_repair_insert(newNode);
 	return newNode;
 }
 
@@ -465,7 +496,7 @@ static RBTreeNode* tree_insertRightNode(RBTreeNode* node) {
 	newNode->right = oldLeft;
 	tree_setRightChild(newNode, oldLeft);
 
-	tree_repair(node->right);
+	tree_repair_insert(node->right);
 	return newNode;
 }
 
@@ -545,12 +576,14 @@ static void* tree_addMemoryToRight(RBTreeNode* node, MemoryArea* area) {
     const size_t minStart = memory_startAddress(&(node->area), area );
     const size_t spaceBetween = rightArea->start - minStart;
 	const size_t areaSize = memory_size( area );
-	if (areaSize>spaceBetween) {
-		/// no space -- go to next node
-		return tree_addMemoryToRight(node->right, area);
-	} else {
-        return tree_addMemoryToLeft(node->right, area);
+	if (areaSize<=spaceBetween) {
+	    void* retAddr = tree_addMemoryToLeft(node->right, area);
+	    if (retAddr != NULL) {
+	        return retAddr;
+	    }
 	}
+    /// no space -- go to next node
+    return tree_addMemoryToRight(node->right, area);
 }
 
 static void tree_findRoot(RBTree* tree) {
@@ -571,7 +604,7 @@ static void* tree_addMemory(RBTree* tree, MemoryArea* area) {
         ///tree->root->color = RBTREE_BLACK;
         tree->root->area = *area;
         assert( tree_isValid(tree) == 0 );
-        tree_repair(tree->root);
+        tree_repair_insert(tree->root);
         assert( tree_isValid(tree) == 0 );
         return (void*)tree->root->area.start;
     }
@@ -670,12 +703,142 @@ static RBTreeNode* tree_findNode(RBTreeNode* node, const size_t adress) {
 	return NULL;
 }
 
-static inline void tree_reconnectToRight(RBTreeNode* node) {
-    RBTreeNode* subtree = node->parent;
-    tree_setLeftChild(subtree, NULL);
-    /// can return 'node', never NULL
-	RBTreeNode* mostNode = (RBTreeNode*) tree_getRightmostNode(node);
-	tree_setRightChild(mostNode, subtree);
+//static void tree_recolor(RBTreeNode* node) {
+//    if (node->color == RBTREE_BLACK) {
+//        node->color = RBTREE_RED;
+//    } else {
+//        node->color = RBTREE_BLACK;
+//    }
+//}
+
+static int tree_repair_childrenColors(const RBTreeNode* parent, const NodeColor leftChild, const NodeColor rightChild) {
+    if ( parent->left->color != leftChild ) {
+        return 1;
+    }
+    if ( parent->right->color != rightChild ) {
+        return 1;
+    }
+    return 0;
+}
+
+static void tree_repair_case1(RBTreeNode* node);
+
+static void tree_repair_case6(RBTreeNode* node) {
+    RBTreeNode* sibling = tree_sibling(node);
+    sibling->color = node->parent->color;
+    node->parent->color = RBTREE_BLACK;
+
+    if (node->parent->left == node) {
+        sibling->right->color = RBTREE_BLACK;
+        tree_rotate_left( node->parent );
+    } else {
+        sibling->left->color = RBTREE_BLACK;
+        tree_rotate_right( node->parent );
+    }
+}
+
+static void tree_repair_case5(RBTreeNode* node) {
+    RBTreeNode* sibling = tree_sibling(node);
+    if (sibling->color != RBTREE_BLACK) {
+        tree_repair_case6(node);
+        return ;
+    }
+
+    if (node->parent->left == node) {
+        if (tree_repair_childrenColors(sibling, RBTREE_RED, RBTREE_BLACK) != 0) {
+            sibling->color = RBTREE_RED;
+            sibling->left->color = RBTREE_BLACK;
+            tree_rotate_right( sibling );
+            tree_repair_case6(node);
+            return ;
+        }
+    }
+
+    if (node->parent->right == node) {
+        if (tree_repair_childrenColors(sibling, RBTREE_BLACK, RBTREE_RED) != 0) {
+            sibling->color = RBTREE_RED;
+            sibling->right->color = RBTREE_BLACK;
+            tree_rotate_left( sibling );
+            tree_repair_case6(node);
+            return ;
+        }
+    }
+}
+
+static void tree_repair_case4(RBTreeNode* node) {
+    if (node->parent->color != RBTREE_RED) {
+        tree_repair_case5(node);
+        return ;
+    }
+    RBTreeNode* sibling = tree_sibling(node);
+    if (sibling->color != RBTREE_BLACK) {
+        tree_repair_case5(node);
+        return ;
+    }
+    if (tree_repair_childrenColors(sibling, RBTREE_BLACK, RBTREE_BLACK) != 0) {
+        tree_repair_case5(node);
+        return ;
+    }
+    sibling->color = RBTREE_RED;
+    node->parent->color = RBTREE_BLACK;
+}
+
+static void tree_repair_case3(RBTreeNode* node) {
+    if (node->parent->color != RBTREE_BLACK) {
+        tree_repair_case4(node);
+        return ;
+    }
+    RBTreeNode* sibling = tree_sibling(node);
+    if (sibling->color != RBTREE_BLACK) {
+        tree_repair_case4(node);
+        return ;
+    }
+
+    if (tree_repair_childrenColors(sibling, RBTREE_BLACK, RBTREE_BLACK) != 0) {
+        tree_repair_case4(node);
+        return ;
+    }
+
+    sibling->color = RBTREE_RED;
+    tree_repair_case1(node->parent);
+}
+
+static void tree_repair_case2(RBTreeNode* node) {
+    RBTreeNode* sibling = tree_sibling(node);
+    if (sibling == NULL) {
+        /// case of root
+        return ;
+    }
+    if (sibling->color == RBTREE_RED) {
+        node->parent->color = RBTREE_RED;
+        sibling->color = RBTREE_BLACK;
+        if (node->parent->left == node)
+            tree_rotate_left( node->parent );
+        else
+            tree_rotate_right( node->parent );
+    }
+    tree_repair_case3(node);
+}
+
+static void tree_repair_case1(RBTreeNode* node) {
+    if (node->parent == NULL) {
+        return ;
+    }
+    tree_repair_case2(node);
+}
+
+static void tree_repair_delete(RBTreeNode* node) {
+    if (node == NULL) {
+        return ;
+    }
+
+    if (node->color == RBTREE_RED) {
+        node->color = RBTREE_BLACK;
+        return ;
+    }
+
+    /// restore -- cases
+    tree_repair_case1(node);
 }
 
 void tree_delete(RBTree* tree, const size_t address) {
@@ -687,13 +850,9 @@ void tree_delete(RBTree* tree, const size_t address) {
 
     if (node->right == NULL) {
         /// simple case -- just remove
-        //TODO: repaint tree
         if ( node->parent != NULL ) {
-            if (node->parent->right == node) {
-                tree_setRightChild(node->parent, node->left);
-            } else {
-                tree_setLeftChild(node->parent, node->left);
-            }
+            /// non-root case
+            tree_changeChild(node->parent, node, node->left);
         } else {
             /// removing root
             tree->root = node->left;
@@ -701,19 +860,20 @@ void tree_delete(RBTree* tree, const size_t address) {
                 node->left->parent = NULL;
             }
         }
+
+        if (node->color == RBTREE_BLACK) {
+            tree_repair_delete(node->left);
+        }
+
         free(node);
         return;
     }
 
     if (node->left == NULL) {
         /// simple case -- just reconnect
-        //TODO: repaint tree
         if ( node->parent != NULL ) {
-            if (node->parent->right == node) {
-                tree_setRightChild(node->parent, NULL);
-            } else {
-                tree_setLeftChild(node->parent, NULL);
-            }
+            /// non-root case
+            tree_changeChild(node->parent, node, node->right);
         } else {
             /// removing root
             tree->root = node->right;
@@ -721,6 +881,11 @@ void tree_delete(RBTree* tree, const size_t address) {
                 node->right->parent = NULL;
             }
         }
+
+        if (node->color == RBTREE_BLACK) {
+            tree_repair_delete(node->right);
+        }
+
         free(node);
         return;
     }
@@ -729,18 +894,14 @@ void tree_delete(RBTree* tree, const size_t address) {
     /// there is right subtree
 
     RBTreeNode* nextNode = (RBTreeNode*) tree_getLeftDescendant(node);      /// never NULL
-    if (nextNode->parent != node) {                                         /// can be 'node'
-        tree_reconnectToRight(nextNode);
+    node->area = nextNode->area;
+
+    tree_changeChild(nextNode->parent, nextNode, nextNode->right);
+    if (node->color == RBTREE_BLACK) {
+        tree_repair_delete(nextNode->right);
     }
-    tree_setLeftChild(nextNode, node->left);
-    if (node->parent != NULL) {
-        tree_setRightChild(node->parent, nextNode);
-    } else {
-        /// removing root
-        tree->root = nextNode;
-        nextNode->parent = NULL;
-    }
-    free(node);
+
+    free(nextNode);
 }
 
 void tree_munmap(RBTree* tree, void *vaddr) {
