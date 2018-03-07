@@ -35,7 +35,15 @@ typedef enum {
     RBTREE_RED
 } NodeColor;
 
-typedef struct RBTreeElement RBTreeNode;       /// pimpl principle
+
+typedef struct RBTreeElement {
+    struct RBTreeElement* parent;
+    struct RBTreeElement* left;
+    struct RBTreeElement* right;
+    MemoryArea area;
+    NodeColor color;                /// black by default
+} RBTreeNode;
+
 
 typedef struct {
     RBTreeNode* root;
@@ -85,11 +93,25 @@ int tree_release(RBTree* tree);
 /// =================================================================
 
 
+RBTreeNode* node_makeDefault();
+
+RBTreeNode* node_makeColored(const NodeColor color);
+
+RBTreeNode* node_makeLeaf(const NodeColor color, MemoryArea area);
+
+RBTreeNode* node_makeFull(RBTreeNode* left, RBTreeNode* right, MemoryArea area, const NodeColor color);
+
 void node_init(RBTreeNode* node);
+
+void node_release(RBTreeNode* node);
 
 void node_setArea(RBTreeNode* node, const MemoryArea* area);
 
 void node_setColor(RBTreeNode* node, const NodeColor color);
+
+RBTreeNode* node_getLeft(RBTreeNode* node);
+
+RBTreeNode* node_getRight(RBTreeNode* node);
 
 void node_connectLeft(RBTreeNode* node, RBTreeNode* child);
 

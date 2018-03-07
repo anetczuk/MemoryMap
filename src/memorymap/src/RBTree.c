@@ -30,18 +30,6 @@
 
 
 
-struct RBTreeElement {
-    struct RBTreeElement* parent;
-    struct RBTreeElement* left;
-    struct RBTreeElement* right;
-    MemoryArea area;
-    NodeColor color;                /// black by default
-};
-
-
-/// ===================================================
-
-
 static const RBTreeNode* tree_getLeftmostNode(const RBTreeNode* node) {
     if (node == NULL) {
         return NULL;
@@ -474,9 +462,8 @@ static void tree_repair_insert(RBTreeNode* node) {
 
 static RBTreeNode* tree_insertLeftNode(RBTreeNode* node) {
 	RBTreeNode* oldLeft = node->left;
-	RBTreeNode* newNode = calloc( 1, sizeof(RBTreeNode) );
+	RBTreeNode* newNode = node_makeColored(RBTREE_RED);         /// default color of new node
 	tree_setLeftChild(node, newNode);
-	newNode->color = RBTREE_RED;						/// default color of new node
 	tree_setLeftChild(newNode, oldLeft);
 
 	tree_repair_insert(newNode);
@@ -485,9 +472,8 @@ static RBTreeNode* tree_insertLeftNode(RBTreeNode* node) {
 
 static RBTreeNode* tree_insertRightNode(RBTreeNode* node) {
 	RBTreeNode* oldLeft = node->right;
-	RBTreeNode* newNode = calloc( 1, sizeof(RBTreeNode) );
+	RBTreeNode* newNode = node_makeColored(RBTREE_RED);         /// default color of new node
 	tree_setRightChild(node, newNode);
-	newNode->color = RBTREE_RED;						/// default color of new node
 	newNode->right = oldLeft;
 	tree_setRightChild(newNode, oldLeft);
 
@@ -647,17 +633,17 @@ void tree_print(const RBTree* tree) {
     printf("%s", "\n");
 }
 
-static int tree_releaseNodes(RBTreeNode* tree) {
-    if (tree == NULL) {
+static int tree_releaseNodes(RBTreeNode* node) {
+    if (node == NULL) {
         return 0;
     }
     /**
      * Done in recursive manner. In case of very large structures consider
      * reimplementing it using while() and vector structure.
      */
-    const int leftReleased = tree_releaseNodes(tree->left);
-    const int rightReleased = tree_releaseNodes(tree->right);
-    free(tree);
+    const int leftReleased = tree_releaseNodes(node->left);
+    const int rightReleased = tree_releaseNodes(node->right);
+    free(node);
     return leftReleased+rightReleased+1;
 }
 
@@ -665,7 +651,9 @@ int tree_release(RBTree* tree) {
     if (tree==NULL) {
         return -1;
     }
-    return tree_releaseNodes(tree->root);
+    const int ret = tree_releaseNodes(tree->root);
+    tree->root = NULL;
+    return ret;
 }
 
 
@@ -925,6 +913,30 @@ int tree_init(RBTree* tree) {
 /// =========================================================
 
 
+RBTreeNode* node_makeDefault() {
+    return calloc( 1, sizeof(RBTreeNode) );
+}
+
+RBTreeNode* node_makeColored(const NodeColor color) {
+    RBTreeNode* node = node_makeDefault();
+    node->color = color;
+    return node;
+}
+
+RBTreeNode* node_makeLeaf(const NodeColor color, MemoryArea area) {
+    RBTreeNode* node = node_makeColored(color);
+    node->area  = area;
+    return node;
+}
+
+RBTreeNode* node_makeFull(RBTreeNode* left, RBTreeNode* right, MemoryArea area, const NodeColor color) {
+    RBTreeNode* node = node_makeColored(color);
+    node_connectLeft(node, left);
+    node_connectRight(node, right);
+    node->area  = area;
+    return node;
+}
+
 void node_init(RBTreeNode* node) {
     if (node==NULL) {
         return ;
@@ -932,12 +944,45 @@ void node_init(RBTreeNode* node) {
     memset(node, 0x0, sizeof(RBTreeNode));
 }
 
+void node_release(RBTreeNode* node) {
+    if (node==NULL) {
+        return ;
+    }
+    tree_releaseNodes( node->left );
+    tree_releaseNodes( node->right );
+    node->left = NULL;
+    node->right = NULL;
+}
+
 void node_setArea(RBTreeNode* node, const MemoryArea* area) {
-    //TODO: xxx
+    if (node==NULL) {
+        return ;
+    }
+    if (area==NULL) {
+        return ;
+    }
+    node->area = *area;
 }
 
 void node_setColor(RBTreeNode* node, const NodeColor color) {
-    //TODO: xxx
+    if (node==NULL) {
+        return ;
+    }
+    node->color = color;
+}
+
+RBTreeNode* node_getLeft(RBTreeNode* node) {
+    if (node==NULL) {
+        return NULL;
+    }
+    return node->left;
+}
+
+RBTreeNode* node_getRight(RBTreeNode* node) {
+    if (node==NULL) {
+        return NULL;
+    }
+    return node->right;
 }
 
 void node_connectLeft(RBTreeNode* node, RBTreeNode* child) {
