@@ -571,6 +571,8 @@ static void test_tree_add_subtree1(void **state) {
 
     assert_int_equal( tree_size(&tree), nodes_num );
     assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
+
+    tree_release(&tree);
 }
 
 static void test_tree_size_NULL(void **state) {
