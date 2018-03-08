@@ -28,7 +28,7 @@
 
 
 typedef struct {
-    struct map_element* root;                /// pimpl idiom
+    struct map_root* root;                /// pimpl idiom
 } map_t;
 
 

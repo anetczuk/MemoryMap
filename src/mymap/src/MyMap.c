@@ -23,17 +23,18 @@
 
 #include "mymap/MyMap.h"
 
-#include <stddef.h>         /// NULL
-#include <stdio.h>          /// printf
+#include <stddef.h>                     /// NULL
+#include <stdio.h>                      /// printf
+#include <stdlib.h>                     /// free
 
 
 #include <memorymap/RBTree.h>
 
 
 
-struct map_element {
-    RBTree root;
-};
+typedef struct map_root {
+    RBTree tree;
+} map_element;
 
 
 
@@ -41,45 +42,76 @@ struct map_element {
  * Reserve memory space.
  */
 void *mymap_mmap(map_t *map, void *vaddr, unsigned int size, unsigned int flags, void *o) {
-    //TODO: implement
-    return NULL;
+    if (map == NULL) {
+        return NULL;
+    }
+    return tree_mmap( &(map->root->tree), vaddr, size );
 }
 
 /**
  * Release memory.
  */
 void mymap_munmap(map_t *map, void *vaddr) {
-    //TODO: implement
+    if (map == NULL) {
+        return ;
+    }
+    if (map->root == NULL) {
+        return ;
+    }
+    tree_munmap( &(map->root->tree), vaddr );
 }
 
 /**
  * Memory initialization.
  */
 int mymap_init(map_t *map) {
-    //TODO: implement
-    return -1;
+    if (map == NULL) {
+        return -1;
+    }
+    map->root = calloc(1, sizeof(map_element) );
+    return tree_init( &(map->root->tree) );
 }
 
 int mymap_release(map_t *map) {
-    //TODO: implement
-    return -1;
+    if (map == NULL) {
+        return 0;
+    }
+    if (map->root == NULL) {
+        return 0;
+    }
+    return tree_release( &(map->root->tree) );
 }
 
 /**
  * Print memory structure.
  */
 int mymap_dump(map_t *map) {
-    //TODO: implement
-    ///printf("%s", "xxxx");
-    return -1;
-}
-
-size_t mymap_size(const map_t *map) {
-    //TODO: implement
+    if (map == NULL) {
+        return 0;
+    }
+    if (map->root == NULL) {
+        return 0;
+    }
+    tree_print( &(map->root->tree) );
     return 0;
 }
 
+size_t mymap_size(const map_t *map) {
+    if (map == NULL) {
+        return 0;
+    }
+    if (map->root == NULL) {
+        return 0;
+    }
+    return tree_size( &(map->root->tree) );
+}
+
 int mymap_isValid(const map_t *map) {
-    //TODO: implement
-    return -1;
+    if (map == NULL) {
+        return 0;
+    }
+    if (map->root == NULL) {
+        return -1;
+    }
+    return tree_isValid( &(map->root->tree) );
 }
