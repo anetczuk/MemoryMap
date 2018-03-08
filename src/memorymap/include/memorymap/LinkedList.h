@@ -30,7 +30,7 @@
 
 
 typedef struct {
-    struct LinkedListElement* root;
+    struct LinkedListElement* root;         /// pimpl idiom
 } LinkedList;
 
 
