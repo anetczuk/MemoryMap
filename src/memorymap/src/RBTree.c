@@ -656,6 +656,10 @@ size_t node_index(const RBTreeNode* node) {
     return node_index(leftNode) + 1 + subIndex;
 }
 
+
+/// ==============================================================================================
+
+
 static void tree_printLevel(const RBTreeNode* node, const size_t level, int* previousNodeIndex) {
     if (node == NULL) {
         return ;
@@ -672,19 +676,23 @@ static void tree_printLevel(const RBTreeNode* node, const size_t level, int* pre
 
     /// print empty space on left
     for(size_t i=0; i<diff; ++i) {
-        printf("           ");
+        printf("          ");
     }
 
+    char color = 'X';
     switch(node->color) {
     case RBTREE_COLOR_BLACK: {
-        printf("(B,%3lu,%3lu)", node->area.start, node->area.end);
+        color = 'B';
         break;
     }
     case RBTREE_COLOR_RED: {
-        printf("(R,%3lu,%3lu)", node->area.start, node->area.end);
+        color = 'R';
         break;
     }
     }
+
+    const size_t blockSize = memory_size(&(node->area));
+    printf("(%c,%03lx,%02lx)", color, node->area.start, blockSize);
 
     *previousNodeIndex = pos;
 }
@@ -714,6 +722,10 @@ void tree_print(const RBTree* tree) {
     }
     tree_printWhole(tree->root);
 }
+
+
+/// ==============================================================================================
+
 
 static int tree_releaseNodes(RBTreeNode* node) {
     if (node == NULL) {

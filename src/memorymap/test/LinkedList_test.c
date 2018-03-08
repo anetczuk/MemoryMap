@@ -224,6 +224,18 @@ static void list_release_list(void **state) {
     assert_int_equal( ret, 0 );
 }
 
+static void list_release_double(void **state) {
+    (void) state; /* unused */
+
+    LinkedList memMap;
+    list_init(&memMap);
+
+    list_add(&memMap, 10, 10);
+
+    assert_int_equal( list_release(&memMap), 1 );
+    assert_int_equal( list_release(&memMap), 0 );
+}
+
 static void list_release_2(void **state) {
     (void) state; /* unused */
 
@@ -433,7 +445,9 @@ int main(void) {
     const struct UnitTest tests[] = {
         unit_test(list_release_NULL),
         unit_test(list_release_list),
+        unit_test(list_release_double),
         unit_test(list_release_2),
+
         unit_test(list_add_NULL),
         unit_test(list_add_first),
         unit_test(list_add_middle),

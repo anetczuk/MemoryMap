@@ -190,7 +190,9 @@ int list_release(LinkedList* list) {
     if (list == NULL) {
         return -1;
     }
-    return list_releaseNodes(list->root);
+    const int ret = list_releaseNodes(list->root);
+    list->root = NULL;
+    return ret;
 }
 
 

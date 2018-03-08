@@ -695,6 +695,18 @@ static void test_tree_release_empty(void **state) {
     assert_int_equal( ret, 0 );
 }
 
+static void test_tree_release_double(void **state) {
+    (void) state; /* unused */
+
+    RBTree memMap;
+    tree_init(&memMap);
+
+    tree_add(&memMap, 10, 10);
+
+    assert_int_equal( tree_release(&memMap), 1 );
+    assert_int_equal( tree_release(&memMap), 0 );
+}
+
 static void test_tree_release_2(void **state) {
     (void) state; /* unused */
 
@@ -988,6 +1000,7 @@ int main(void) {
 
         unit_test(test_tree_release_NULL),
         unit_test(test_tree_release_empty),
+        unit_test(test_tree_release_double),
         unit_test(test_tree_release_2),
 
         unit_test(test_tree_delete_R_both),
