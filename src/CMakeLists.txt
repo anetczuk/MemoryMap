@@ -36,7 +36,7 @@ endif()
 ## compiler flags, gcc does not handle "appended" values
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall" )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic" )
-set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long" )
+#set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long" )
 
 
 ## option for code coverage
