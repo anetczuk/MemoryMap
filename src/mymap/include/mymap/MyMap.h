@@ -24,7 +24,15 @@
 #ifndef MYMAP_H_
 #define MYMAP_H_
 
-#include "mymap/map_t.h"
+#include <stddef.h>                           /// NULL, size_t
+
+
+typedef struct {
+    struct map_element* root;                /// pimpl idiom
+} map_t;
+
+
+/// ==================================================
 
 
 /**
@@ -42,10 +50,15 @@ void mymap_munmap(map_t *map, void *vaddr);
  */
 int mymap_init(map_t *map);
 
+int mymap_release(map_t *map);
+
 /**
  * Print memory structure.
  */
 int mymap_dump(map_t *map);
 
+size_t mymap_size(const map_t *map);
+
+int mymap_isValid(const map_t *map);
 
 #endif /* MYMAP_H_ */

@@ -6,7 +6,10 @@
 set( TARGET_NAME mymap )
 
 
-set( EXT_LIBS  )
+include_directories( "../../memorymap/include" )
+
+
+set( EXT_LIBS memorymap )
 
 
 file(GLOB_RECURSE cpp_files *.c )

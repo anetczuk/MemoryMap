@@ -29,7 +29,10 @@
 #include <cmocka.h>
 
 
-static void mymap_mmap_NULL(void **state) {
+typedef map_t ContainerType;
+
+
+static void test_mymap_mmap_NULL(void **state) {
     (void) state; /* unused */
 
     const void* ret = mymap_mmap(NULL, NULL, 0, 0, NULL);
@@ -37,7 +40,73 @@ static void mymap_mmap_NULL(void **state) {
     assert_null( ret );
 }
 
-static void mymap_munmap_NULL(void **state) {
+static void test_mymap_mmap_first(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    mymap_init(&memMap);
+
+    const void* ret = mymap_mmap(&memMap, (void*)128, 64, 0, NULL);
+    assert_int_equal( ret, 128 );
+
+    assert_int_equal( mymap_isValid(&memMap), 0 );
+
+    mymap_release(&memMap);
+}
+
+static void test_mymap_mmap_second(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    mymap_init(&memMap);
+
+    mymap_mmap(&memMap, (void*)160, 64, 0, NULL);
+
+    const void* ret = mymap_mmap(&memMap, (void*)128, 64, 0, NULL);
+    assert_int_equal( ret, 224 );
+
+    assert_int_equal( mymap_isValid(&memMap), 0 );
+
+    mymap_release(&memMap);
+}
+
+static void test_mymap_mmap_segmented_toLeft(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    mymap_init(&memMap);
+
+    mymap_mmap(&memMap, (void*)200, 64, 0, NULL);
+    /// small space between segments
+    mymap_mmap(&memMap, (void*)100, 64, 0, NULL);
+
+    const void* ret = mymap_mmap(&memMap, (void*)128, 64, 0, NULL);
+    assert_int_equal( ret, 264 );
+
+    assert_int_equal( mymap_isValid(&memMap), 0 );
+
+    mymap_release(&memMap);
+}
+
+static void test_mymap_mmap_segmented_toRight(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    mymap_init(&memMap);
+
+    mymap_mmap(&memMap, (void*)100, 64, 0, NULL);
+    /// small space between segments
+    mymap_mmap(&memMap, (void*)200, 64, 0, NULL);
+
+    const void* ret = mymap_mmap(&memMap, (void*)128, 64, 0, NULL);
+    assert_int_equal( ret, 264 );
+
+    assert_int_equal( mymap_isValid(&memMap), 0 );
+
+    mymap_release(&memMap);
+}
+
+static void test_mymap_munmap_NULL(void **state) {
     (void) state; /* unused */
 
     mymap_munmap(NULL, NULL);
@@ -45,30 +114,224 @@ static void mymap_munmap_NULL(void **state) {
     assert_true( 1 );
 }
 
-static void mymap_init_NULL(void **state) {
+static void test_mymap_munmap_empty(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    mymap_init(&memMap);
+
+    mymap_munmap(&memMap, NULL);
+
+    mymap_release(&memMap);
+}
+
+static void test_mymap_munmap_badaddr(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    mymap_init(&memMap);
+    mymap_mmap(&memMap, (void*)100, 64, 0, NULL);
+
+    mymap_munmap(&memMap, (void*)50);
+
+    const size_t ret = mymap_size(&memMap);
+    assert_int_equal( ret, 1 );
+
+    assert_int_equal( mymap_isValid(&memMap), 0 );
+
+    mymap_release(&memMap);
+}
+
+static void test_mymap_munmap_root(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    mymap_init(&memMap);
+
+    mymap_mmap(&memMap, (void*)100, 64, 0, NULL);
+    mymap_mmap(&memMap, (void*)200, 64, 0, NULL);
+
+    mymap_munmap(&memMap, (void*)120);
+
+    const size_t ret = mymap_size(&memMap);
+    assert_int_equal( ret, 1 );
+
+    assert_int_equal( mymap_isValid(&memMap), 0 );
+
+    mymap_release(&memMap);
+}
+
+static void test_mymap_munmap_root2(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    mymap_init(&memMap);
+
+    mymap_mmap(&memMap, (void*)100, 64, 0, NULL);
+    mymap_mmap(&memMap, (void*)20, 64, 0, NULL);
+    mymap_mmap(&memMap, (void*)200, 64, 0, NULL);
+
+    mymap_munmap(&memMap, (void*)120);
+
+    const size_t ret = mymap_size(&memMap);
+    assert_int_equal( ret, 2 );
+
+    assert_int_equal( mymap_isValid(&memMap), 0 );
+
+    mymap_release(&memMap);
+}
+
+static void test_mymap_munmap_right(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    mymap_init(&memMap);
+
+    mymap_mmap(&memMap, (void*)100, 64, 0, NULL);
+    mymap_mmap(&memMap, (void*)200, 64, 0, NULL);
+
+    mymap_munmap(&memMap, (void*)220);
+
+    const size_t ret = mymap_size(&memMap);
+    assert_int_equal( ret, 1 );
+
+    assert_int_equal( mymap_isValid(&memMap), 0 );
+
+    mymap_release(&memMap);
+}
+
+static void test_mymap_munmap_right2(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    mymap_init(&memMap);
+
+    mymap_mmap(&memMap, (void*)100, 64, 0, NULL);
+    mymap_mmap(&memMap, (void*)20, 64, 0, NULL);
+    mymap_mmap(&memMap, (void*)200, 64, 0, NULL);
+
+    mymap_munmap(&memMap, (void*)220);
+
+    const size_t ret = mymap_size(&memMap);
+    assert_int_equal( ret, 2 );
+
+    assert_int_equal( mymap_isValid(&memMap), 0 );
+
+    mymap_release(&memMap);
+}
+
+static void test_mymap_munmap_left(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    mymap_init(&memMap);
+
+    mymap_mmap(&memMap, (void*)200, 64, 0, NULL);
+    mymap_mmap(&memMap, (void*)100, 64, 0, NULL);
+    mymap_mmap(&memMap, (void*)300, 64, 0, NULL);
+
+    mymap_munmap(&memMap, (void*)120);
+
+    const size_t ret = mymap_size(&memMap);
+    assert_int_equal( ret, 2 );
+
+    assert_int_equal( mymap_isValid(&memMap), 0 );
+
+    mymap_release(&memMap);
+}
+
+static void test_mymap_munmap_left2(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    mymap_init(&memMap);
+
+    mymap_mmap(&memMap, (void*)200, 64, 0, NULL);
+    mymap_mmap(&memMap, (void*)100, 64, 0, NULL);
+    mymap_mmap(&memMap, (void*)300, 64, 0, NULL);
+    mymap_mmap(&memMap, (void*)400, 64, 0, NULL);
+
+    mymap_munmap(&memMap, (void*)320);
+
+    const size_t ret = mymap_size(&memMap);
+    assert_int_equal( ret, 3 );
+
+    assert_int_equal( mymap_isValid(&memMap), 0 );
+
+    mymap_release(&memMap);
+}
+
+static void test_mymap_munmap_subtree(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    mymap_init(&memMap);
+
+    mymap_mmap(&memMap, (void*)20, 18, 0, NULL);
+    mymap_mmap(&memMap, (void*)92, 17, 0, NULL);
+    mymap_mmap(&memMap, (void*)72, 19, 0, NULL);
+    mymap_mmap(&memMap, (void*)106, 16, 0, NULL);
+    mymap_mmap(&memMap, (void*)90, 12, 0, NULL);
+    mymap_mmap(&memMap, (void*)46, 16, 0, NULL);
+    mymap_mmap(&memMap, (void*)92, 17, 0, NULL);        /// the same once again
+    mymap_mmap(&memMap, (void*)113, 13, 0, NULL);
+    mymap_mmap(&memMap, (void*)155, 13, 0, NULL);
+    mymap_mmap(&memMap, (void*)110, 18, 0, NULL);
+
+    assert_int_equal( mymap_size(&memMap), 10 );
+
+    mymap_munmap(&memMap, (void*)96);
+
+    const size_t ret = mymap_size(&memMap);
+    assert_int_equal( ret, 9 );
+
+    assert_int_equal( mymap_isValid(&memMap), 0 );
+
+    mymap_release(&memMap);
+}
+
+static void test_mymap_init_NULL(void **state) {
     (void) state; /* unused */
 
     const int ret = mymap_init(NULL);
-
     assert_int_equal( ret, -1 );
 }
 
-static void mymap_dump_NULL(void **state) {
+static void test_mymap_init_valid(void **state) {
     (void) state; /* unused */
 
-    const int ret = mymap_dump(NULL);
+    ContainerType memMap;
+    const int ret = mymap_init(&memMap);
+    assert_int_equal( ret, 0 );
 
-    assert_int_equal( ret, -1 );
+    assert_int_equal( mymap_isValid(&memMap), 0 );
+
+    mymap_release(&memMap);
 }
 
 
 
 int main(void) {
     const struct UnitTest tests[] = {
-        unit_test(mymap_mmap_NULL),
-        unit_test(mymap_munmap_NULL),
-        unit_test(mymap_init_NULL),
-        unit_test(mymap_dump_NULL),
+        unit_test(test_mymap_mmap_NULL),
+        unit_test(test_mymap_mmap_first),
+        unit_test(test_mymap_mmap_second),
+        unit_test(test_mymap_mmap_segmented_toLeft),
+        unit_test(test_mymap_mmap_segmented_toRight),
+
+        unit_test(test_mymap_munmap_NULL),
+        unit_test(test_mymap_munmap_empty),
+        unit_test(test_mymap_munmap_badaddr),
+        unit_test(test_mymap_munmap_root),
+        unit_test(test_mymap_munmap_root2),
+        unit_test(test_mymap_munmap_right),
+        unit_test(test_mymap_munmap_right2),
+        unit_test(test_mymap_munmap_left),
+        unit_test(test_mymap_munmap_left2),
+        unit_test(test_mymap_munmap_subtree),
+
+        unit_test(test_mymap_init_NULL),
+        unit_test(test_mymap_init_valid),
     };
 
     return run_group_tests(tests);

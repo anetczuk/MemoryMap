@@ -27,6 +27,16 @@
 #include <stdio.h>          /// printf
 
 
+#include <memorymap/RBTree.h>
+
+
+
+struct map_element {
+    RBTree root;
+};
+
+
+
 /**
  * Reserve memory space.
  */
@@ -50,11 +60,26 @@ int mymap_init(map_t *map) {
     return -1;
 }
 
+int mymap_release(map_t *map) {
+    //TODO: implement
+    return -1;
+}
+
 /**
  * Print memory structure.
  */
 int mymap_dump(map_t *map) {
     //TODO: implement
     ///printf("%s", "xxxx");
+    return -1;
+}
+
+size_t mymap_size(const map_t *map) {
+    //TODO: implement
+    return 0;
+}
+
+int mymap_isValid(const map_t *map) {
+    //TODO: implement
     return -1;
 }
