@@ -712,7 +712,7 @@ void tree_print(const RBTree* tree) {
         printf("%s", "[NULL]");
         return ;
     }
-    tree_printSubtree(tree->root);
+    tree_printWhole(tree->root);
 }
 
 static int tree_releaseNodes(RBTreeNode* node) {
