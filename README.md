@@ -6,7 +6,7 @@ Map consists of two primary operations:
 * _reserve_ of new memory block described by start address and block size
 * _remove_ of existing block by any address within range of the block
 
-In case of memory segmentation - new block cannot be added in pointed address - new block is reserved at first available place starting from desired address  
+In case of memory segmentation - new block cannot be added in pointed address - new block is reserved at first available place starting from desired address.  
 
 
 ### Modules
@@ -50,6 +50,10 @@ _ctest_
 Checking memory leaks on tests, eg. on _RBTree.h_:
 
 _./memorymap/test/test_RBTree_test.sh --tool=memcheck_
+
+Running callgrind on tests, eg. on _RBTree.h_:
+
+_./memorymap/test/test_RBTree_test.sh --tool=callgrind_
 
 Measuring code coverage of tests, eg. for _RBTree.h_:
 
