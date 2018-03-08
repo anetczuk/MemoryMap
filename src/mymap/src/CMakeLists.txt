@@ -6,9 +6,6 @@
 set( TARGET_NAME mymap )
 
 
-include_directories( "../../memorymap/include" )
-
-
 set( EXT_LIBS memorymap )
 
 

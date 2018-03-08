@@ -309,6 +309,25 @@ static void test_mymap_init_valid(void **state) {
     mymap_release(&memMap);
 }
 
+static void test_mymap_release_NULL(void **state) {
+    (void) state; /* unused */
+
+    const int ret = mymap_release(NULL);
+    assert_int_equal( ret, -1 );
+}
+
+static void test_mymap_release_double(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    mymap_init(&memMap);
+
+    mymap_mmap(&memMap, (void*)10, 10, 0, NULL);
+
+    assert_int_equal( mymap_release(&memMap), 1 );
+    assert_int_equal( mymap_release(&memMap), -2 );
+}
+
 
 
 int main(void) {
@@ -332,6 +351,9 @@ int main(void) {
 
         unit_test(test_mymap_init_NULL),
         unit_test(test_mymap_init_valid),
+
+        unit_test(test_mymap_release_NULL),
+        unit_test(test_mymap_release_double),
     };
 
     return run_group_tests(tests);

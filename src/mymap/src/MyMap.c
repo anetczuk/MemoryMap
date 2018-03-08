@@ -40,9 +40,13 @@ typedef struct map_root {
 
 /**
  * Reserve memory space.
+ * Fields 'flags' and 'o' not supported for now.
  */
 void *mymap_mmap(map_t *map, void *vaddr, unsigned int size, unsigned int flags, void *o) {
     if (map == NULL) {
+        return NULL;
+    }
+    if (map->root == NULL) {
         return NULL;
     }
     return tree_mmap( &(map->root->tree), vaddr, size );
@@ -74,12 +78,17 @@ int mymap_init(map_t *map) {
 
 int mymap_release(map_t *map) {
     if (map == NULL) {
-        return 0;
+        return -1;
     }
     if (map->root == NULL) {
-        return 0;
+        return -2;
     }
-    return tree_release( &(map->root->tree) );
+    const int ret = tree_release( &(map->root->tree) );
+
+    free(map->root);
+    map->root = NULL;
+
+    return ret;
 }
 
 /**
@@ -104,6 +113,26 @@ size_t mymap_size(const map_t *map) {
         return 0;
     }
     return tree_size( &(map->root->tree) );
+}
+
+void *mymap_startAddress(const map_t *map) {
+    if (map == NULL) {
+        return NULL;
+    }
+    if (map->root == NULL) {
+        return NULL;
+    }
+    return (void *)tree_startAddress( &(map->root->tree) );
+}
+
+void *mymap_endAddress(const map_t *map) {
+    if (map == NULL) {
+        return NULL;
+    }
+    if (map->root == NULL) {
+        return NULL;
+    }
+    return (void *)tree_endAddress( &(map->root->tree) );
 }
 
 int mymap_isValid(const map_t *map) {

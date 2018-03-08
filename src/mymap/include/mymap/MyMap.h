@@ -32,7 +32,7 @@ typedef struct {
 } map_t;
 
 
-/// ==================================================
+/// ====================================================================+
 
 
 /**
@@ -57,7 +57,15 @@ int mymap_release(map_t *map);
  */
 int mymap_dump(map_t *map);
 
+
+/// ====================================================================+
+
+
 size_t mymap_size(const map_t *map);
+
+void *mymap_startAddress(const map_t *map);
+
+void *mymap_endAddress(const map_t *map);
 
 int mymap_isValid(const map_t *map);
 
