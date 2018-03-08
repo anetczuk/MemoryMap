@@ -84,7 +84,18 @@ case "$checkTool" in
                      coverage_dir=$SCRIPT_DIR/@test_name@_coverage
                      rm -rf $coverage_dir
                      mkdir -p $coverage_dir
-                     lcov --base-directory . --directory . --zerocounters -q
+                     
+                     coverage_reference_file=$coverage_dir/base.info
+                     coverage_measure_file=$coverage_dir/test.info
+                     coverage_merge_file=$coverage_dir/total.info
+                     coverage_source_dir=@CMAKE_CURRENT_BINARY_DIR@/..
+                     
+                     #### calculate reference values
+                     ##base_dir=$coverage_source_dir/..
+                     ##lcov --zerocounters --directory $base_dir --output-file $coverage_reference_file                    
+                     ##lcov --capture --initial --directory $base_dir --output-file $coverage_reference_file
+                     
+                     lcov --base-directory $coverage_source_dir --directory $coverage_source_dir --zerocounters -q
                      
                      ## execute tests
                      set +e
@@ -94,9 +105,20 @@ case "$checkTool" in
                      
                      set -e
                      
+                     lcov --capture --directory $coverage_source_dir --output-file $coverage_measure_file
+                     if [ -f "$coverage_reference_file" ]; then
+                         ## merge baseline data with coverage data
+                         lcov -a $coverage_reference_file -a $coverage_measure_file -o $coverage_merge_file
+                     else
+                         coverage_merge_file=$coverage_measure_file
+                     fi
+                     
+                     #### remove system headers references (lcov's '--no-external' is not supported for version 1.9 and below)
+                     ##lcov --extract $coverage_merge_file "$coverage_source_dir/*" --output-file $coverage_merge_file
+                     ##lcov --remove $coverage_merge_file "$coverage_source_dir/example/*" --output-file $coverage_merge_file
+                                          
                      ## generate report
-                     lcov --base-directory . --directory . -c -o $coverage_dir/test.info
-                     genhtml -o $coverage_dir -t "@test_name@ test coverage" --num-spaces 4 $coverage_dir/test.info
+                     genhtml --demangle-cpp -o $coverage_dir -t "@test_name@ test coverage" --num-spaces 4 $coverage_merge_file
                      
                      echo -e "\nReport file: $coverage_dir/index.html"
                      exit $exitCode;;
