@@ -29,6 +29,7 @@ In case of memory segmentation - new block cannot be added in pointed address - 
 * cmocka (libcmocka-dev) library - for unit tests
 * gcc - for code coverage
 * valgrind - for memory leaks checking
+* cppcheck - for static code analysis
 
 
 ### Usage
@@ -66,6 +67,15 @@ _./memorymap/test/test_RBTree_test.sh --tool=coverage_
 Running example program:
 
 _./mymap/example/mymap_example_
+
+
+Static check of code (cppcheck):
+
+_{src dir}/staticcheck.sh_
+
+optional configuration checking:
+
+_{src dir}/staticcheck.sh -cc_
 
 
 ### ToDo
