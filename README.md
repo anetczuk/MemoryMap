@@ -9,6 +9,15 @@ Map consists of two primary operations:
 In case of memory segmentation - new block cannot be added in pointed address - new block is reserved at first available place starting from desired address.  
 
 
+### Features
+
+* red-black trees implementation without 3rd party dependencies
+* unit tests using cmocka library
+* valgrind integration
+* code coverage calculation
+* cppcheck analysis
+
+
 ### Modules
 
 * _memorymap/LinkedList.h_ contains implementation of memory map based on linked list
