@@ -42,7 +42,7 @@ case $i in
     --untilfail|-uf)    ## until failure
                         untilFailure=1
                         ;;
-    --tool=*)           checkTool="${i#*=}"
+    --tool=*|-t=*)      checkTool="${i#*=}"
                         shift                   # past argument=value
                         ;;
     *)                  ;;                      # unknown option, ignore
@@ -58,18 +58,18 @@ fi
 case "$checkTool" in
     "")              ## no tool, just run test suite
                      if [ $untilFailure -eq 1 ]; then
-                        exitCode=0
-                        counter=0
-                        while [ $exitCode -eq 0 ]; do
-                            $SCRIPT_DIR/@test_name@ $@
-                            exitCode=$?
+                         exitCode=0
+                         counter=0
+                         while [ $exitCode -eq 0 ]; do
+                             $SCRIPT_DIR/@test_name@ $@
+                             exitCode=$?
                             
-                            counter=$((counter+1))
+                             counter=$((counter+1))
                             
-                            echo -e "\n\nNext iteration: $counter"
-                            sleep 1
-                        done
-                        exit $exitCode
+                             echo -e "\n\nNext iteration: $counter"
+                             sleep 1
+                         done
+                         exit $exitCode
                      fi
                      $SCRIPT_DIR/@test_name@ $@
                      exit $?;;
@@ -81,6 +81,11 @@ case "$checkTool" in
                      exit $?;;
                    
     cover|coverage)  ## prepare coverage
+                     if [ "@CODE_COVERAGE@" == "" ] || [ "@CODE_COVERAGE@" == "0" ] || [ "@CODE_COVERAGE@" == "OFF" ]; then
+                         echo "Code coverage not enable. Activate it through cmake (variable CODE_COVERAGE)"
+                         exit 1
+                     fi
+                     
                      coverage_dir=$SCRIPT_DIR/@test_name@_coverage
                      rm -rf $coverage_dir
                      mkdir -p $coverage_dir
