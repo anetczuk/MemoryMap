@@ -927,7 +927,7 @@ static void test_tree_randomTest1(void **state) {
         const RBTreeValidationError valid = tree_isValid(&tree);
         if (valid != RBTREE_INVALID_OK) {
             printf("seed: %u\n", seed);
-            printf("Iteration %lu: removing %lu\n", i, addr);
+            printf("Iteration %zu: removing %zu\n", i, addr);
         }
         assert_int_equal( valid, RBTREE_INVALID_OK );
     }
@@ -963,7 +963,7 @@ static void test_tree_randomTest2(void **state) {
         const RBTreeValidationError valid = tree_isValid(&tree);
         if (valid != RBTREE_INVALID_OK) {
             printf("seed: %u\n", seed);
-            printf("Iteration %lu: removing %lu\n", i, addr);
+            printf("Iteration %zu: removing %zu\n", i, addr);
         }
         assert_int_equal( valid, RBTREE_INVALID_OK );
     }
