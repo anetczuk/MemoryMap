@@ -39,6 +39,10 @@ Project configuration:
 
 _cmake {path to src dir}_
 
+for code coverage run following: 
+
+_cmake -DCODE_COVERAGE=ON {path to src dir}_
+
 Compilation:
 
 _make_
@@ -67,6 +71,8 @@ _./mymap/example/mymap_example_
 ### ToDo
 
 * integrate cppcheck
+* add clang analyzer
+* compare with other libraries/implementations
 * add selective run of test cases based on it's names
 
 
