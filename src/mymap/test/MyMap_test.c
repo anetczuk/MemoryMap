@@ -40,6 +40,18 @@ static void test_mymap_mmap_NULL(void **state) {
     assert_null( ret );
 }
 
+static void test_mymap_mmap_empty(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    memMap.root = NULL;
+
+    const void* ret = mymap_mmap(&memMap, (void*)128, 64, 0, NULL);
+    assert_null( ret );
+
+    mymap_release(&memMap);
+}
+
 static void test_mymap_mmap_first(void **state) {
     (void) state; /* unused */
 
@@ -115,6 +127,15 @@ static void test_mymap_munmap_NULL(void **state) {
 }
 
 static void test_mymap_munmap_empty(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    memMap.root = NULL;
+
+    mymap_munmap(&memMap, NULL);
+}
+
+static void test_mymap_munmap_empty2(void **state) {
     (void) state; /* unused */
 
     ContainerType memMap;
@@ -309,6 +330,92 @@ static void test_mymap_init_valid(void **state) {
     mymap_release(&memMap);
 }
 
+static void test_mymap_size_NULL(void **state) {
+    (void) state; /* unused */
+
+    assert_int_equal( mymap_size(NULL), 0 );
+}
+
+static void test_mymap_size_empty(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    memMap.root = NULL;
+
+    assert_int_equal( mymap_size(&memMap), 0 );
+}
+
+static void test_mymap_startAddress_NULL(void **state) {
+    (void) state; /* unused */
+
+    assert_int_equal( mymap_startAddress(NULL), NULL );
+}
+
+static void test_mymap_startAddress_empty(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    memMap.root = NULL;
+
+    assert_int_equal( mymap_startAddress(&memMap), NULL );
+}
+
+static void test_mymap_startAddress_normal(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    mymap_init(&memMap);
+
+    mymap_mmap(&memMap, (void*)10, 10, 0, NULL);
+
+    assert_int_equal( mymap_startAddress(&memMap), 10 );
+
+    mymap_release(&memMap);
+}
+
+static void test_mymap_endAddress_NULL(void **state) {
+    (void) state; /* unused */
+
+    assert_int_equal( mymap_endAddress(NULL), NULL );
+}
+
+static void test_mymap_endAddress_empty(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    memMap.root = NULL;
+
+    assert_int_equal( mymap_endAddress(&memMap), NULL );
+}
+
+static void test_mymap_endAddress_normal(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    mymap_init(&memMap);
+
+    mymap_mmap(&memMap, (void*)10, 10, 0, NULL);
+
+    assert_int_equal( mymap_endAddress(&memMap), 20 );
+
+    mymap_release(&memMap);
+}
+
+static void test_mymap_isValid_NULL(void **state) {
+    (void) state; /* unused */
+
+    assert_int_equal( mymap_isValid(NULL), 0 );
+}
+
+static void test_mymap_isValid_empty(void **state) {
+    (void) state; /* unused */
+
+    ContainerType memMap;
+    memMap.root = NULL;
+
+    assert_int_equal( mymap_isValid(&memMap), -1 );
+}
+
 static void test_mymap_release_NULL(void **state) {
     (void) state; /* unused */
 
@@ -333,6 +440,7 @@ static void test_mymap_release_double(void **state) {
 int main(void) {
     const struct UnitTest tests[] = {
         unit_test(test_mymap_mmap_NULL),
+        unit_test(test_mymap_mmap_empty),
         unit_test(test_mymap_mmap_first),
         unit_test(test_mymap_mmap_second),
         unit_test(test_mymap_mmap_segmented_toLeft),
@@ -340,6 +448,7 @@ int main(void) {
 
         unit_test(test_mymap_munmap_NULL),
         unit_test(test_mymap_munmap_empty),
+        unit_test(test_mymap_munmap_empty2),
         unit_test(test_mymap_munmap_badaddr),
         unit_test(test_mymap_munmap_root),
         unit_test(test_mymap_munmap_root2),
@@ -351,6 +460,18 @@ int main(void) {
 
         unit_test(test_mymap_init_NULL),
         unit_test(test_mymap_init_valid),
+
+        unit_test(test_mymap_size_NULL),
+        unit_test(test_mymap_size_empty),
+        unit_test(test_mymap_startAddress_NULL),
+        unit_test(test_mymap_startAddress_empty),
+        unit_test(test_mymap_startAddress_normal),
+        unit_test(test_mymap_endAddress_NULL),
+        unit_test(test_mymap_endAddress_empty),
+        unit_test(test_mymap_endAddress_normal),
+
+        unit_test(test_mymap_isValid_NULL),
+        unit_test(test_mymap_isValid_empty),
 
         unit_test(test_mymap_release_NULL),
         unit_test(test_mymap_release_double),
