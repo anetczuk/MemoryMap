@@ -42,7 +42,10 @@ typedef struct map_root {
  * Reserve memory space.
  * Fields 'flags' and 'o' not supported for now.
  */
-void *mymap_mmap(map_t *map, void *vaddr, unsigned int size, unsigned int flags, void *o) {
+void *mymap_mmap(map_t *map, void *vaddr, unsigned int size, unsigned int flags, void* o) {
+    (void) flags; /* unused */
+    (void) o; /* unused */
+
     if (map == NULL) {
         return NULL;
     }

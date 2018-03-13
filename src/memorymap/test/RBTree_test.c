@@ -40,7 +40,7 @@ static RBTree create_default_tree(const size_t nodes) {
     RBTree tree;
     tree_init(&tree);
 
-    for(size_t i = 0; i < 16; ++i) {
+    for(size_t i = 0; i < nodes; ++i) {
         tree_add(&tree, i+1, 1);
 
 //        assert_int_equal( tree_size(&tree), i+1 );
