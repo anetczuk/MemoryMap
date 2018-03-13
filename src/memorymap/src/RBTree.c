@@ -299,57 +299,35 @@ static RBTreeValidationError tree_isValid_checkBlackPath(const RBTreeNode* node)
     return tree_isValid_countBlackPaths(node, &counter);
 }
 
-static RBTreeValidationError tree_isValidSubTree(const RBTreeNode* node) {
-    if (node==NULL)
-        return RBTREE_INVALID_OK;
-
-    /// check pointers
-    const RBTreeValidationError validPointers = tree_isValid_checkPointers(node, node->parent);
-    if (validPointers != RBTREE_INVALID_OK) {
-        return validPointers;
+static RBTreeValidationError tree_isValid_checkColor(const RBTreeNode* node) {
+	if (node->left != NULL) {
+		const RBTreeValidationError validLeft = tree_isValid_checkColor(node->left);
+		if (validLeft != RBTREE_INVALID_OK) {
+			return validLeft;
+		}
     }
-    /// if pointers are valid, then there is no cycles
+	if (node->right != NULL) {
+		const RBTreeValidationError validRight = tree_isValid_checkColor(node->right);
+		if (validRight != RBTREE_INVALID_OK) {
+			return validRight;
+		}
+	}
 
-    /// check memory segments
-    const RBTreeValidationError validMemory = tree_isValid_checkMemory(node);
-    if (validMemory != RBTREE_INVALID_OK) {
-        return validMemory;
+    if (node->color != RBTREE_COLOR_RED) {
+    	return RBTREE_INVALID_OK;
     }
+	if (node->left != NULL) {
+		if (node->left->color != RBTREE_COLOR_BLACK) {
+			return RBTREE_INVALID_BLACK_CHILDREN;
+		}
+	}
+	if (node->right != NULL) {
+		if (node->right->color != RBTREE_COLOR_BLACK) {
+			return RBTREE_INVALID_BLACK_CHILDREN;
+		}
+	}
 
-    /// check is sorted
-    const RBTreeValidationError validOrder = tree_isValid_checkSorted(node);
-    if (validOrder != RBTREE_INVALID_OK) {
-        return validOrder;
-    }
-
-    /// checking red-black properties
-    /// root is black
-    if (node->parent == NULL) {
-        /// root
-        if (node->color != RBTREE_COLOR_BLACK)
-            return RBTREE_INVALID_RED_ROOT;
-    }
-
-    /// if a node is red, then both its children are black
-    if (node->color == RBTREE_COLOR_RED) {
-        if (node->left != NULL) {
-            if (node->left->color != RBTREE_COLOR_BLACK) {
-                return RBTREE_INVALID_BLACK_CHILDREN;
-            }
-        }
-        if (node->right != NULL) {
-            if (node->right->color != RBTREE_COLOR_BLACK) {
-                return RBTREE_INVALID_BLACK_CHILDREN;
-            }
-        }
-    }
-
-    const RBTreeValidationError validPath = tree_isValid_checkBlackPath(node);
-    if (validPath != RBTREE_INVALID_OK) {
-        return validPath;
-    }
-
-    return RBTREE_INVALID_OK;
+	return RBTREE_INVALID_OK;
 }
 
 RBTreeValidationError tree_isValid(const RBTree* tree) {
@@ -359,7 +337,45 @@ RBTreeValidationError tree_isValid(const RBTree* tree) {
         return RBTREE_INVALID_OK;
     if (tree->root->parent != NULL)
         return RBTREE_INVALID_ROOT_PARENT;
-    return tree_isValidSubTree( tree->root );
+
+    const RBTreeNode* rootNode = tree->root;
+
+    /// check pointers
+    const RBTreeValidationError validPointers = tree_isValid_checkPointers(rootNode, rootNode->parent);
+    if (validPointers != RBTREE_INVALID_OK) {
+        return validPointers;
+    }
+    /// if pointers are valid, then there is no cycles
+
+    /// check memory segments
+    const RBTreeValidationError validMemory = tree_isValid_checkMemory(rootNode);
+    if (validMemory != RBTREE_INVALID_OK) {
+        return validMemory;
+    }
+
+    /// check is sorted
+    const RBTreeValidationError validOrder = tree_isValid_checkSorted(rootNode);
+    if (validOrder != RBTREE_INVALID_OK) {
+        return validOrder;
+    }
+
+    /// checking red-black properties
+    /// root is black
+    if (rootNode->color != RBTREE_COLOR_BLACK)
+        return RBTREE_INVALID_RED_ROOT;
+
+    /// if a node is red, then both its children are black
+    const RBTreeValidationError validColor = tree_isValid_checkColor(rootNode);
+    if (validColor != RBTREE_INVALID_OK) {
+        return validColor;
+    }
+
+    const RBTreeValidationError validPath = tree_isValid_checkBlackPath(rootNode);
+    if (validPath != RBTREE_INVALID_OK) {
+        return validPath;
+    }
+
+    return RBTREE_INVALID_OK;
 }
 
 
