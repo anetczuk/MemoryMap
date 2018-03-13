@@ -68,3 +68,7 @@ add_subdirectory( memorymap )
 
 add_subdirectory( mymap )
 
+
+## generate bash script
+set( GENERATOR_FILE "${CMAKE_SOURCE_DIR}/run_tests.sh.in" )
+configure_file( ${GENERATOR_FILE} run_tests.sh @ONLY )

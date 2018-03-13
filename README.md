@@ -14,7 +14,7 @@ In case of memory segmentation - new block cannot be added in pointed address - 
 * red-black trees implementation without 3rd party dependencies
 * unit tests using cmocka library
 * valgrind integration
-* code coverage calculation
+* code coverage calculation (more than 95% of code covered by tests)
 * cppcheck analysis
 
 
@@ -73,6 +73,13 @@ Measuring code coverage of tests, eg. for _RBTree.h_:
 
 _./memorymap/test/test_RBTree_test.sh --tool=coverage_
 
+There is possibility to run all test suites at once:
+
+*./run_tests.sh*
+
+script supports following tools: _memcheck_, _callgrind_, _coverage_
+
+
 Running example program:
 
 _./mymap/example/mymap_example_
@@ -89,7 +96,6 @@ _{src dir}/staticcheck.sh -cc_
 
 ### ToDo
 
-* integrate cppcheck
 * add clang analyzer
 * compare with other libraries/implementations
 * add selective run of test cases based on it's names
