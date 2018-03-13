@@ -659,6 +659,47 @@ static void test_tree_endAddress_valid(void **state) {
     }
 }
 
+static void test_tree_area_NULL(void **state) {
+    (void) state; /* unused */
+
+	const MemoryArea area = tree_area(NULL);
+	assert_int_equal( area.start, 0 );
+	assert_int_equal( area.end, 0 );
+}
+
+static void test_tree_area_empty(void **state) {
+    (void) state; /* unused */
+
+    RBTree tree;
+    tree_init(&tree);
+
+	const MemoryArea area = tree_area(&tree);
+
+	assert_int_equal( area.start, 0 );
+	assert_int_equal( area.end, 0 );
+
+    tree_release(&tree);
+}
+
+static void test_tree_isValid_NULL(void **state) {
+    (void) state; /* unused */
+
+    assert_int_equal( tree_isValid(NULL), RBTREE_INVALID_OK );
+}
+
+//static void test_tree_isValid_valid(void **state) {
+//    (void) state; /* unused */
+//
+//    const size_t treeSize = 77;
+//    RBTree tree = create_default_tree(treeSize);
+//
+//    assert_int_equal( tree_size(&tree), treeSize );
+//
+//    assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
+//
+//    tree_release(&tree);
+//}
+
 static void test_node_index(void **state) {
     (void) state; /* unused */
 
@@ -997,6 +1038,11 @@ int main(void) {
         unit_test(test_tree_depth_0),
         unit_test(test_tree_startAddress_valid),
         unit_test(test_tree_endAddress_valid),
+        unit_test(test_tree_area_NULL),
+        unit_test(test_tree_area_empty),
+
+        unit_test(test_tree_isValid_NULL),
+//        unit_test(test_tree_isValid_valid),
 
         unit_test(test_node_index),
 
@@ -1036,9 +1082,6 @@ int main(void) {
         unit_test(test_tree_randomTest1),
         unit_test(test_tree_randomTest2),
     };
-
-//    return run_test( test_tree_add_subtree1 );
-//    return run_test( test_tree_delete_random );
 
     return run_group_tests(tests);
 }
