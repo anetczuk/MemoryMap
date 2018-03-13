@@ -319,6 +319,21 @@ static void list_add_middle(void **state) {
     list_release(&list);
 }
 
+static void list_isValid_invalidSegment(void **state) {
+    (void) state; /* unused */
+
+    LinkedList list;
+    list_init(&list);
+
+    list_add(&list, 100, (size_t)-1);				/// invalid segment
+
+    assert_int_equal( list_size(&list), 1 );
+
+    assert_int_equal( list_isValid(&list), -1 );
+
+    list_release(&list);
+}
+
 static void list_size_NULL(void **state) {
     (void) state; /* unused */
 
@@ -452,6 +467,8 @@ int main(void) {
         unit_test(list_add_first),
         unit_test(list_add_middle),
         unit_test(list_add_last),
+
+        unit_test(list_isValid_invalidSegment),
 
         unit_test(list_size_NULL),
         unit_test(list_size_0),

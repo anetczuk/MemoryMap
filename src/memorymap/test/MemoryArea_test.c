@@ -29,6 +29,13 @@
 #include <cmocka.h>
 
 
+static void memory_isValid_NULL(void **state) {
+    (void) state; /* unused */
+
+    const int ret = memory_isValid(NULL);
+	assert_int_equal( ret, 0 );
+}
+
 static void memory_isValid_false(void **state) {
     (void) state; /* unused */
 
@@ -61,6 +68,28 @@ static void memory_size_valid(void **state) {
 
 	const size_t ret = memory_size(&check);
 	assert_int_equal( ret, 10 );
+}
+
+static void memory_startAddress_greater(void **state) {
+    (void) state; /* unused */
+
+    const MemoryArea area = memory_create(50, 10);
+    const MemoryArea check = memory_create(30, 10);
+
+    const size_t start = memory_startAddress(&area, &check);
+
+	assert_int_equal( start, 60 );
+}
+
+static void memory_startAddress_same(void **state) {
+    (void) state; /* unused */
+
+    const MemoryArea area = memory_create(50, 10);
+    const MemoryArea check = memory_create(70, 10);
+
+    const size_t start = memory_startAddress(&area, &check);
+
+	assert_int_equal( start, 70 );
 }
 
 static void memory_fitBetween_NULL(void **state) {
@@ -222,11 +251,15 @@ static void memory_fitAfter_after(void **state) {
 
 int main(void) {
     const struct UnitTest tests[] = {
+        unit_test(memory_isValid_NULL),
         unit_test(memory_isValid_false),
         unit_test(memory_isValid_valid),
 
         unit_test(memory_size_NULL),
         unit_test(memory_size_valid),
+
+        unit_test(memory_startAddress_greater),
+        unit_test(memory_startAddress_same),
 
         unit_test(memory_fitBetween_NULL),
         unit_test(memory_fitBetween_NULL_range),

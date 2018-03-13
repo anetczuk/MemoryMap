@@ -69,7 +69,7 @@ static inline int memory_isValid( const MemoryArea* area ) {
 }
 
 static inline size_t memory_startAddress(const MemoryArea* area, const MemoryArea* check) {
-    if (check->start < area->end) {
+    if (area->end > check->start) {
         return area->end;
     } else {
         return check->start;
