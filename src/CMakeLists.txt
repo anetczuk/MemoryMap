@@ -61,6 +61,15 @@ enable_testing()
 
 
 
+## ================= macros =================
+
+
+function(generate_file sourceFile targetFile)
+    set( GENERATOR_FILE "${sourceFile}" )
+    configure_file( ${sourceFile} ${targetFile} @ONLY )
+endfunction()
+
+
 ## ================= build =================
 
 
@@ -69,6 +78,6 @@ add_subdirectory( memorymap )
 add_subdirectory( mymap )
 
 
-## generate bash script
-set( GENERATOR_FILE "${CMAKE_SOURCE_DIR}/run_tests.sh.in" )
-configure_file( ${GENERATOR_FILE} run_tests.sh @ONLY )
+## generate bash scripts
+generate_file( ${CMAKE_SOURCE_DIR}/run_tests.sh.in run_tests.sh )
+

@@ -21,8 +21,6 @@ set( EXT_LIBS mymap ${CMOCKA_LIBRARIES} )
 file(GLOB cpp_test_files *_test.c )
 
 
-set( GENERATOR_FILE "${CMAKE_SOURCE_DIR}/runSuite.sh.in" )
-
 ## generate test suites
 foreach(test_filename IN LISTS cpp_test_files)
 	## extract filename without extension
@@ -34,5 +32,5 @@ foreach(test_filename IN LISTS cpp_test_files)
 	add_test( mymap/${test_name} ${test_name} )
 	
 	## generate bash script
-	configure_file( ${GENERATOR_FILE} "test_${test_name}.sh" @ONLY )
+	generate_file( "${CMAKE_SOURCE_DIR}/runSuite.sh.in" "test_${test_name}.sh" )
 endforeach()
