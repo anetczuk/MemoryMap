@@ -16,6 +16,7 @@ In case of memory segmentation - new block cannot be added in pointed address - 
 * valgrind integration
 * code coverage calculation (more than 95% of code covered by tests)
 * cppcheck analysis
+* clang static analysis
 
 
 ### Modules
@@ -39,6 +40,7 @@ In case of memory segmentation - new block cannot be added in pointed address - 
 * gcc - for code coverage
 * valgrind - for memory leaks checking
 * cppcheck - for static code analysis
+* clang - for clang static analysis
 
 
 ### Usage
@@ -92,6 +94,11 @@ _{src dir}/staticcheck.sh_
 optional configuration checking:
 
 _{src dir}/staticcheck.sh -cc_
+
+
+To run clang static analysis create separate build folder, go there and run: 
+
+_{src dir}/clanganalyzer.sh_
 
 
 ### ToDo
