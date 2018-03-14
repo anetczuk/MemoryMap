@@ -100,6 +100,10 @@ To run clang static analysis create separate build folder, go there and run:
 
 _{src dir}/clanganalyzer.sh_
 
+To activate address sanitizer run following (requires clang):
+
+_cmake -DADDRESS_SANITIZER=ON {path to src dir}_
+
 
 ### ToDo
 
