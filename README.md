@@ -107,7 +107,6 @@ _cmake -DADDRESS_SANITIZER=ON {path to src dir}_
 
 ### ToDo
 
-* add clang analyzer
 * compare with other libraries/implementations
 * add selective run of test cases based on it's names
 
