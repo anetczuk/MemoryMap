@@ -709,14 +709,14 @@ static void test_tree_isValid_valid(void **state) {
     tree_release(&tree);
 }
 
-static void test_node_index_NULL(void **state) {
+static void test_tree_nodeIndex_NULL(void **state) {
 	(void) state; /* unused */
 
-	const size_t ind = node_index(NULL);
+	const size_t ind = tree_nodeIndex(NULL);
 	assert_int_equal( ind, -1 );
 }
 
-static void test_node_index(void **state) {
+static void test_tree_nodeIndex(void **state) {
     (void) state; /* unused */
 
     const size_t treeSize = 16;
@@ -731,7 +731,7 @@ static void test_node_index(void **state) {
         RBTreeNode* node = tree_findNode(&tree, i+1);
         assert_non_null( node );
 
-        const size_t ind = node_index(node);
+        const size_t ind = tree_nodeIndex(node);
         assert_int_equal( ind+1, node->area.start );
     }
 
@@ -1180,8 +1180,8 @@ int main(void) {
         unit_test(test_tree_isValid_NULL),
         unit_test(test_tree_isValid_valid),
 
-        unit_test(test_node_index_NULL),
-        unit_test(test_node_index),
+        unit_test(test_tree_nodeIndex_NULL),
+        unit_test(test_tree_nodeIndex),
 
         unit_test(test_tree_release_NULL),
         unit_test(test_tree_release_empty),

@@ -508,7 +508,7 @@ static void rbtree_repair_insert(RBTreeNode* node) {
 
 static RBTreeNode* rbtree_insertLeftNode(RBTreeNode* node) {
 	RBTreeNode* oldLeft = node->left;
-	RBTreeNode* newNode = node_makeColored(ARBTREE_COLOR_RED);         /// default color of new node
+	RBTreeNode* newNode = rbtree_makeColoredNode(ARBTREE_COLOR_RED);         /// default color of new node
 	rbtree_setLeftChild(node, newNode);
 	rbtree_setLeftChild(newNode, oldLeft);
 
@@ -518,7 +518,7 @@ static RBTreeNode* rbtree_insertLeftNode(RBTreeNode* node) {
 
 static RBTreeNode* rbtree_insertRightNode(RBTreeNode* node) {
 	RBTreeNode* oldLeft = node->right;
-	RBTreeNode* newNode = node_makeColored(ARBTREE_COLOR_RED);         /// default color of new node
+	RBTreeNode* newNode = rbtree_makeColoredNode(ARBTREE_COLOR_RED);         /// default color of new node
 	rbtree_setRightChild(node, newNode);
 	newNode->right = oldLeft;
 	rbtree_setRightChild(newNode, oldLeft);
@@ -638,7 +638,7 @@ static void rbtree_printLevel(const RBTreeNode* node, const size_t level, int* p
         return ;
     }
 
-    const size_t pos = node_index(node);
+    const size_t pos = rbtree_nodeIndex(node);
     const size_t diff = (pos==0) ? 0 : (pos - *previousNodeIndex) - 1;
 
     /// print empty space on left
@@ -963,17 +963,17 @@ bool rbtree_delete(RBTree* tree, const RBTreeValue value) {
 /// =========================================================
 
 
-RBTreeNode* node_makeDefault() {
+RBTreeNode* rbtree_makeDefaultNode() {
     return calloc( 1, sizeof(RBTreeNode) );
 }
 
-RBTreeNode* node_makeColored(const NodeColor color) {
-    RBTreeNode* node = node_makeDefault();
+RBTreeNode* rbtree_makeColoredNode(const NodeColor color) {
+    RBTreeNode* node = rbtree_makeDefaultNode();
     node->color = color;
     return node;
 }
 
-size_t node_index(const RBTreeNode* node) {
+size_t rbtree_nodeIndex(const RBTreeNode* node) {
     if (node == NULL) {
         return -1;
     }
@@ -983,6 +983,6 @@ size_t node_index(const RBTreeNode* node) {
     if (leftNode == NULL) {
         return subIndex;
     }
-    return node_index(leftNode) + 1 + subIndex;
+    return rbtree_nodeIndex(leftNode) + 1 + subIndex;
 }
 

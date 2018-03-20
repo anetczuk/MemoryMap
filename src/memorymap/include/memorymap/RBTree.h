@@ -114,11 +114,11 @@ int tree_release(RBTree* tree);
 /// =================================================================
 
 
-RBTreeNode* node_makeDefault();
+RBTreeNode* tree_makeDefaultNode();
 
-RBTreeNode* node_makeColored(const NodeColor color);
+RBTreeNode* tree_makeColoredNode(const NodeColor color);
 
-size_t node_index(const RBTreeNode* node);
+size_t tree_nodeIndex(const RBTreeNode* node);
 
 
 

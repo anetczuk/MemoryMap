@@ -505,7 +505,7 @@ static void tree_repair_insert(RBTreeNode* node) {
 
 static RBTreeNode* tree_insertLeftNode(RBTreeNode* node) {
 	RBTreeNode* oldLeft = node->left;
-	RBTreeNode* newNode = node_makeColored(RBTREE_COLOR_RED);         /// default color of new node
+	RBTreeNode* newNode = tree_makeColoredNode(RBTREE_COLOR_RED);         /// default color of new node
 	tree_setLeftChild(node, newNode);
 	tree_setLeftChild(newNode, oldLeft);
 
@@ -515,7 +515,7 @@ static RBTreeNode* tree_insertLeftNode(RBTreeNode* node) {
 
 static RBTreeNode* tree_insertRightNode(RBTreeNode* node) {
 	RBTreeNode* oldLeft = node->right;
-	RBTreeNode* newNode = node_makeColored(RBTREE_COLOR_RED);         /// default color of new node
+	RBTreeNode* newNode = tree_makeColoredNode(RBTREE_COLOR_RED);         /// default color of new node
 	tree_setRightChild(node, newNode);
 	newNode->right = oldLeft;
 	tree_setRightChild(newNode, oldLeft);
@@ -674,7 +674,7 @@ static void tree_printLevel(const RBTreeNode* node, const size_t level, int* pre
         return ;
     }
 
-    const size_t pos = node_index(node);
+    const size_t pos = tree_nodeIndex(node);
     const size_t diff = (pos==0) ? 0 : (pos - *previousNodeIndex) - 1;
 
     /// print empty space on left
@@ -1053,24 +1053,24 @@ int tree_init(RBTree* tree) {
 /// =========================================================
 
 
-RBTreeNode* node_makeDefault() {
+RBTreeNode* tree_makeDefaultNode() {
     return calloc( 1, sizeof(RBTreeNode) );
 }
 
-RBTreeNode* node_makeColored(const NodeColor color) {
-    RBTreeNode* node = node_makeDefault();
+RBTreeNode* tree_makeColoredNode(const NodeColor color) {
+    RBTreeNode* node = tree_makeDefaultNode();
     node->color = color;
     return node;
 }
 
 //RBTreeNode* node_makeLeaf(const NodeColor color, MemoryArea area) {
-//    RBTreeNode* node = node_makeColored(color);
+//    RBTreeNode* node = tree_makeColoredNode(color);
 //    node->area  = area;
 //    return node;
 //}
 //
 //RBTreeNode* node_makeFull(RBTreeNode* left, RBTreeNode* right, MemoryArea area, const NodeColor color) {
-//    RBTreeNode* node = node_makeColored(color);
+//    RBTreeNode* node = tree_makeColoredNode(color);
 //    node_connectLeft(node, left);
 //    node_connectRight(node, right);
 //    node->area  = area;
@@ -1094,7 +1094,7 @@ RBTreeNode* node_makeColored(const NodeColor color) {
 //    node->right = NULL;
 //}
 
-size_t node_index(const RBTreeNode* node) {
+size_t tree_nodeIndex(const RBTreeNode* node) {
     if (node == NULL) {
         return -1;
     }
@@ -1104,7 +1104,7 @@ size_t node_index(const RBTreeNode* node) {
     if (leftNode == NULL) {
         return subIndex;
     }
-    return node_index(leftNode) + 1 + subIndex;
+    return tree_nodeIndex(leftNode) + 1 + subIndex;
 }
 
 //void node_setArea(RBTreeNode* node, const MemoryArea* area) {

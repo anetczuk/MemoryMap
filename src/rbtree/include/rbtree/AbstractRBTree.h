@@ -126,11 +126,11 @@ int rbtree_release(RBTree* tree);
 /// =================================================================
 
 
-RBTreeNode* node_makeDefault();
+RBTreeNode* rbtree_makeDefaultNode();
 
-RBTreeNode* node_makeColored(const NodeColor color);
+RBTreeNode* rbtree_makeColoredNode(const NodeColor color);
 
-size_t node_index(const RBTreeNode* node);
+size_t rbtree_nodeIndex(const RBTreeNode* node);
 
 
 #endif /* SRC_RBTREE_INCLUDE_RBTREE_ABSTRACTRBTREE_H_ */
