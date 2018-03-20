@@ -29,7 +29,7 @@
 
 
 
-int rbtree_init(RBTree* tree) {
+int rbtree_init(ARBTree* tree) {
     if (tree == NULL) {
         return -1;
     }
@@ -38,42 +38,42 @@ int rbtree_init(RBTree* tree) {
     return 0;
 }
 
-static const RBTreeNode* rbtree_getLeftmostNode(const RBTreeNode* node) {
+static const ARBTreeNode* rbtree_getLeftmostNode(const ARBTreeNode* node) {
     if (node == NULL) {
         return NULL;
     }
-    const RBTreeNode* curr = node;
+    const ARBTreeNode* curr = node;
     while (curr->left != NULL) {
         curr = curr->left;
     }
     return curr;
 }
 
-static const RBTreeNode* rbtree_getRightmostNode(const RBTreeNode* node) {
+static const ARBTreeNode* rbtree_getRightmostNode(const ARBTreeNode* node) {
     if (node == NULL) {
         return NULL;
     }
-    const RBTreeNode* curr = node;
+    const ARBTreeNode* curr = node;
     while (curr->right != NULL) {
         curr = curr->right;
     }
     return curr;
 }
 
-static const RBTreeNode* rbtree_getLeftDescendant(const RBTreeNode* node) {
+static const ARBTreeNode* rbtree_getLeftDescendant(const ARBTreeNode* node) {
     return rbtree_getLeftmostNode(node->right);
 }
 
-static const RBTreeNode* rbtree_getRightDescendant(const RBTreeNode* node) {
+static const ARBTreeNode* rbtree_getRightDescendant(const ARBTreeNode* node) {
     return rbtree_getRightmostNode(node->left);
 }
 
 /**
  * Returns ancestor on right side of current node.
  */
-static const RBTreeNode* rbtree_getRightAncestor(const RBTreeNode* node) {
-    const RBTreeNode* child = node;
-    const RBTreeNode* curr = node->parent;
+static const ARBTreeNode* rbtree_getRightAncestor(const ARBTreeNode* node) {
+    const ARBTreeNode* child = node;
+    const ARBTreeNode* curr = node->parent;
     while( curr != NULL ) {
         if (curr->left == child) {
             return curr;
@@ -88,9 +88,9 @@ static const RBTreeNode* rbtree_getRightAncestor(const RBTreeNode* node) {
 /**
  * Returns ancestor on left side of current node.
  */
-static const RBTreeNode* rbtree_getLeftAncestor(const RBTreeNode* node) {
-    const RBTreeNode* child = node;
-    const RBTreeNode* curr = node->parent;
+static const ARBTreeNode* rbtree_getLeftAncestor(const ARBTreeNode* node) {
+    const ARBTreeNode* child = node;
+    const ARBTreeNode* curr = node->parent;
     while( curr != NULL ) {
         if (curr->right == child) {
             return curr;
@@ -106,7 +106,7 @@ static const RBTreeNode* rbtree_getLeftAncestor(const RBTreeNode* node) {
 /// ===================================================
 
 
-static size_t rbtree_sizeSubtree(const RBTreeNode* tree) {
+static size_t rbtree_sizeSubtree(const ARBTreeNode* tree) {
     if (tree==NULL) {
         return 0;
     }
@@ -116,13 +116,13 @@ static size_t rbtree_sizeSubtree(const RBTreeNode* tree) {
     return leftSize + rightSize + 1;
 }
 
-size_t rbtree_size(const RBTree* tree) {
+size_t rbtree_size(const ARBTree* tree) {
     if (tree==NULL)
         return 0;
     return rbtree_sizeSubtree(tree->root);
 }
 
-static size_t rbtree_depthSubtree(const RBTreeNode* tree) {
+static size_t rbtree_depthSubtree(const ARBTreeNode* tree) {
 	if (tree == NULL) {
 		return 0;
 	}
@@ -135,7 +135,7 @@ static size_t rbtree_depthSubtree(const RBTreeNode* tree) {
 	}
 }
 
-size_t rbtree_depth(const RBTree* tree) {
+size_t rbtree_depth(const ARBTree* tree) {
     if (tree==NULL)
         return 0;
     return rbtree_depthSubtree(tree->root);
@@ -145,7 +145,7 @@ size_t rbtree_depth(const RBTree* tree) {
 /// ==================================================================================
 
 
-static RBTreeValidationError rbtree_isValid_checkPointers(const RBTreeNode* node, const RBTreeNode* parent) {
+static ARBTreeValidationError rbtree_isValid_checkPointers(const ARBTreeNode* node, const ARBTreeNode* parent) {
     if (node == NULL) {
         return ARBTREE_INVALID_OK;
     }
@@ -157,11 +157,11 @@ static RBTreeValidationError rbtree_isValid_checkPointers(const RBTreeNode* node
         return ARBTREE_INVALID_SAME_CHILD;
     }
 
-    const RBTreeValidationError validLeft = rbtree_isValid_checkPointers(node->left, node);
+    const ARBTreeValidationError validLeft = rbtree_isValid_checkPointers(node->left, node);
     if (validLeft != ARBTREE_INVALID_OK) {
         return validLeft;
     }
-    const RBTreeValidationError validRight = rbtree_isValid_checkPointers(node->right, node);
+    const ARBTreeValidationError validRight = rbtree_isValid_checkPointers(node->right, node);
     if (validRight != ARBTREE_INVALID_OK) {
         return validRight;
     }
@@ -169,7 +169,7 @@ static RBTreeValidationError rbtree_isValid_checkPointers(const RBTreeNode* node
     return ARBTREE_INVALID_OK;
 }
 
-static RBTreeValidationError rbtree_isValid_checkValues(const RBTreeNode* node) {
+static ARBTreeValidationError rbtree_isValid_checkValues(const ARBTreeNode* node) {
     if (node == NULL) {
         return ARBTREE_INVALID_OK;
     }
@@ -178,11 +178,11 @@ static RBTreeValidationError rbtree_isValid_checkValues(const RBTreeNode* node) 
         return ARBTREE_INVALID_BAD_VALUE;
     }
 
-    const RBTreeValidationError validLeft = rbtree_isValid_checkValues(node->left);
+    const ARBTreeValidationError validLeft = rbtree_isValid_checkValues(node->left);
     if (validLeft != ARBTREE_INVALID_OK) {
         return validLeft;
     }
-    const RBTreeValidationError validRight = rbtree_isValid_checkValues(node->right);
+    const ARBTreeValidationError validRight = rbtree_isValid_checkValues(node->right);
     if (validRight != ARBTREE_INVALID_OK) {
         return validRight;
     }
@@ -190,42 +190,42 @@ static RBTreeValidationError rbtree_isValid_checkValues(const RBTreeNode* node) 
     return ARBTREE_INVALID_OK;
 }
 
-static RBTreeValidationError rbtree_isValid_checkSorted(const RBTreeNode* node) {
+static ARBTreeValidationError rbtree_isValid_checkSorted(const ARBTreeNode* node) {
     if (node == NULL) {
         return ARBTREE_INVALID_OK;
     }
 
-    const RBTreeNode* prevTop = rbtree_getLeftAncestor(node);
+    const ARBTreeNode* prevTop = rbtree_getLeftAncestor(node);
     if (prevTop != NULL) {
         if (rbtree_isValid_isOrder(prevTop, node) == false) {
         	return ARBTREE_INVALID_NOT_SORTED;
         }
     }
-    const RBTreeNode* nextTop = rbtree_getRightAncestor(node);
+    const ARBTreeNode* nextTop = rbtree_getRightAncestor(node);
     if (nextTop != NULL) {
         if (rbtree_isValid_isOrder(node, nextTop) == false) {
         	return ARBTREE_INVALID_NOT_SORTED;
         }
     }
 
-    const RBTreeNode* prevBottom = rbtree_getRightDescendant(node);
+    const ARBTreeNode* prevBottom = rbtree_getRightDescendant(node);
     if (prevBottom != NULL) {
         if (rbtree_isValid_isOrder(prevBottom, node) == false) {
         	return ARBTREE_INVALID_NOT_SORTED;
         }
     }
-    const RBTreeNode* nextBottom = rbtree_getLeftDescendant(node);
+    const ARBTreeNode* nextBottom = rbtree_getLeftDescendant(node);
     if (nextBottom != NULL) {
         if (rbtree_isValid_isOrder(node, nextBottom) == false) {
         	return ARBTREE_INVALID_NOT_SORTED;
         }
     }
 
-    const RBTreeValidationError validLeft = rbtree_isValid_checkSorted(node->left);
+    const ARBTreeValidationError validLeft = rbtree_isValid_checkSorted(node->left);
     if (validLeft != ARBTREE_INVALID_OK) {
         return validLeft;
     }
-    const RBTreeValidationError validRight = rbtree_isValid_checkSorted(node->right);
+    const ARBTreeValidationError validRight = rbtree_isValid_checkSorted(node->right);
     if (validRight != ARBTREE_INVALID_OK) {
         return validRight;
     }
@@ -233,18 +233,18 @@ static RBTreeValidationError rbtree_isValid_checkSorted(const RBTreeNode* node) 
     return ARBTREE_INVALID_OK;
 }
 
-static RBTreeValidationError rbtree_isValid_countBlackPaths(const RBTreeNode* node, size_t* counter) {
+static ARBTreeValidationError rbtree_isValid_countBlackPaths(const ARBTreeNode* node, size_t* counter) {
     if (node == NULL) {
         *counter = 0;
         return ARBTREE_INVALID_OK;
     }
     size_t leftCounter = 0;
-    const RBTreeValidationError validLeft = rbtree_isValid_countBlackPaths(node->left, &leftCounter);
+    const ARBTreeValidationError validLeft = rbtree_isValid_countBlackPaths(node->left, &leftCounter);
     if (validLeft != ARBTREE_INVALID_OK) {
         return validLeft;
     }
     size_t rightCounter = 0;
-    const RBTreeValidationError validRight = rbtree_isValid_countBlackPaths(node->right, &rightCounter);
+    const ARBTreeValidationError validRight = rbtree_isValid_countBlackPaths(node->right, &rightCounter);
     if (validRight != ARBTREE_INVALID_OK) {
         return validRight;
     }
@@ -266,7 +266,7 @@ static RBTreeValidationError rbtree_isValid_countBlackPaths(const RBTreeNode* no
  * Every path from a given node to any of its descendant NULL nodes
  * contains the same number of black nodes.
  */
-static RBTreeValidationError rbtree_isValid_checkBlackPath(const RBTreeNode* node) {
+static ARBTreeValidationError rbtree_isValid_checkBlackPath(const ARBTreeNode* node) {
     if (node == NULL) {
         return ARBTREE_INVALID_OK;
     }
@@ -274,15 +274,15 @@ static RBTreeValidationError rbtree_isValid_checkBlackPath(const RBTreeNode* nod
     return rbtree_isValid_countBlackPaths(node, &counter);
 }
 
-static RBTreeValidationError rbtree_isValid_checkColor(const RBTreeNode* node) {
+static ARBTreeValidationError rbtree_isValid_checkColor(const ARBTreeNode* node) {
 	if (node->left != NULL) {
-		const RBTreeValidationError validLeft = rbtree_isValid_checkColor(node->left);
+		const ARBTreeValidationError validLeft = rbtree_isValid_checkColor(node->left);
 		if (validLeft != ARBTREE_INVALID_OK) {
 			return validLeft;
 		}
     }
 	if (node->right != NULL) {
-		const RBTreeValidationError validRight = rbtree_isValid_checkColor(node->right);
+		const ARBTreeValidationError validRight = rbtree_isValid_checkColor(node->right);
 		if (validRight != ARBTREE_INVALID_OK) {
 			return validRight;
 		}
@@ -305,7 +305,7 @@ static RBTreeValidationError rbtree_isValid_checkColor(const RBTreeNode* node) {
 	return ARBTREE_INVALID_OK;
 }
 
-RBTreeValidationError rbtree_isValid(const RBTree* tree) {
+ARBTreeValidationError rbtree_isValid(const ARBTree* tree) {
     if (tree==NULL)
         return ARBTREE_INVALID_OK;
     if (tree->root == NULL)
@@ -313,23 +313,23 @@ RBTreeValidationError rbtree_isValid(const RBTree* tree) {
     if (tree->root->parent != NULL)
         return ARBTREE_INVALID_ROOT_PARENT;
 
-    const RBTreeNode* rootNode = tree->root;
+    const ARBTreeNode* rootNode = tree->root;
 
     /// check pointers
-    const RBTreeValidationError validPointers = rbtree_isValid_checkPointers(rootNode, rootNode->parent);
+    const ARBTreeValidationError validPointers = rbtree_isValid_checkPointers(rootNode, rootNode->parent);
     if (validPointers != ARBTREE_INVALID_OK) {
         return validPointers;
     }
     /// if pointers are valid, then there is no cycles
 
     /// check memory segments
-    const RBTreeValidationError validMemory = rbtree_isValid_checkValues(rootNode);
+    const ARBTreeValidationError validMemory = rbtree_isValid_checkValues(rootNode);
     if (validMemory != ARBTREE_INVALID_OK) {
         return validMemory;
     }
 
     /// check is sorted
-    const RBTreeValidationError validOrder = rbtree_isValid_checkSorted(rootNode);
+    const ARBTreeValidationError validOrder = rbtree_isValid_checkSorted(rootNode);
     if (validOrder != ARBTREE_INVALID_OK) {
         return validOrder;
     }
@@ -340,12 +340,12 @@ RBTreeValidationError rbtree_isValid(const RBTree* tree) {
         return ARBTREE_INVALID_RED_ROOT;
 
     /// if a node is red, then both its children are black
-    const RBTreeValidationError validColor = rbtree_isValid_checkColor(rootNode);
+    const ARBTreeValidationError validColor = rbtree_isValid_checkColor(rootNode);
     if (validColor != ARBTREE_INVALID_OK) {
         return validColor;
     }
 
-    const RBTreeValidationError validPath = rbtree_isValid_checkBlackPath(rootNode);
+    const ARBTreeValidationError validPath = rbtree_isValid_checkBlackPath(rootNode);
     if (validPath != ARBTREE_INVALID_OK) {
         return validPath;
     }
@@ -357,11 +357,11 @@ RBTreeValidationError rbtree_isValid(const RBTree* tree) {
 /// ==================================================================================
 
 
-RBTreeNode* rbtree_findNode(const RBTree* tree, const RBTreeValue value) {
+ARBTreeNode* rbtree_findNode(const ARBTree* tree, const ARBTreeValue value) {
     if (tree == NULL) {
         return NULL;
     }
-    RBTreeNode* curr = tree->root;
+    ARBTreeNode* curr = tree->root;
     while (curr != NULL) {
         if ( rbtree_checkOrder(value, curr->value) == true ) {
             /// value < curr->value
@@ -385,14 +385,14 @@ RBTreeNode* rbtree_findNode(const RBTree* tree, const RBTreeValue value) {
 /// ==================================================================================
 
 
-static RBTreeNode* rbtree_grandparent(RBTreeNode* node) {
+static ARBTreeNode* rbtree_grandparent(ARBTreeNode* node) {
 	if (node->parent == NULL) {
 		return NULL;
 	}
 	return node->parent->parent;
 }
 
-static RBTreeNode* rbtree_sibling(RBTreeNode* node) {
+static ARBTreeNode* rbtree_sibling(ARBTreeNode* node) {
 	if (node->parent == NULL) {
 		return NULL;
 	}
@@ -402,25 +402,25 @@ static RBTreeNode* rbtree_sibling(RBTreeNode* node) {
 		return node->parent->left;
 }
 
-static inline RBTreeNode* rbtree_uncle(RBTreeNode* node) {
+static inline ARBTreeNode* rbtree_uncle(ARBTreeNode* node) {
 	return rbtree_sibling(node->parent);
 }
 
-static inline void rbtree_setLeftChild(RBTreeNode* node, RBTreeNode* child) {
+static inline void rbtree_setLeftChild(ARBTreeNode* node, ARBTreeNode* child) {
     node->left = child;
     if (child != NULL) {
         child->parent = node;
     }
 }
 
-static inline void rbtree_setRightChild(RBTreeNode* node, RBTreeNode* child) {
+static inline void rbtree_setRightChild(ARBTreeNode* node, ARBTreeNode* child) {
     node->right = child;
     if (child != NULL) {
         child->parent = node;
     }
 }
 
-static inline void rbtree_changeChild(RBTreeNode* node, RBTreeNode* from, RBTreeNode* to) {
+static inline void rbtree_changeChild(ARBTreeNode* node, ARBTreeNode* from, ARBTreeNode* to) {
     if (node->left == from) {
         rbtree_setLeftChild(node, to);
     } else {
@@ -428,9 +428,9 @@ static inline void rbtree_changeChild(RBTreeNode* node, RBTreeNode* from, RBTree
     }
 }
 
-static void rbtree_rotate_left(RBTreeNode* node) {
-    RBTreeNode* parent = node->parent;
-    RBTreeNode* nnew = node->right;
+static void rbtree_rotate_left(ARBTreeNode* node) {
+    ARBTreeNode* parent = node->parent;
+    ARBTreeNode* nnew = node->right;
     assert(nnew != NULL);                   /// since the leaves of a red-black tree are empty, they cannot become internal nodes
     rbtree_setRightChild(node, nnew->left);
     rbtree_setLeftChild(nnew, node);
@@ -445,9 +445,9 @@ static void rbtree_rotate_left(RBTreeNode* node) {
     }
 }
 
-static void rbtree_rotate_right(RBTreeNode* node) {
-    RBTreeNode* parent = node->parent;
-    RBTreeNode* nnew = node->left;
+static void rbtree_rotate_right(ARBTreeNode* node) {
+    ARBTreeNode* parent = node->parent;
+    ARBTreeNode* nnew = node->left;
     assert(nnew != NULL);                   /// since the leaves of a red-black tree are empty, they cannot become internal nodes
     rbtree_setLeftChild(node, nnew->right);
     rbtree_setRightChild(nnew, node);
@@ -462,8 +462,8 @@ static void rbtree_rotate_right(RBTreeNode* node) {
     }
 }
 
-static void rbtree_repair_insert(RBTreeNode* node) {
-	RBTreeNode* nParent = node->parent;
+static void rbtree_repair_insert(ARBTreeNode* node) {
+	ARBTreeNode* nParent = node->parent;
 	if ( nParent == NULL) {
 		node->color = ARBTREE_COLOR_BLACK;
 		return ;
@@ -472,21 +472,21 @@ static void rbtree_repair_insert(RBTreeNode* node) {
 		/// do nothing
 		return ;
 	}
-	RBTreeNode* uncle = rbtree_uncle(node);
+	ARBTreeNode* uncle = rbtree_uncle(node);
 	if (uncle != NULL) {
         if (uncle->color == ARBTREE_COLOR_RED) {
             nParent->color = ARBTREE_COLOR_BLACK;
             uncle->color = ARBTREE_COLOR_BLACK;
-            RBTreeNode* grandpa = rbtree_grandparent(node);		/// never NULL here
+            ARBTreeNode* grandpa = rbtree_grandparent(node);		/// never NULL here
             grandpa->color = ARBTREE_COLOR_RED;
             rbtree_repair_insert(grandpa);
             return ;
         }
 	}
 
-    RBTreeNode* curr = node;
+    ARBTreeNode* curr = node;
 	{
-        RBTreeNode* grandpa = rbtree_grandparent(curr);		/// never NULL here
+        ARBTreeNode* grandpa = rbtree_grandparent(curr);		/// never NULL here
         if ((grandpa->left != NULL) && (curr == grandpa->left->right)) {
             rbtree_rotate_left(curr->parent);
             curr = curr->left;
@@ -496,7 +496,7 @@ static void rbtree_repair_insert(RBTreeNode* node) {
         }
 	}
 	{
-	    RBTreeNode* grandpa = rbtree_grandparent(curr);       /// never NULL here
+	    ARBTreeNode* grandpa = rbtree_grandparent(curr);       /// never NULL here
         if (curr == curr->parent->left)
             rbtree_rotate_right(grandpa);
         else
@@ -506,9 +506,9 @@ static void rbtree_repair_insert(RBTreeNode* node) {
 	}
 }
 
-static RBTreeNode* rbtree_insertLeftNode(RBTreeNode* node) {
-	RBTreeNode* oldLeft = node->left;
-	RBTreeNode* newNode = rbtree_makeColoredNode(ARBTREE_COLOR_RED);         /// default color of new node
+static ARBTreeNode* rbtree_insertLeftNode(ARBTreeNode* node) {
+	ARBTreeNode* oldLeft = node->left;
+	ARBTreeNode* newNode = rbtree_makeColoredNode(ARBTREE_COLOR_RED);         /// default color of new node
 	rbtree_setLeftChild(node, newNode);
 	rbtree_setLeftChild(newNode, oldLeft);
 
@@ -516,9 +516,9 @@ static RBTreeNode* rbtree_insertLeftNode(RBTreeNode* node) {
 	return newNode;
 }
 
-static RBTreeNode* rbtree_insertRightNode(RBTreeNode* node) {
-	RBTreeNode* oldLeft = node->right;
-	RBTreeNode* newNode = rbtree_makeColoredNode(ARBTREE_COLOR_RED);         /// default color of new node
+static ARBTreeNode* rbtree_insertRightNode(ARBTreeNode* node) {
+	ARBTreeNode* oldLeft = node->right;
+	ARBTreeNode* newNode = rbtree_makeColoredNode(ARBTREE_COLOR_RED);         /// default color of new node
 	rbtree_setRightChild(node, newNode);
 	newNode->right = oldLeft;
 	rbtree_setRightChild(newNode, oldLeft);
@@ -527,12 +527,12 @@ static RBTreeNode* rbtree_insertRightNode(RBTreeNode* node) {
 	return newNode;
 }
 
-static bool rbtree_addToRight(RBTreeNode* node, RBTreeValue value);
+static bool rbtree_addToRight(ARBTreeNode* node, ARBTreeValue value);
 
 /**
  * Adding to left side: value should be smaller than 'node->value'
  */
-static bool rbtree_addToLeft(RBTreeNode* node, RBTreeValue value) {
+static bool rbtree_addToLeft(ARBTreeNode* node, ARBTreeValue value) {
     if ( rbtree_checkOrder(value, node->value) == false ) {
         /// could not add on left side -- invalid order
     	return false;
@@ -540,7 +540,7 @@ static bool rbtree_addToLeft(RBTreeNode* node, RBTreeValue value) {
 
     if ( node->left == NULL ) {
     	/// leaf case -- can add
-        RBTreeNode* newNode = rbtree_insertLeftNode(node);
+        ARBTreeNode* newNode = rbtree_insertLeftNode(node);
         newNode->value = value;
 		return true;
     }
@@ -555,7 +555,7 @@ static bool rbtree_addToLeft(RBTreeNode* node, RBTreeValue value) {
 /**
  * Adding to right side: value should be greater than 'node->value'
  */
-static bool rbtree_addToRight(RBTreeNode* node, RBTreeValue value) {
+static bool rbtree_addToRight(ARBTreeNode* node, ARBTreeValue value) {
     if ( rbtree_checkOrder(value, node->value) == true ) {
         /// could not add on right side -- invalid order
         return false;
@@ -563,7 +563,7 @@ static bool rbtree_addToRight(RBTreeNode* node, RBTreeValue value) {
 
     if ( node->right == NULL ) {
         /// leaf case -- can add
-        RBTreeNode* newNode = rbtree_insertRightNode(node);
+        ARBTreeNode* newNode = rbtree_insertRightNode(node);
         newNode->value = value;
         return true;
     }
@@ -575,39 +575,41 @@ static bool rbtree_addToRight(RBTreeNode* node, RBTreeValue value) {
     return rbtree_addToRight(node->right, value);
 }
 
-static const RBTreeNode* rbtree_findRootFromNode(const RBTreeNode* node) {
+static const ARBTreeNode* rbtree_findRootFromNode(const ARBTreeNode* node) {
     /// find the new root to return
-    const RBTreeNode* curr = node;
+    const ARBTreeNode* curr = node;
     while (curr->parent != NULL)
         curr = curr->parent;
     return curr;
 }
 
-static void rbtree_findRoot(RBTree* tree) {
+static void rbtree_findRoot(ARBTree* tree) {
     /// find the new root to return
-    tree->root = (RBTreeNode*) rbtree_findRootFromNode(tree->root);
+    tree->root = (ARBTreeNode*) rbtree_findRootFromNode(tree->root);
 }
 
-static int rbtree_addValue(RBTree* tree, const RBTreeValue value) {
-    assert( tree != NULL );
+bool rbtree_add(ARBTree* tree, const ARBTreeValue value) {
+    if (tree == NULL) {
+        return false;
+    }
     if (rbtree_isValidValue(value) == false) {
-        return -1;
+        return false;
     }
 
     if (tree->root == NULL) {
-        tree->root = calloc( 1, sizeof(RBTreeNode) );
+        tree->root = rbtree_makeDefaultNode();
         ///tree->root->parent = NULL;
         ///tree->root->color = RBTREE_BLACK;
         tree->root->value = value;
         rbtree_repair_insert(tree->root);
-        return 0;
+        return true;
     }
 
-	bool addResult = rbtree_addToLeft(tree->root, value);
-	if (addResult==true) {
-	    rbtree_findRoot(tree);
-	    return addResult;
-	}
+    bool addResult = rbtree_addToLeft(tree->root, value);
+    if (addResult==true) {
+        rbtree_findRoot(tree);
+        return addResult;
+    }
     /// go to right, called on root should always work
     addResult = rbtree_addToRight(tree->root, value);
     if (addResult==true) {
@@ -616,18 +618,11 @@ static int rbtree_addValue(RBTree* tree, const RBTreeValue value) {
     return addResult;
 }
 
-int rbtree_add(RBTree* tree, const RBTreeValue value) {
-    if (tree == NULL) {
-        return -1;
-    }
-    return rbtree_addValue(tree, value);
-}
-
 
 /// ==============================================================================================
 
 
-static void rbtree_printLevel(const RBTreeNode* node, const size_t level, int* previousNodeIndex) {
+static void rbtree_printLevel(const ARBTreeNode* node, const size_t level, int* previousNodeIndex) {
     if (node == NULL) {
         return ;
     }
@@ -665,7 +660,7 @@ static void rbtree_printLevel(const RBTreeNode* node, const size_t level, int* p
     *previousNodeIndex = pos;
 }
 
-static void rbtree_printSubtree(const RBTreeNode* node) {
+static void rbtree_printSubtree(const ARBTreeNode* node) {
     if (node == NULL) {
         printf("%s", "(NULL)");
         return ;
@@ -678,12 +673,12 @@ static void rbtree_printSubtree(const RBTreeNode* node) {
     }
 }
 
-static inline void rbtree_printWhole(const RBTreeNode* node) {
-    const RBTreeNode* root = rbtree_findRootFromNode(node);
+static inline void rbtree_printWhole(const ARBTreeNode* node) {
+    const ARBTreeNode* root = rbtree_findRootFromNode(node);
     rbtree_printSubtree( root );
 }
 
-void rbtree_print(const RBTree* tree) {
+void rbtree_print(const ARBTree* tree) {
     if (tree == NULL) {
         printf("%s", "[NULL]");
         return ;
@@ -695,7 +690,7 @@ void rbtree_print(const RBTree* tree) {
 /// ==============================================================================================
 
 
-static int rbtree_releaseNodes(RBTreeNode* node) {
+static int rbtree_releaseNodes(ARBTreeNode* node) {
     if (node == NULL) {
         return 0;
     }
@@ -709,7 +704,7 @@ static int rbtree_releaseNodes(RBTreeNode* node) {
     return leftReleased+rightReleased+1;
 }
 
-int rbtree_release(RBTree* tree) {
+int rbtree_release(ARBTree* tree) {
     if (tree==NULL) {
         return -1;
     }
@@ -722,7 +717,7 @@ int rbtree_release(RBTree* tree) {
 /// =========================================================================
 
 
-static RBTreeNode* rbtree_repair_sibling(RBTreeNode* parent, RBTreeNode* node) {
+static ARBTreeNode* rbtree_repair_sibling(ARBTreeNode* parent, ARBTreeNode* node) {
     if (parent == NULL) {
         return NULL;
     }
@@ -732,7 +727,7 @@ static RBTreeNode* rbtree_repair_sibling(RBTreeNode* parent, RBTreeNode* node) {
         return parent->left;
 }
 
-static int rbtree_repair_isChildrenColors(const RBTreeNode* parent, const NodeColor leftChild, const NodeColor rightChild) {
+static int rbtree_repair_isChildrenColors(const ARBTreeNode* parent, const ARBTreeNodeColor leftChild, const ARBTreeNodeColor rightChild) {
     if ( parent->left != NULL ) {
         if ( parent->left->color != leftChild ) {
             return 1;
@@ -754,10 +749,10 @@ static int rbtree_repair_isChildrenColors(const RBTreeNode* parent, const NodeCo
     return 0;
 }
 
-static void rbtree_repair_case1(RBTreeNode* parent, RBTreeNode* node);
+static void rbtree_repair_case1(ARBTreeNode* parent, ARBTreeNode* node);
 
-static void rbtree_repair_case6(RBTreeNode* parent, RBTreeNode* node) {
-    RBTreeNode* sibling = rbtree_repair_sibling(parent, node);
+static void rbtree_repair_case6(ARBTreeNode* parent, ARBTreeNode* node) {
+    ARBTreeNode* sibling = rbtree_repair_sibling(parent, node);
     sibling->color = parent->color;
     parent->color = ARBTREE_COLOR_BLACK;
 
@@ -772,8 +767,8 @@ static void rbtree_repair_case6(RBTreeNode* parent, RBTreeNode* node) {
     }
 }
 
-static void rbtree_repair_case5(RBTreeNode* parent, RBTreeNode* node) {
-    RBTreeNode* sibling = rbtree_repair_sibling(parent, node);
+static void rbtree_repair_case5(ARBTreeNode* parent, ARBTreeNode* node) {
+    ARBTreeNode* sibling = rbtree_repair_sibling(parent, node);
     if (sibling->color != ARBTREE_COLOR_BLACK) {
         rbtree_repair_case6(parent, node);
         return ;
@@ -812,12 +807,12 @@ static void rbtree_repair_case5(RBTreeNode* parent, RBTreeNode* node) {
     }
 }
 
-static void rbtree_repair_case4(RBTreeNode* parent, RBTreeNode* node) {
+static void rbtree_repair_case4(ARBTreeNode* parent, ARBTreeNode* node) {
     if (parent->color != ARBTREE_COLOR_RED) {
         rbtree_repair_case5(parent, node);
         return ;
     }
-    RBTreeNode* sibling = rbtree_repair_sibling(parent, node);
+    ARBTreeNode* sibling = rbtree_repair_sibling(parent, node);
     if (sibling->color != ARBTREE_COLOR_BLACK) {
         rbtree_repair_case5(parent, node);
         return ;
@@ -830,12 +825,12 @@ static void rbtree_repair_case4(RBTreeNode* parent, RBTreeNode* node) {
     parent->color = ARBTREE_COLOR_BLACK;
 }
 
-static void rbtree_repair_case3(RBTreeNode* parent, RBTreeNode* node) {
+static void rbtree_repair_case3(ARBTreeNode* parent, ARBTreeNode* node) {
     if (parent->color != ARBTREE_COLOR_BLACK) {
         rbtree_repair_case4(parent, node);
         return ;
     }
-    RBTreeNode* sibling = rbtree_repair_sibling(parent, node);
+    ARBTreeNode* sibling = rbtree_repair_sibling(parent, node);
     if (sibling->color != ARBTREE_COLOR_BLACK) {
         rbtree_repair_case4(parent, node);
         return ;
@@ -850,8 +845,8 @@ static void rbtree_repair_case3(RBTreeNode* parent, RBTreeNode* node) {
     rbtree_repair_case1(parent->parent, parent);
 }
 
-static void rbtree_repair_case2(RBTreeNode* parent, RBTreeNode* node) {
-    RBTreeNode* sibling = rbtree_repair_sibling(parent, node);
+static void rbtree_repair_case2(ARBTreeNode* parent, ARBTreeNode* node) {
+    ARBTreeNode* sibling = rbtree_repair_sibling(parent, node);
     if (sibling == NULL) {
         /// case of root
         return ;
@@ -867,14 +862,14 @@ static void rbtree_repair_case2(RBTreeNode* parent, RBTreeNode* node) {
     rbtree_repair_case3(parent, node);
 }
 
-static void rbtree_repair_case1(RBTreeNode* parent, RBTreeNode* node) {
+static void rbtree_repair_case1(ARBTreeNode* parent, ARBTreeNode* node) {
     if (parent == NULL) {
         return ;
     }
     rbtree_repair_case2(parent, node);
 }
 
-static void rbtree_repair_delete(RBTreeNode* parent, RBTreeNode* node) {
+static void rbtree_repair_delete(ARBTreeNode* parent, ARBTreeNode* node) {
     if (node != NULL) {
         if (node->color == ARBTREE_COLOR_RED) {
             node->color = ARBTREE_COLOR_BLACK;
@@ -886,11 +881,11 @@ static void rbtree_repair_delete(RBTreeNode* parent, RBTreeNode* node) {
     rbtree_repair_case1(parent, node);
 }
 
-bool rbtree_delete(RBTree* tree, const RBTreeValue value) {
+bool rbtree_delete(ARBTree* tree, const ARBTreeValue value) {
 	(void) tree; /* unused */
 	(void) value; /* unused */
 
-    RBTreeNode* node = rbtree_findNode( tree, value );
+    ARBTreeNode* node = rbtree_findNode( tree, value );
     if (node == NULL) {
         /// node not found -- nothing to remove
         return false;
@@ -945,7 +940,7 @@ bool rbtree_delete(RBTree* tree, const RBTreeValue value) {
     /// have both children
     /// there is right subtree
 
-    RBTreeNode* nextNode = (RBTreeNode*) rbtree_getLeftDescendant(node);      /// never NULL
+    ARBTreeNode* nextNode = (ARBTreeNode*) rbtree_getLeftDescendant(node);      /// never NULL
     node->value = nextNode->value;
 
     rbtree_changeChild(nextNode->parent, nextNode, nextNode->right);
@@ -963,23 +958,23 @@ bool rbtree_delete(RBTree* tree, const RBTreeValue value) {
 /// =========================================================
 
 
-RBTreeNode* rbtree_makeDefaultNode() {
-    return calloc( 1, sizeof(RBTreeNode) );
+ARBTreeNode* rbtree_makeDefaultNode() {
+    return calloc( 1, sizeof(ARBTreeNode) );
 }
 
-RBTreeNode* rbtree_makeColoredNode(const NodeColor color) {
-    RBTreeNode* node = rbtree_makeDefaultNode();
+ARBTreeNode* rbtree_makeColoredNode(const ARBTreeNodeColor color) {
+    ARBTreeNode* node = rbtree_makeDefaultNode();
     node->color = color;
     return node;
 }
 
-size_t rbtree_nodeIndex(const RBTreeNode* node) {
+size_t rbtree_nodeIndex(const ARBTreeNode* node) {
     if (node == NULL) {
         return -1;
     }
 
     const size_t subIndex = rbtree_sizeSubtree(node->left);
-    const RBTreeNode* leftNode = rbtree_getLeftAncestor(node);
+    const ARBTreeNode* leftNode = rbtree_getLeftAncestor(node);
     if (leftNode == NULL) {
         return subIndex;
     }

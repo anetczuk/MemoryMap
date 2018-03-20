@@ -32,24 +32,24 @@
 typedef enum {
     ARBTREE_COLOR_BLACK = 0,
     ARBTREE_COLOR_RED
-} NodeColor;
+} ARBTreeNodeColor;
 
 
-typedef int RBTreeValue;
+typedef int ARBTreeValue;
 
 
-typedef struct RBTreeElement {
-    struct RBTreeElement* parent;
-    struct RBTreeElement* left;
-    struct RBTreeElement* right;
-    RBTreeValue value;
-    NodeColor color;                			/// black by default
-} RBTreeNode;
+typedef struct ARBTreeElement {
+    struct ARBTreeElement* parent;
+    struct ARBTreeElement* left;
+    struct ARBTreeElement* right;
+    ARBTreeValue value;
+    ARBTreeNodeColor color;                			/// black by default
+} ARBTreeNode;
 
 
 typedef struct {
-    RBTreeNode* root;
-} RBTree;
+    ARBTreeNode* root;
+} ARBTree;
 
 
 typedef enum {
@@ -66,30 +66,30 @@ typedef enum {
     ARBTREE_INVALID_RED_ROOT = 6,
     ARBTREE_INVALID_BLACK_CHILDREN = 7,            /// when node is red, then children have to be black
     ARBTREE_INVALID_BLACK_PATH = 8                 /// invalid number of black nodes on paths
-} RBTreeValidationError;
+} ARBTreeValidationError;
 
 
 /// ===========================================================================
 
 
-bool rbtree_checkOrder(const RBTreeValue valueA, const RBTreeValue valueB) {
+bool rbtree_checkOrder(const ARBTreeValue valueA, const ARBTreeValue valueB) {
 	(void) valueA; /* unused */
 	(void) valueB; /* unused */
 	return (valueA < valueB);
 }
 
-bool rbtree_isValidValue(const RBTreeValue value) {
+bool rbtree_isValidValue(const ARBTreeValue value) {
 	(void) value; /* unused */
 	return true;                        /// always valid
 }
 
-bool rbtree_isValid_isOrder(const RBTreeNode* node, const RBTreeNode* nextNode) {
+bool rbtree_isValid_isOrder(const ARBTreeNode* node, const ARBTreeNode* nextNode) {
 	(void) node;     /* unused */
 	(void) nextNode; /* unused */
 	return true;                        /// always valid
 }
 
-void rbtree_printValue(const RBTreeValue value) {
+void rbtree_printValue(const ARBTreeValue value) {
 	printf("%d", value);
 }
 
@@ -100,37 +100,37 @@ void rbtree_printValue(const RBTreeValue value) {
  * If list has be initialized previously, then have to be released
  * before next initialization.
  */
-int rbtree_init(RBTree* tree);
+int rbtree_init(ARBTree* tree);
 
-size_t rbtree_size(const RBTree* tree);
+size_t rbtree_size(const ARBTree* tree);
 
-size_t rbtree_depth(const RBTree* tree);
+size_t rbtree_depth(const ARBTree* tree);
 
-RBTreeValidationError rbtree_isValid(const RBTree* tree);
+ARBTreeValidationError rbtree_isValid(const ARBTree* tree);
 
-RBTreeNode* rbtree_findNode(const RBTree* tree, const RBTreeValue value);
+ARBTreeNode* rbtree_findNode(const ARBTree* tree, const ARBTreeValue value);
 
-int rbtree_add(RBTree* tree, const RBTreeValue value);
+bool rbtree_add(ARBTree* tree, const ARBTreeValue value);
 
-bool rbtree_delete(RBTree* tree, const RBTreeValue value);
+bool rbtree_delete(ARBTree* tree, const ARBTreeValue value);
 
-void rbtree_print(const RBTree* tree);
+void rbtree_print(const ARBTree* tree);
 
 /**
  * List has to be initialized before releasing.
  * Returns number of released elements (size of list)
  */
-int rbtree_release(RBTree* tree);
+int rbtree_release(ARBTree* tree);
 
 
 /// =================================================================
 
 
-RBTreeNode* rbtree_makeDefaultNode();
+ARBTreeNode* rbtree_makeDefaultNode();
 
-RBTreeNode* rbtree_makeColoredNode(const NodeColor color);
+ARBTreeNode* rbtree_makeColoredNode(const ARBTreeNodeColor color);
 
-size_t rbtree_nodeIndex(const RBTreeNode* node);
+size_t rbtree_nodeIndex(const ARBTreeNode* node);
 
 
 #endif /* SRC_RBTREE_INCLUDE_RBTREE_ABSTRACTRBTREE_H_ */
