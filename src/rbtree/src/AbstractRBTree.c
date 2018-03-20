@@ -21,7 +21,7 @@
 /// SOFTWARE.
 ///
 
-#include "../include/rbtree/AbstractRBTree.h"
+#include "rbtree/AbstractRBTree.h"
 
 #include <stdlib.h>                     /// free
 #include <assert.h>
@@ -197,26 +197,26 @@ static ARBTreeValidationError rbtree_isValid_checkSorted(const ARBTreeNode* node
 
     const ARBTreeNode* prevTop = rbtree_getLeftAncestor(node);
     if (prevTop != NULL) {
-        if (rbtree_isValid_isOrder(prevTop, node) == false) {
+        if (rbtree_checkOrder(prevTop->value, node->value) == false) {
         	return ARBTREE_INVALID_NOT_SORTED;
         }
     }
     const ARBTreeNode* nextTop = rbtree_getRightAncestor(node);
     if (nextTop != NULL) {
-        if (rbtree_isValid_isOrder(node, nextTop) == false) {
+        if (rbtree_checkOrder(node->value, nextTop->value) == false) {
         	return ARBTREE_INVALID_NOT_SORTED;
         }
     }
 
     const ARBTreeNode* prevBottom = rbtree_getRightDescendant(node);
     if (prevBottom != NULL) {
-        if (rbtree_isValid_isOrder(prevBottom, node) == false) {
+        if (rbtree_checkOrder(prevBottom->value, node->value) == false) {
         	return ARBTREE_INVALID_NOT_SORTED;
         }
     }
     const ARBTreeNode* nextBottom = rbtree_getLeftDescendant(node);
     if (nextBottom != NULL) {
-        if (rbtree_isValid_isOrder(node, nextBottom) == false) {
+        if (rbtree_checkOrder(node->value, nextBottom->value) == false) {
         	return ARBTREE_INVALID_NOT_SORTED;
         }
     }
@@ -882,9 +882,6 @@ static void rbtree_repair_delete(ARBTreeNode* parent, ARBTreeNode* node) {
 }
 
 bool rbtree_delete(ARBTree* tree, const ARBTreeValue value) {
-	(void) tree; /* unused */
-	(void) value; /* unused */
-
     ARBTreeNode* node = rbtree_findNode( tree, value );
     if (node == NULL) {
         /// node not found -- nothing to remove

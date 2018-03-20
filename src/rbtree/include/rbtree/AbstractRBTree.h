@@ -35,6 +35,7 @@ typedef enum {
 } ARBTreeNodeColor;
 
 
+///typedef void* ARBTreeValue;
 typedef int ARBTreeValue;
 
 
@@ -80,12 +81,6 @@ bool rbtree_checkOrder(const ARBTreeValue valueA, const ARBTreeValue valueB) {
 
 bool rbtree_isValidValue(const ARBTreeValue value) {
 	(void) value; /* unused */
-	return true;                        /// always valid
-}
-
-bool rbtree_isValid_isOrder(const ARBTreeNode* node, const ARBTreeNode* nextNode) {
-	(void) node;     /* unused */
-	(void) nextNode; /* unused */
 	return true;                        /// always valid
 }
 
