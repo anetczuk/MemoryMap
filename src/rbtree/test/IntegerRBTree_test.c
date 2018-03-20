@@ -36,14 +36,6 @@
 #include <cmocka.h>
 
 
-//static unsigned int current_seed = 0;
-//
-//static unsigned int get_next_seed() {
-//	if (current_seed == 0) {
-//		current_seed = time(NULL);
-//	}
-//	return (--current_seed);
-//}
 
 static RBTree create_default_tree(const size_t nodes) {
     RBTree tree;
@@ -59,22 +51,22 @@ static RBTree create_default_tree(const size_t nodes) {
     return tree;
 }
 
-static RBTree create_random_tree(const unsigned int seed, const size_t nodes) {
-    srand( seed );
-
-    RBTree tree;
-    rbtree_init(&tree);
-
-    for(size_t i = 0; i < nodes; ++i) {
-        const size_t addr = rand() % nodes +1;
-    	rbtree_add(&tree, addr);
-
-        assert_int_equal( rbtree_size(&tree), i+1 );
-        assert_int_equal( rbtree_isValid(&tree), ARBTREE_INVALID_OK );
-    }
-
-    return tree;
-}
+//static RBTree create_random_tree(const unsigned int seed, const size_t nodes) {
+//    srand( seed );
+//
+//    RBTree tree;
+//    rbtree_init(&tree);
+//
+//    for(size_t i = 0; i < nodes; ++i) {
+//        const size_t addr = rand() % nodes +1;
+//    	rbtree_add(&tree, addr);
+//
+//        assert_int_equal( rbtree_size(&tree), i+1 );
+//        assert_int_equal( rbtree_isValid(&tree), ARBTREE_INVALID_OK );
+//    }
+//
+//    return tree;
+//}
 
 static RBTree create_random_rbtree_map(const unsigned int seed, const size_t nodes, const size_t addressRange) {
     srand( seed );
