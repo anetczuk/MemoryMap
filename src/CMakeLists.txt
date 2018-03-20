@@ -83,6 +83,8 @@ endfunction()
 ## ================= build =================
 
 
+add_subdirectory( rbtree )
+
 add_subdirectory( memorymap )
 
 add_subdirectory( mymap )
