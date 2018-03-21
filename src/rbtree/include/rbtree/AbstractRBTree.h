@@ -28,15 +28,17 @@
 #include <stdio.h>                      	   /// printf
 #include <stdbool.h>
 
-
-typedef enum {
-    ARBTREE_COLOR_BLACK = 0,
-    ARBTREE_COLOR_RED
-} ARBTreeNodeColor;
+#include <rbtree/AbstractRBTreeDefs.h>
 
 
-///typedef void* ARBTreeValue;
-typedef int ARBTreeValue;
+typedef void* ARBTreeValue;
+
+typedef bool (* rbtree_isValidValue)(const ARBTreeValue value);
+
+typedef bool (* rbtree_checkOrder)(const ARBTreeValue valueA, const ARBTreeValue valueB);
+
+typedef void (* rbtree_printValue)(const ARBTreeValue value);
+
 
 
 typedef struct ARBTreeElement {
@@ -50,43 +52,11 @@ typedef struct ARBTreeElement {
 
 typedef struct {
     ARBTreeNode* root;
+    rbtree_isValidValue fIsValidValue;
+    rbtree_checkOrder fCheckOrder;
+    rbtree_printValue fPrintValue;
 } ARBTree;
 
-
-typedef enum {
-    ARBTREE_INVALID_OK = 0,                        /// tree is valid
-
-    /// binary tree properties
-    ARBTREE_INVALID_ROOT_PARENT = 1,
-    ARBTREE_INVALID_NODE_PARENT = 2,
-    ARBTREE_INVALID_SAME_CHILD = 3,                /// 'left' and 'right' points to the same node
-    ARBTREE_INVALID_BAD_VALUE = 4,
-    ARBTREE_INVALID_NOT_SORTED = 5,
-
-    /// red-black tree properties
-    ARBTREE_INVALID_RED_ROOT = 6,
-    ARBTREE_INVALID_BLACK_CHILDREN = 7,            /// when node is red, then children have to be black
-    ARBTREE_INVALID_BLACK_PATH = 8                 /// invalid number of black nodes on paths
-} ARBTreeValidationError;
-
-
-/// ===========================================================================
-
-
-bool rbtree_checkOrder(const ARBTreeValue valueA, const ARBTreeValue valueB) {
-	(void) valueA; /* unused */
-	(void) valueB; /* unused */
-	return (valueA < valueB);
-}
-
-bool rbtree_isValidValue(const ARBTreeValue value) {
-	(void) value; /* unused */
-	return true;                        /// always valid
-}
-
-void rbtree_printValue(const ARBTreeValue value) {
-	printf("%d", value);
-}
 
 /// ===========================================================================
 
@@ -103,12 +73,6 @@ size_t rbtree_depth(const ARBTree* tree);
 
 ARBTreeValidationError rbtree_isValid(const ARBTree* tree);
 
-ARBTreeNode* rbtree_findNode(const ARBTree* tree, const ARBTreeValue value);
-
-bool rbtree_add(ARBTree* tree, const ARBTreeValue value);
-
-bool rbtree_delete(ARBTree* tree, const ARBTreeValue value);
-
 void rbtree_print(const ARBTree* tree);
 
 /**
@@ -116,6 +80,16 @@ void rbtree_print(const ARBTree* tree);
  * Returns number of released elements (size of list)
  */
 int rbtree_release(ARBTree* tree);
+
+
+/// =================================================================
+
+
+ARBTreeNode* rbtree_findNode(const ARBTree* tree, const ARBTreeValue value);
+
+bool rbtree_add(ARBTree* tree, const ARBTreeValue value);
+
+bool rbtree_delete(ARBTree* tree, const ARBTreeValue value);
 
 
 /// =================================================================

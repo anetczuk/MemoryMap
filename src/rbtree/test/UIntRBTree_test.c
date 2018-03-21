@@ -21,7 +21,7 @@
 /// SOFTWARE.
 ///
 
-#include "../include/rbtree/AbstractRBTree.h"
+#include "rbtree/UIntRBTree.h"
 
 #include <time.h>
 #include <stdlib.h>
@@ -39,10 +39,10 @@
 
 static ARBTree create_default_tree(const size_t nodes) {
     ARBTree tree;
-    rbtree_init(&tree);
+    uirbtree_init(&tree);
 
     for(size_t i = 0; i < nodes; ++i) {
-    	rbtree_add(&tree, i+1);
+    	uirbtree_add(&tree, i+1);
 
 //        assert_int_equal( rbtree_size(&tree), i+1 );
 //        assert_int_equal( rbtree_isValid(&tree), ARBTREE_INVALID_OK );
@@ -55,11 +55,11 @@ static ARBTree create_default_tree(const size_t nodes) {
 //    srand( seed );
 //
 //    RBTree tree;
-//    rbtree_init(&tree);
+//    uirbtree_init(&tree);
 //
 //    for(size_t i = 0; i < nodes; ++i) {
 //        const size_t addr = rand() % nodes +1;
-//    	rbtree_add(&tree, addr);
+//    	uirbtree_add(&tree, addr);
 //
 //        assert_int_equal( rbtree_size(&tree), i+1 );
 //        assert_int_equal( rbtree_isValid(&tree), ARBTREE_INVALID_OK );
@@ -72,12 +72,12 @@ static ARBTree create_random_rbtree_map(const unsigned int seed, const size_t no
     srand( seed );
 
     ARBTree tree;
-    rbtree_init(&tree);
+    uirbtree_init(&tree);
 
     for(size_t i = 0; i < nodes; ++i) {
         const size_t addr = rand() % addressRange +1;
 
-        rbtree_add(&tree, addr);
+        uirbtree_add(&tree, addr);
 
 //        printf("Iteration %lu: adding (%lu, %lu), size: %lu\n", i, addr, msize, rbtree_size(&tree) );
 
@@ -92,18 +92,18 @@ static ARBTree create_random_rbtree_map(const unsigned int seed, const size_t no
 /// ======================================================
 
 
-static void test_rbtree_init_NULL(void **state) {
+static void test_uirbtree_init_NULL(void **state) {
     (void) state; /* unused */
 
-    const int ret = rbtree_init(NULL);
+    const int ret = uirbtree_init(NULL);
     assert_int_equal( ret, -1 );
 }
 
-static void test_rbtree_init_valid(void **state) {
+static void test_uirbtree_init_valid(void **state) {
     (void) state; /* unused */
 
     ARBTree tree;
-    const int ret = rbtree_init(&tree);
+    const int ret = uirbtree_init(&tree);
     assert_int_equal( ret, 0 );
 
     assert_int_equal( rbtree_isValid(&tree), ARBTREE_INVALID_OK );
@@ -115,20 +115,20 @@ static void test_rbtree_init_valid(void **state) {
 /// ==================================================
 
 
-static void test_rbtree_add_NULL(void **state) {
+static void test_uirbtree_add_NULL(void **state) {
     (void) state; /* unused */
 
-    const bool ret = rbtree_add(NULL, 3);
+    const bool ret = uirbtree_add(NULL, 3);
     assert_int_equal( ret, false );
 }
 
-static void test_rbtree_add_root(void **state) {
+static void test_uirbtree_add_root(void **state) {
     (void) state; /* unused */
 
     ARBTree tree;
-    rbtree_init(&tree);
+    uirbtree_init(&tree);
 
-    const bool retAddr = rbtree_add(&tree, 10);
+    const bool retAddr = uirbtree_add(&tree, 10);
     assert_int_equal( retAddr, true );
 
     assert_int_equal( rbtree_size(&tree), 1 );
@@ -138,17 +138,19 @@ static void test_rbtree_add_root(void **state) {
     rbtree_release(&tree);
 }
 
-static void test_rbtree_add_same(void **state) {
+static void test_uirbtree_add_same(void **state) {
     (void) state; /* unused */
 
     ARBTree tree;
-    rbtree_init(&tree);
+    uirbtree_init(&tree);
 
-    const bool retAddr1 = rbtree_add(&tree, 10);
+    const bool retAddr1 = uirbtree_add(&tree, 10);
     assert_int_equal( retAddr1, true );
 
-    const bool retAddr2 = rbtree_add(&tree, 10);
+    const bool retAddr2 = uirbtree_add(&tree, 10);
     assert_int_equal( retAddr2, true );
+
+//    rbtree_print(&tree);
 
     assert_int_equal( rbtree_size(&tree), 2 );
     assert_int_equal( rbtree_depth(&tree), 2 );
@@ -157,14 +159,14 @@ static void test_rbtree_add_same(void **state) {
     rbtree_release(&tree);
 }
 
-static void test_rbtree_add_left(void **state) {
+static void test_uirbtree_add_left(void **state) {
     (void) state; /* unused */
 
     ARBTree tree;
-    rbtree_init(&tree);
+    uirbtree_init(&tree);
 
-    rbtree_add(&tree, 3);
-    rbtree_add(&tree, 1);
+    uirbtree_add(&tree, 3);
+    uirbtree_add(&tree, 1);
 
 //    rbtree_print(&tree);
 
@@ -179,14 +181,14 @@ static void test_rbtree_add_left(void **state) {
     rbtree_release(&tree);
 }
 
-static void test_rbtree_add_right(void **state) {
+static void test_uirbtree_add_right(void **state) {
     (void) state; /* unused */
 
     ARBTree tree;
-    rbtree_init(&tree);
+    uirbtree_init(&tree);
 
-    rbtree_add(&tree, 3);
-    rbtree_add(&tree, 6);
+    uirbtree_add(&tree, 3);
+    uirbtree_add(&tree, 6);
 
 //    rbtree_print(&tree);
 
@@ -201,16 +203,16 @@ static void test_rbtree_add_right(void **state) {
     rbtree_release(&tree);
 }
 
-static void test_rbtree_add_subrbtree_left(void **state) {
+static void test_uirbtree_add_subrbtree_left(void **state) {
     (void) state; /* unused */
 
     ARBTree tree;
-    rbtree_init(&tree);
+    uirbtree_init(&tree);
 
-    rbtree_add(&tree, 50);
-    rbtree_add(&tree, 20);
-    rbtree_add(&tree, 30);
-    rbtree_add(&tree, 40);
+    uirbtree_add(&tree, 50);
+    uirbtree_add(&tree, 20);
+    uirbtree_add(&tree, 30);
+    uirbtree_add(&tree, 40);
 
     const size_t lSize = rbtree_size(&tree);
     assert_int_equal( lSize, 4 );
@@ -225,16 +227,16 @@ static void test_rbtree_add_subrbtree_left(void **state) {
     rbtree_release(&tree);
 }
 
-static void test_rbtree_add_subrbtree_right(void **state) {
+static void test_uirbtree_add_subrbtree_right(void **state) {
     (void) state; /* unused */
 
     ARBTree tree;
-    rbtree_init(&tree);
+    uirbtree_init(&tree);
 
-    rbtree_add(&tree, 50);
-    rbtree_add(&tree, 80);
-    rbtree_add(&tree, 70);
-    rbtree_add(&tree, 60);
+    uirbtree_add(&tree, 50);
+    uirbtree_add(&tree, 80);
+    uirbtree_add(&tree, 70);
+    uirbtree_add(&tree, 60);
 
     const size_t lSize = rbtree_size(&tree);
     assert_int_equal( lSize, 4 );
@@ -247,23 +249,23 @@ static void test_rbtree_add_subrbtree_right(void **state) {
     rbtree_release(&tree);
 }
 
-static void test_rbtree_add_subtree(void **state) {
+static void test_uirbtree_add_subtree(void **state) {
     (void) state; /* unused */
 
     ARBTree tree;
-    rbtree_init(&tree);
+    uirbtree_init(&tree);
 
-    rbtree_add(&tree, 13);
-    rbtree_add(&tree, 8);
-    rbtree_add(&tree, 1);
-    rbtree_add(&tree, 6);
-    rbtree_add(&tree, 11);
+    uirbtree_add(&tree, 13);
+    uirbtree_add(&tree, 8);
+    uirbtree_add(&tree, 1);
+    uirbtree_add(&tree, 6);
+    uirbtree_add(&tree, 11);
 
-    rbtree_add(&tree, 17);
-    rbtree_add(&tree, 15);
-    rbtree_add(&tree, 25);
-    rbtree_add(&tree, 22);
-    rbtree_add(&tree, 27);
+    uirbtree_add(&tree, 17);
+    uirbtree_add(&tree, 15);
+    uirbtree_add(&tree, 25);
+    uirbtree_add(&tree, 22);
+    uirbtree_add(&tree, 27);
 
     const size_t lSize = rbtree_size(&tree);
     assert_int_equal( lSize, 10 );
@@ -276,7 +278,7 @@ static void test_rbtree_add_subtree(void **state) {
     rbtree_release(&tree);
 }
 
-static void test_rbtree_add_subtree1(void **state) {
+static void test_uirbtree_add_subtree1(void **state) {
     (void) state; /* unused */
 
     const unsigned int seed = 1520466046;
@@ -308,7 +310,7 @@ static void test_rbtree_depth_0(void **state) {
     (void) state; /* unused */
 
     ARBTree tree;
-    rbtree_init(&tree);
+    uirbtree_init(&tree);
 
     const size_t ret = rbtree_depth(&tree);
     assert_int_equal( ret, 0 );
@@ -346,7 +348,7 @@ static void test_rbtree_release_empty(void **state) {
     (void) state; /* unused */
 
     ARBTree tree;
-    rbtree_init(&tree);
+    uirbtree_init(&tree);
     const int ret = rbtree_release(&tree);
     assert_int_equal( ret, 0 );
 }
@@ -355,9 +357,9 @@ static void test_rbtree_release_double(void **state) {
     (void) state; /* unused */
 
     ARBTree memMap;
-    rbtree_init(&memMap);
+    uirbtree_init(&memMap);
 
-    rbtree_add(&memMap, 10);
+    uirbtree_add(&memMap, 10);
 
     assert_int_equal( rbtree_release(&memMap), 1 );
     assert_int_equal( rbtree_release(&memMap), 0 );
@@ -367,33 +369,33 @@ static void test_rbtree_release_2(void **state) {
     (void) state; /* unused */
 
     ARBTree tree;
-    const int init = rbtree_init(&tree);
+    const int init = uirbtree_init(&tree);
     assert_int_equal( init, 0 );
 
-    rbtree_add(&tree, 1);
-    rbtree_add(&tree, 2);
+    uirbtree_add(&tree, 1);
+    uirbtree_add(&tree, 2);
 
     const int ret = rbtree_release(&tree);
     assert_int_equal( ret, 2 );
 }
 
-static void test_rbtree_delete_NULL(void **state) {
+static void test_uirbtree_delete_NULL(void **state) {
     (void) state; /* unused */
 
-    const bool deleted = rbtree_delete(NULL, 10);
+    const bool deleted = uirbtree_delete(NULL, 10);
     assert_int_equal( deleted, false );
 }
 
-static void test_rbtree_delete_root(void **state) {
+static void test_uirbtree_delete_root(void **state) {
     (void) state; /* unused */
 
     ARBTree tree;
-    rbtree_init(&tree);
+    uirbtree_init(&tree);
 
-    rbtree_add(&tree, 10);
-    rbtree_add(&tree,  5);
+    uirbtree_add(&tree, 10);
+    uirbtree_add(&tree,  5);
 
-    const bool deleted = rbtree_delete(&tree, 10);			             /// deleting root
+    const bool deleted = uirbtree_delete(&tree, 10);			             /// deleting root
 
     assert_int_equal( deleted, true );
 
@@ -404,7 +406,7 @@ static void test_rbtree_delete_root(void **state) {
     rbtree_release(&tree);
 }
 
-static void test_rbtree_delete_item(void **state) {
+static void test_uirbtree_delete_item(void **state) {
     (void) state; /* unused */
 
     const size_t treeSize = 16;
@@ -415,7 +417,7 @@ static void test_rbtree_delete_item(void **state) {
 
 //    rbtree_print(&tree);
 
-    const bool deleted = rbtree_delete(&tree, 10);
+    const bool deleted = uirbtree_delete(&tree, 10);
 
 //    rbtree_print(&tree);
 
@@ -437,19 +439,23 @@ int main(void) {
     //TODO: add selective run
 
     const struct UnitTest tests[] = {
-        unit_test(test_rbtree_add_NULL),
-        unit_test(test_rbtree_add_root),
-        unit_test(test_rbtree_add_same),
-        unit_test(test_rbtree_add_left),
-        unit_test(test_rbtree_add_right),
-        unit_test(test_rbtree_add_subrbtree_left),
-        unit_test(test_rbtree_add_subrbtree_right),
-        unit_test(test_rbtree_add_subtree),
-        unit_test(test_rbtree_add_subtree1),
-
         unit_test(test_rbtree_size_NULL),
         unit_test(test_rbtree_depth_NULL),
         unit_test(test_rbtree_depth_0),
+
+        unit_test(test_uirbtree_add_NULL),
+        unit_test(test_uirbtree_add_root),
+        unit_test(test_uirbtree_add_same),
+        unit_test(test_uirbtree_add_left),
+        unit_test(test_uirbtree_add_right),
+        unit_test(test_uirbtree_add_subrbtree_left),
+        unit_test(test_uirbtree_add_subrbtree_right),
+        unit_test(test_uirbtree_add_subtree),
+        unit_test(test_uirbtree_add_subtree1),
+
+        unit_test(test_uirbtree_delete_NULL),
+        unit_test(test_uirbtree_delete_root),
+        unit_test(test_uirbtree_delete_item),
 
         unit_test(test_rbtree_isValid_NULL),
         unit_test(test_rbtree_isValid_valid),
@@ -459,12 +465,8 @@ int main(void) {
         unit_test(test_rbtree_release_double),
         unit_test(test_rbtree_release_2),
 
-        unit_test(test_rbtree_delete_NULL),
-        unit_test(test_rbtree_delete_root),
-        unit_test(test_rbtree_delete_item),
-
-        unit_test(test_rbtree_init_NULL),
-        unit_test(test_rbtree_init_valid)
+        unit_test(test_uirbtree_init_NULL),
+        unit_test(test_uirbtree_init_valid)
     };
 
     return run_group_tests(tests);
