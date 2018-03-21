@@ -31,15 +31,6 @@
 #include <rbtree/AbstractRBTreeDefs.h>
 
 
-typedef void* ARBTreeValue;
-
-typedef bool (* rbtree_isValidValue)(const ARBTreeValue value);
-
-typedef bool (* rbtree_checkOrder)(const ARBTreeValue valueA, const ARBTreeValue valueB);
-
-typedef void (* rbtree_printValue)(const ARBTreeValue value);
-
-
 
 typedef struct ARBTreeElement {
     struct ARBTreeElement* parent;
@@ -50,14 +41,6 @@ typedef struct ARBTreeElement {
 } ARBTreeNode;
 
 
-typedef struct {
-    ARBTreeNode* root;
-    rbtree_isValidValue fIsValidValue;
-    rbtree_checkOrder fCheckOrder;
-    rbtree_printValue fPrintValue;
-} ARBTree;
-
-
 /// ===========================================================================
 
 
@@ -65,7 +48,7 @@ typedef struct {
  * If list has be initialized previously, then have to be released
  * before next initialization.
  */
-int rbtree_init(ARBTree* tree);
+bool rbtree_init(ARBTree* tree);
 
 size_t rbtree_size(const ARBTree* tree);
 
@@ -77,9 +60,9 @@ void rbtree_print(const ARBTree* tree);
 
 /**
  * List has to be initialized before releasing.
- * Returns number of released elements (size of list)
+ * Returns true if released, otherwise false.
  */
-int rbtree_release(ARBTree* tree);
+bool rbtree_release(ARBTree* tree);
 
 
 /// =================================================================

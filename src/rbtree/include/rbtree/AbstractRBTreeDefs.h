@@ -24,6 +24,8 @@
 #ifndef SRC_RBTREE_INCLUDE_RBTREE_ABSTRACTRBTREEDEFS_H_
 #define SRC_RBTREE_INCLUDE_RBTREE_ABSTRACTRBTREEDEFS_H_
 
+#include <stdbool.h>
+
 
 typedef enum {
     ARBTREE_COLOR_BLACK = 0,
@@ -46,6 +48,33 @@ typedef enum {
     ARBTREE_INVALID_BLACK_CHILDREN = 7,            /// when node is red, then children have to be black
     ARBTREE_INVALID_BLACK_PATH = 8                 /// invalid number of black nodes on paths
 } ARBTreeValidationError;
+
+
+/// ==================================================================
+
+
+typedef void* ARBTreeValue;
+
+typedef bool (* rbtree_isValidValue)(const ARBTreeValue value);
+
+typedef bool (* rbtree_isLessOrder)(const ARBTreeValue valueA, const ARBTreeValue valueB);
+
+typedef void (* rbtree_printValue)(const ARBTreeValue value);
+
+
+/// ==================================================================
+
+
+struct ARBTreeElement;
+
+
+typedef struct {
+    struct ARBTreeElement* root;
+
+    rbtree_isValidValue fIsValidValue;
+    rbtree_isLessOrder fIsLessOrder;
+    rbtree_printValue fPrintValue;
+} ARBTree;
 
 
 #endif /* SRC_RBTREE_INCLUDE_RBTREE_ABSTRACTRBTREEDEFS_H_ */

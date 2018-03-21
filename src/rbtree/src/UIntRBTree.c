@@ -25,6 +25,8 @@
 
 #include <stdlib.h>                     /// malloc, free
 
+#include "rbtree/AbstractRBTree.h"
+
 
 static inline bool uirbtree_isValidValue(const ARBTreeValue value) {
     return (value != NULL);
@@ -45,24 +47,65 @@ static inline void uirbtree_printValue(const ARBTreeValue value) {
 /// ========================================================================================
 
 
-int uirbtree_init(ARBTree* tree) {
-    const int ret = rbtree_init(tree);
-    if (ret!=0) {
+bool uirbtree_init(UIntRBTree* tree) {
+    if (tree == NULL) {
+        return false;
+    }
+    ARBTree* baseTree = &(tree->tree);
+    const bool ret = rbtree_init(baseTree);
+    if (ret==false) {
         return ret;
     }
 
-    tree->fIsValidValue = uirbtree_isValidValue;
-    tree->fCheckOrder = uirbtree_checkOrder;
-    tree->fPrintValue = uirbtree_printValue;
+    baseTree->fIsValidValue = uirbtree_isValidValue;
+    baseTree->fIsLessOrder = uirbtree_checkOrder;
+    baseTree->fPrintValue = uirbtree_printValue;
 
     return ret;
 }
 
-bool uirbtree_add(ARBTree* tree, const UIntRBTreeValue value) {
+size_t uirbtree_size(const UIntRBTree* tree) {
+    if (tree == NULL) {
+        return 0;
+    }
+    const ARBTree* baseTree = &(tree->tree);
+    return rbtree_size(baseTree);
+}
+
+size_t uirbtree_depth(const UIntRBTree* tree) {
+    if (tree == NULL) {
+        return 0;
+    }
+    const ARBTree* baseTree = &(tree->tree);
+    return rbtree_depth(baseTree);
+}
+
+ARBTreeValidationError uirbtree_isValid(const UIntRBTree* tree) {
+    if (tree == NULL) {
+        return ARBTREE_INVALID_OK;
+    }
+    const ARBTree* baseTree = &(tree->tree);
+    return rbtree_isValid(baseTree);
+}
+
+void uirbtree_print(const UIntRBTree* tree) {
+    if (tree == NULL) {
+        return ;
+    }
+    const ARBTree* baseTree = &(tree->tree);
+    rbtree_print(baseTree);
+}
+
+bool uirbtree_add(UIntRBTree* tree, const UIntRBTreeValue value) {
+    if (tree == NULL) {
+        return false;
+    }
+    ARBTree* baseTree = &(tree->tree);
+
     UIntRBTreeValue* ptr = malloc( sizeof(UIntRBTreeValue) );
     *ptr = value;
 
-    if (rbtree_add(tree, ptr)==true) {
+    if (rbtree_add(baseTree, ptr)==true) {
         return true;
     }
 
@@ -70,7 +113,21 @@ bool uirbtree_add(ARBTree* tree, const UIntRBTreeValue value) {
     return false;
 }
 
-bool uirbtree_delete(ARBTree* tree, const UIntRBTreeValue value) {
+bool uirbtree_delete(UIntRBTree* tree, const UIntRBTreeValue value) {
+    if (tree == NULL) {
+        return false;
+    }
+    ARBTree* baseTree = &(tree->tree);
+
     const ARBTreeValue v = (ARBTreeValue)&value;
-    return rbtree_delete(tree, v);
+    return rbtree_delete(baseTree, v);
 }
+
+bool uirbtree_release(UIntRBTree* tree) {
+    if (tree == NULL) {
+        return false;
+    }
+    ARBTree* baseTree = &(tree->tree);
+    return rbtree_release(baseTree);
+}
+

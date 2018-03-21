@@ -29,18 +29,18 @@
 
 
 
-int rbtree_init(ARBTree* tree) {
+bool rbtree_init(ARBTree* tree) {
     if (tree == NULL) {
-        return -1;
+        return false;
     }
 
     tree->root = NULL;
 
     tree->fIsValidValue = NULL;
-    tree->fCheckOrder = NULL;
+    tree->fIsLessOrder = NULL;
     tree->fPrintValue = NULL;
 
-    return 0;
+    return true;
 }
 
 static const ARBTreeNode* rbtree_getLeftmostNode(const ARBTreeNode* node) {
@@ -202,26 +202,26 @@ static ARBTreeValidationError rbtree_isValid_checkSorted(const ARBTree* tree, co
 
     const ARBTreeNode* prevTop = rbtree_getLeftAncestor(node);
     if (prevTop != NULL) {
-        if (tree->fCheckOrder(node->value, prevTop->value) == true) {
+        if (tree->fIsLessOrder(node->value, prevTop->value) == true) {
         	return ARBTREE_INVALID_NOT_SORTED;
         }
     }
     const ARBTreeNode* nextTop = rbtree_getRightAncestor(node);
     if (nextTop != NULL) {
-        if (tree->fCheckOrder(nextTop->value, node->value) == true) {
+        if (tree->fIsLessOrder(nextTop->value, node->value) == true) {
         	return ARBTREE_INVALID_NOT_SORTED;
         }
     }
 
     const ARBTreeNode* prevBottom = rbtree_getRightDescendant(node);
     if (prevBottom != NULL) {
-        if (tree->fCheckOrder(node->value, prevBottom->value) == true) {
+        if (tree->fIsLessOrder(node->value, prevBottom->value) == true) {
         	return ARBTREE_INVALID_NOT_SORTED;
         }
     }
     const ARBTreeNode* nextBottom = rbtree_getLeftDescendant(node);
     if (nextBottom != NULL) {
-        if (tree->fCheckOrder(nextBottom->value, node->value) == true) {
+        if (tree->fIsLessOrder(nextBottom->value, node->value) == true) {
         	return ARBTREE_INVALID_NOT_SORTED;
         }
     }
@@ -368,12 +368,12 @@ ARBTreeNode* rbtree_findNode(const ARBTree* tree, const ARBTreeValue value) {
     }
     ARBTreeNode* curr = tree->root;
     while (curr != NULL) {
-        if ( tree->fCheckOrder(value, curr->value) == true ) {
+        if ( tree->fIsLessOrder(value, curr->value) == true ) {
             /// value < curr->value
             curr = curr->left;
             continue ;
         }
-        if ( tree->fCheckOrder(curr->value, value) == true ) {
+        if ( tree->fIsLessOrder(curr->value, value) == true ) {
             /// value > curr->value
             curr = curr->right;
             continue ;
@@ -538,7 +538,7 @@ static bool rbtree_addToRight(const ARBTree* tree, ARBTreeNode* node, ARBTreeVal
  * Adding to left side: value should be smaller than 'node->value'
  */
 static bool rbtree_addToLeft(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value) {
-    if ( tree->fCheckOrder(value, node->value) == false ) {
+    if ( tree->fIsLessOrder(value, node->value) == false ) {
         /// could not add on left side -- invalid order
     	return false;
     }
@@ -561,7 +561,7 @@ static bool rbtree_addToLeft(const ARBTree* tree, ARBTreeNode* node, ARBTreeValu
  * Adding to right side: value should be greater than 'node->value'
  */
 static bool rbtree_addToRight(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value) {
-    if ( tree->fCheckOrder(value, node->value) == true ) {
+    if ( tree->fIsLessOrder(value, node->value) == true ) {
         /// could not add on right side -- invalid order
         return false;
     }
@@ -701,13 +701,16 @@ static int rbtree_releaseNodes(ARBTreeNode* node) {
     return leftReleased+rightReleased+1;
 }
 
-int rbtree_release(ARBTree* tree) {
+bool rbtree_release(ARBTree* tree) {
     if (tree==NULL) {
-        return -1;
+        return false;
     }
-    const int ret = rbtree_releaseNodes(tree->root);
+    if (tree->root==NULL) {
+        return false;
+    }
+    rbtree_releaseNodes(tree->root);
     tree->root = NULL;
-    return ret;
+    return true;
 }
 
 

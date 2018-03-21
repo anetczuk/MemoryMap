@@ -24,17 +24,37 @@
 #ifndef SRC_RBTREE_INCLUDE_RBTREE_UINTRBTREE_H_
 #define SRC_RBTREE_INCLUDE_RBTREE_UINTRBTREE_H_
 
-#include "rbtree/AbstractRBTree.h"
+#include <stddef.h>                            /// NULL, size_t
+
+#include "rbtree/AbstractRBTreeDefs.h"
 
 
 typedef size_t UIntRBTreeValue;
 
 
-int uirbtree_init(ARBTree* tree);
+typedef struct {
+    ARBTree tree;
+} UIntRBTree;
 
-bool uirbtree_add(ARBTree* tree, const UIntRBTreeValue value);
 
-bool uirbtree_delete(ARBTree* tree, const UIntRBTreeValue value);
+/// ================================================================
+
+
+bool uirbtree_init(UIntRBTree* tree);
+
+size_t uirbtree_size(const UIntRBTree* tree);
+
+size_t uirbtree_depth(const UIntRBTree* tree);
+
+ARBTreeValidationError uirbtree_isValid(const UIntRBTree* tree);
+
+void uirbtree_print(const UIntRBTree* tree);
+
+bool uirbtree_add(UIntRBTree* tree, const UIntRBTreeValue value);
+
+bool uirbtree_delete(UIntRBTree* tree, const UIntRBTreeValue value);
+
+bool uirbtree_release(UIntRBTree* tree);
 
 
 #endif /* SRC_RBTREE_INCLUDE_RBTREE_UINTRBTREE_H_ */
