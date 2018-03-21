@@ -43,6 +43,10 @@ static inline void uirbtree_printValue(const ARBTreeValue value) {
     printf("%lu", v);
 }
 
+static inline void uirbtree_freeValue(ARBTreeValue value) {
+    free(value);
+}
+
 
 /// ========================================================================================
 
@@ -60,6 +64,7 @@ bool uirbtree_init(UIntRBTree* tree) {
     baseTree->fIsValidValue = uirbtree_isValidValue;
     baseTree->fIsLessOrder = uirbtree_checkOrder;
     baseTree->fPrintValue = uirbtree_printValue;
+    baseTree->fFreeValue = uirbtree_freeValue;
 
     return ret;
 }

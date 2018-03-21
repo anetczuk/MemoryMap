@@ -687,7 +687,12 @@ void rbtree_print(const ARBTree* tree) {
 /// ==============================================================================================
 
 
-static int rbtree_releaseNodes(ARBTreeNode* node) {
+static void releaseNode(ARBTree* tree, ARBTreeNode* node) {
+    tree->fFreeValue(node->value);
+    free(node);
+}
+
+static int rbtree_releaseNodes(ARBTree* tree, ARBTreeNode* node) {
     if (node == NULL) {
         return 0;
     }
@@ -695,9 +700,11 @@ static int rbtree_releaseNodes(ARBTreeNode* node) {
      * Done in recursive manner. In case of very large structures consider
      * reimplementing it using while() and vector structure.
      */
-    const int leftReleased = rbtree_releaseNodes(node->left);
-    const int rightReleased = rbtree_releaseNodes(node->right);
-    free(node);
+    const int leftReleased = rbtree_releaseNodes(tree, node->left);
+    const int rightReleased = rbtree_releaseNodes(tree, node->right);
+
+    releaseNode(tree, node);
+
     return leftReleased+rightReleased+1;
 }
 
@@ -708,7 +715,7 @@ bool rbtree_release(ARBTree* tree) {
     if (tree->root==NULL) {
         return false;
     }
-    rbtree_releaseNodes(tree->root);
+    rbtree_releaseNodes(tree, tree->root);
     tree->root = NULL;
     return true;
 }
@@ -907,7 +914,7 @@ bool rbtree_delete(ARBTree* tree, const ARBTreeValue value) {
             rbtree_findRoot(tree);
         }
 
-        free(node);
+        releaseNode(tree, node);
         return true;
     }
 
@@ -930,7 +937,7 @@ bool rbtree_delete(ARBTree* tree, const ARBTreeValue value) {
             rbtree_findRoot(tree);
         }
 
-        free(node);
+        releaseNode(tree, node);
         return true;
     }
 
@@ -938,7 +945,11 @@ bool rbtree_delete(ARBTree* tree, const ARBTreeValue value) {
     /// there is right subtree
 
     ARBTreeNode* nextNode = (ARBTreeNode*) rbtree_getLeftDescendant(node);      /// never NULL
+
+    /// swap pointer values (it's important -- it causes to release proper pointer)
+    ARBTreeValue tmpVal = node->value;
     node->value = nextNode->value;
+    nextNode->value = tmpVal;
 
     rbtree_changeChild(nextNode->parent, nextNode, nextNode->right);
     if (nextNode->color == ARBTREE_COLOR_BLACK) {
@@ -947,7 +958,7 @@ bool rbtree_delete(ARBTree* tree, const ARBTreeValue value) {
         rbtree_findRoot(tree);
     }
 
-    free(nextNode);
+    releaseNode(tree, nextNode);
     return true;
 }
 

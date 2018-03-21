@@ -55,11 +55,14 @@ typedef enum {
 
 typedef void* ARBTreeValue;
 
+
 typedef bool (* rbtree_isValidValue)(const ARBTreeValue value);
 
 typedef bool (* rbtree_isLessOrder)(const ARBTreeValue valueA, const ARBTreeValue valueB);
 
 typedef void (* rbtree_printValue)(const ARBTreeValue value);
+
+typedef void (* rbtree_freeValue)(ARBTreeValue value);
 
 
 /// ==================================================================
@@ -74,6 +77,7 @@ typedef struct {
     rbtree_isValidValue fIsValidValue;
     rbtree_isLessOrder fIsLessOrder;
     rbtree_printValue fPrintValue;
+    rbtree_freeValue fFreeValue;
 } ARBTree;
 
 
