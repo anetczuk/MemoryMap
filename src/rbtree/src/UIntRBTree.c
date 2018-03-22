@@ -40,7 +40,7 @@ static inline bool uirbtree_checkOrder(const ARBTreeValue valueA, const ARBTreeV
 
 static inline void uirbtree_printValue(const ARBTreeValue value) {
     const UIntRBTreeValue v = *((UIntRBTreeValue*)value);
-    printf("%lu", v);
+    printf("%zu", v);
 }
 
 static inline void uirbtree_freeValue(ARBTreeValue value) {
