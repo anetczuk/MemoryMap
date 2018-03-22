@@ -93,3 +93,6 @@ add_subdirectory( mymap )
 ## generate bash scripts
 generate_file( ${CMAKE_SOURCE_DIR}/run_tests.sh.in run_tests.sh )
 
+## copy script
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/clanganalyzer.sh DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )
+
