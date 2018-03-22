@@ -3,6 +3,7 @@
 #
 
 
+include_directories( "../rbtree/include" )
 include_directories( "include" )
 
 
