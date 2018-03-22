@@ -828,6 +828,8 @@ static void test_tree_delete_R2(void **state) {
 //    tree_print(&tree);
 
     const MemoryArea area = tree_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
+
     const size_t addr = rand() % memory_size(&area) + area.start;
 
 //    printf("seed: %u deleting: %lu\n", seed, addr);
@@ -853,6 +855,8 @@ static void test_tree_delete_R2_L(void **state) {
 //    tree_print(&tree);
 
     const MemoryArea area = tree_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
+
     const size_t addr = rand() % memory_size(&area) + area.start;
 
 //    printf("seed: %u deleting: %lu\n", seed, addr);
@@ -878,6 +882,8 @@ static void test_tree_delete_R3(void **state) {
 //    tree_print(&tree);
 
     const MemoryArea area = tree_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
+
     const size_t addr = rand() % memory_size(&area) + area.start;
 
 //    printf("seed: %u deleting: %lu\n", seed, addr);
@@ -903,6 +909,8 @@ static void test_tree_delete_R3b(void **state) {
 //    tree_print(&tree);
 
     const MemoryArea area = tree_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
+
     const size_t addr = rand() % memory_size(&area) + area.start;
 
 //    printf("seed: %u deleting: %lu\n", seed, addr);
@@ -928,6 +936,8 @@ static void test_tree_delete_R3c(void **state) {
 //    tree_print(&tree);
 
     const MemoryArea area = tree_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
+
     const size_t addr = rand() % memory_size(&area) + area.start;
 
 //    printf("seed: %u deleting: %lu\n", seed, addr);
@@ -953,6 +963,8 @@ static void test_tree_delete_R4(void **state) {
 //    tree_print(&tree);
 
     const MemoryArea area = tree_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
+
     const size_t addr = rand() % memory_size(&area) + area.start;
 
 //    printf("seed: %u deleting: %lu\n", seed, addr);
@@ -978,6 +990,8 @@ static void test_tree_delete_R5(void **state) {
 //    tree_print(&tree);
 
     const MemoryArea area = tree_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
+
     const size_t addr = rand() % memory_size(&area) + area.start;
 
 //    printf("seed: %u deleting: %lu\n", seed, addr);
@@ -1004,6 +1018,8 @@ static void test_tree_delete_random(void **state) {
     /// tree_print(&tree);
 
     const MemoryArea area = tree_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
+
     const size_t addr = rand() % memory_size(&area) + area.start;
 
 //    printf("seed: %u deleting: %lu\n", seed, addr);
@@ -1033,6 +1049,7 @@ static void test_tree_randomT1(void **state) {
     RBTree tree = create_random_tree_map(seed, nodes_num, 200, 20);
 
     const MemoryArea area = tree_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
 
     for(size_t i = 0; i < nodes_num; ++i) {
         const size_t addr = rand() % memory_size(&area) + area.start;
@@ -1059,6 +1076,7 @@ static void test_tree_randomT2(void **state) {
     RBTree tree = create_random_tree_map(seed, nodes_num, 200, 20);
 
     const MemoryArea area = tree_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
 
     for(size_t i = 0; i < nodes_num; ++i) {
         const size_t addr = rand() % memory_size(&area) + area.start;
@@ -1093,6 +1111,7 @@ static void test_tree_randomTest1(void **state) {
     assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
 
     const MemoryArea area = tree_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
 
     for(size_t i = 0; i < nodes_num; ++i) {
         const size_t addr = rand() % memory_size(&area) + area.start;
@@ -1129,6 +1148,7 @@ static void test_tree_randomTest2(void **state) {
     assert_int_equal( treeSize, nodes_num );
 
     const MemoryArea area = tree_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
 
     for(size_t i = 0; i < nodes_num; ++i) {
         const size_t addr = rand() % memory_size(&area) + area.start;
