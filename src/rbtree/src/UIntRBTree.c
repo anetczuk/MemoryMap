@@ -56,17 +56,14 @@ bool uirbtree_init(UIntRBTree* tree) {
         return false;
     }
     ARBTree* baseTree = &(tree->tree);
-    const bool ret = rbtree_init(baseTree);
-    if (ret==false) {
-        return ret;
-    }
+    rbtree_init(baseTree);
 
     baseTree->fIsValidValue = uirbtree_isValidValue;
     baseTree->fIsLessOrder = uirbtree_checkOrder;
     baseTree->fPrintValue = uirbtree_printValue;
     baseTree->fFreeValue = uirbtree_freeValue;
 
-    return ret;
+    return true;
 }
 
 size_t uirbtree_size(const UIntRBTree* tree) {

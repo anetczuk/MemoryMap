@@ -50,6 +50,9 @@ typedef enum {
 } ARBTreeValidationError;
 
 
+struct ARBTreeElement;
+
+
 /// ==================================================================
 
 
@@ -64,6 +67,8 @@ typedef void (* rbtree_printValue)(const ARBTreeValue value);
 
 typedef void (* rbtree_freeValue)(ARBTreeValue value);
 
+typedef bool (* rbtree_canInsert)(const struct ARBTreeElement* node, ARBTreeValue value);
+
 
 /// ==================================================================
 
@@ -77,7 +82,10 @@ typedef struct {
     rbtree_isValidValue fIsValidValue;
     rbtree_isLessOrder fIsLessOrder;
     rbtree_printValue fPrintValue;
-    rbtree_freeValue fFreeValue;
+    rbtree_freeValue fFreeValue;            /// destroy value (release memory etc)
+
+    rbtree_canInsert fCanInsertRight;
+    rbtree_canInsert fCanInsertLeft;
 } ARBTree;
 
 

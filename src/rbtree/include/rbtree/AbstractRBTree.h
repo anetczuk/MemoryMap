@@ -48,7 +48,7 @@ typedef struct ARBTreeElement {
  * If list has be initialized previously, then have to be released
  * before next initialization.
  */
-bool rbtree_init(ARBTree* tree);
+void rbtree_init(ARBTree* tree);
 
 size_t rbtree_size(const ARBTree* tree);
 
@@ -73,6 +73,44 @@ ARBTreeNode* rbtree_findNode(const ARBTree* tree, const ARBTreeValue value);
 bool rbtree_add(ARBTree* tree, const ARBTreeValue value);
 
 bool rbtree_delete(ARBTree* tree, const ARBTreeValue value);
+
+
+/// =================================================================
+
+
+/**
+ * Returns ancestor on right side of current node.
+ */
+static inline const ARBTreeNode* rbtree_getRightAncestor(const ARBTreeNode* node) {
+    const ARBTreeNode* child = node;
+    const ARBTreeNode* curr = node->parent;
+    while( curr != NULL ) {
+        if (curr->left == child) {
+            return curr;
+        }
+        child = curr;
+        curr = curr->parent;
+    }
+    /// root found
+    return NULL;
+}
+
+/**
+ * Returns ancestor on left side of current node.
+ */
+static inline const ARBTreeNode* rbtree_getLeftAncestor(const ARBTreeNode* node) {
+    const ARBTreeNode* child = node;
+    const ARBTreeNode* curr = node->parent;
+    while( curr != NULL ) {
+        if (curr->right == child) {
+            return curr;
+        }
+        child = curr;
+        curr = curr->parent;
+    }
+    /// root found
+    return NULL;
+}
 
 
 /// =================================================================

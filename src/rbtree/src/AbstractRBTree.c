@@ -29,18 +29,18 @@
 
 
 
-bool rbtree_init(ARBTree* tree) {
-    if (tree == NULL) {
-        return false;
-    }
+void rbtree_init(ARBTree* tree) {
+    assert( tree != NULL );
 
     tree->root = NULL;
 
     tree->fIsValidValue = NULL;
     tree->fIsLessOrder = NULL;
     tree->fPrintValue = NULL;
+    tree->fFreeValue = NULL;
 
-    return true;
+    tree->fCanInsertRight = NULL;
+    tree->fCanInsertLeft = NULL;
 }
 
 static const ARBTreeNode* rbtree_getLeftmostNode(const ARBTreeNode* node) {
@@ -73,66 +73,30 @@ static const ARBTreeNode* rbtree_getRightDescendant(const ARBTreeNode* node) {
     return rbtree_getRightmostNode(node->left);
 }
 
-/**
- * Returns ancestor on right side of current node.
- */
-static const ARBTreeNode* rbtree_getRightAncestor(const ARBTreeNode* node) {
-    const ARBTreeNode* child = node;
-    const ARBTreeNode* curr = node->parent;
-    while( curr != NULL ) {
-        if (curr->left == child) {
-            return curr;
-        }
-        child = curr;
-        curr = curr->parent;
-    }
-    /// root found
-    return NULL;
-}
-
-/**
- * Returns ancestor on left side of current node.
- */
-static const ARBTreeNode* rbtree_getLeftAncestor(const ARBTreeNode* node) {
-    const ARBTreeNode* child = node;
-    const ARBTreeNode* curr = node->parent;
-    while( curr != NULL ) {
-        if (curr->right == child) {
-            return curr;
-        }
-        child = curr;
-        curr = curr->parent;
-    }
-    /// root found
-    return NULL;
-}
-
 
 /// ===================================================
 
 
-static size_t rbtree_sizeSubtree(const ARBTreeNode* tree) {
-    if (tree==NULL) {
+static size_t rbtree_sizeSubtree(const ARBTreeNode* node) {
+    if (node==NULL) {
         return 0;
     }
-
-    const size_t leftSize = rbtree_sizeSubtree(tree->left);
-    const size_t rightSize = rbtree_sizeSubtree(tree->right);
+    const size_t leftSize = rbtree_sizeSubtree(node->left);
+    const size_t rightSize = rbtree_sizeSubtree(node->right);
     return leftSize + rightSize + 1;
 }
 
 size_t rbtree_size(const ARBTree* tree) {
-    if (tree==NULL)
-        return 0;
+    assert( tree != NULL );
     return rbtree_sizeSubtree(tree->root);
 }
 
-static size_t rbtree_depthSubtree(const ARBTreeNode* tree) {
-	if (tree == NULL) {
+static size_t rbtree_depthSubtree(const ARBTreeNode* node) {
+	if (node == NULL) {
 		return 0;
 	}
-	const size_t dLeft = rbtree_depthSubtree(tree->left);
-	const size_t dRight = rbtree_depthSubtree(tree->right);
+	const size_t dLeft = rbtree_depthSubtree(node->left);
+	const size_t dRight = rbtree_depthSubtree(node->right);
 	if (dLeft>dRight) {
 		return dLeft+1;
 	} else {
@@ -141,8 +105,7 @@ static size_t rbtree_depthSubtree(const ARBTreeNode* tree) {
 }
 
 size_t rbtree_depth(const ARBTree* tree) {
-    if (tree==NULL)
-        return 0;
+    assert( tree != NULL );
     return rbtree_depthSubtree(tree->root);
 }
 
@@ -311,8 +274,8 @@ static ARBTreeValidationError rbtree_isValid_checkColor(const ARBTreeNode* node)
 }
 
 ARBTreeValidationError rbtree_isValid(const ARBTree* tree) {
-    if (tree==NULL)
-        return ARBTREE_INVALID_OK;
+    assert( tree != NULL );
+
     if (tree->root == NULL)
         return ARBTREE_INVALID_OK;
     if (tree->root->parent != NULL)
@@ -363,9 +326,8 @@ ARBTreeValidationError rbtree_isValid(const ARBTree* tree) {
 
 
 ARBTreeNode* rbtree_findNode(const ARBTree* tree, const ARBTreeValue value) {
-    if (tree == NULL) {
-        return NULL;
-    }
+    assert( tree != NULL );
+
     ARBTreeNode* curr = tree->root;
     while (curr != NULL) {
         if ( tree->fIsLessOrder(value, curr->value) == true ) {
@@ -568,6 +530,9 @@ static bool rbtree_addToRight(const ARBTree* tree, ARBTreeNode* node, ARBTreeVal
 
     if ( node->right == NULL ) {
         /// leaf case -- can add
+        if ( (tree->fCanInsertRight != NULL) && (tree->fCanInsertRight(node, value) == false) ) {
+            return false;
+        }
         ARBTreeNode* newNode = rbtree_insertRightNode(node);
         newNode->value = value;
         return true;
@@ -594,9 +559,8 @@ static void rbtree_findRoot(ARBTree* tree) {
 }
 
 bool rbtree_add(ARBTree* tree, const ARBTreeValue value) {
-    if (tree == NULL) {
-        return false;
-    }
+    assert( tree != NULL );
+
     if (tree->fIsValidValue(value) == false) {
         return false;
     }
@@ -709,11 +673,10 @@ static int rbtree_releaseNodes(ARBTree* tree, ARBTreeNode* node) {
 }
 
 bool rbtree_release(ARBTree* tree) {
-    if (tree==NULL) {
-        return false;
-    }
+    assert( tree != NULL );
     if (tree->root==NULL) {
-        return false;
+        /// empty is valid, so releasing is successful
+        return true;
     }
     rbtree_releaseNodes(tree, tree->root);
     tree->root = NULL;

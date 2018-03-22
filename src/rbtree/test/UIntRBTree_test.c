@@ -350,7 +350,7 @@ static void test_uirbtree_release_empty(void **state) {
     UIntRBTree tree;
     uirbtree_init(&tree);
     const bool ret = uirbtree_release(&tree);
-    assert_int_equal( ret, false );
+    assert_int_equal( ret, true );
 }
 
 static void test_uirbtree_release_double(void **state) {
@@ -362,7 +362,7 @@ static void test_uirbtree_release_double(void **state) {
     uirbtree_add(&memMap, 10);
 
     assert_int_equal( uirbtree_release(&memMap), true );
-    assert_int_equal( uirbtree_release(&memMap), false );
+    assert_int_equal( uirbtree_release(&memMap), true );
 }
 
 static void test_uirbtree_release_2(void **state) {
