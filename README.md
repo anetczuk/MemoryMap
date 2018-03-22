@@ -22,7 +22,7 @@ In case of memory segmentation - new block cannot be added in pointed address - 
 ### Modules
 
 * _rbtree/AbstractRBTree.h_ contains abstract(template-like) implementation of red-black trees
-* _rbtree/UIntRBTree.h_ contains _classic_ tree of integers -- use example of _AbstractRBTree_
+* _rbtree/UIntRBTree.h_ contains red-black tree of integers -- use example of _AbstractRBTree_
 * _memorymap/LinkedList.h_ contains implementation of memory map based on linked list
 * _memorymap/RBTree.h_ implementation of memory map based on red-black trees
 * _mymap/MyMap.h_ access interface to memory map using _RBTree.h_ under the hood
