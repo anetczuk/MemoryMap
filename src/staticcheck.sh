@@ -34,6 +34,7 @@ fi
 
 cppcheck --enable=all $cppcheckAdditionalParams \
          --suppress=missingIncludeSystem \
+	     -I $SCRIPT_DIR/rbtree/include \
 	     -I $SCRIPT_DIR/memorymap/include \
 	     -I $SCRIPT_DIR/mymap/include \
 	     --xml --xml-version=2 $SCRIPT_DIR 2> $REPORT_DIR/report.xml
