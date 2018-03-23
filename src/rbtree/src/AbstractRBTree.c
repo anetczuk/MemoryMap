@@ -359,16 +359,12 @@ ARBTreeNode* rbtree_findNode(const ARBTree* tree, const ARBTreeValue value) {
 
 
 static ARBTreeNode* rbtree_grandparent(ARBTreeNode* node) {
-	if (node->parent == NULL) {
-		return NULL;
-	}
+	assert( node->parent != NULL );
 	return node->parent->parent;
 }
 
 static ARBTreeNode* rbtree_sibling(ARBTreeNode* node) {
-	if (node->parent == NULL) {
-		return NULL;
-	}
+	assert( node->parent != NULL );
 	if (node->parent->left == node)
 		return node->parent->right;
 	else

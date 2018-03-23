@@ -50,13 +50,12 @@ typedef enum {
 } ARBTreeValidationError;
 
 
-struct ARBTreeElement;
+struct ARBTreeElement;                  /// tree node
+
+typedef void* ARBTreeValue;
 
 
 /// ==================================================================
-
-
-typedef void* ARBTreeValue;
 
 
 typedef bool (* rbtree_isValidValue)(const ARBTreeValue value);
@@ -71,9 +70,6 @@ typedef bool (* rbtree_tryFit)(const struct ARBTreeElement* node, ARBTreeValue v
 
 
 /// ==================================================================
-
-
-struct ARBTreeElement;
 
 
 typedef struct {
