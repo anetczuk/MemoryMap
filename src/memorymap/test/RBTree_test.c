@@ -441,8 +441,8 @@ static void test_tree_add_right(void **state) {
     tree_add(&tree, 3, 1);
     tree_add(&tree, 6, 1);
 
-    assert_int_equal( tree2_size(&tree), 2 );
-    assert_int_equal( tree2_depth(&tree), 2 );
+    assert_int_equal( tree_size(&tree), 2 );
+    assert_int_equal( tree_depth(&tree), 2 );
 
     assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
 
