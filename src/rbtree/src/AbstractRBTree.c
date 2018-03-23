@@ -35,12 +35,16 @@ void rbtree_init(ARBTree* tree) {
     tree->root = NULL;
 
     tree->fIsValidValue = NULL;
-    tree->fIsLessOrder = NULL;
-    tree->fPrintValue = NULL;
-    tree->fFreeValue = NULL;
 
+    tree->fIsLessOrder = NULL;
     tree->fCanInsertRight = NULL;
     tree->fCanInsertLeft = NULL;
+
+    tree->fTryFitRight = NULL;
+    tree->fTryFitLeft = NULL;
+
+    tree->fPrintValue = NULL;
+    tree->fDeleteValue = NULL;
 }
 
 static const ARBTreeNode* rbtree_getLeftmostNode(const ARBTreeNode* node) {
@@ -141,9 +145,11 @@ static ARBTreeValidationError rbtree_isValid_checkValues(const ARBTree* tree, co
     if (node == NULL) {
         return ARBTREE_INVALID_OK;
     }
-    if ( tree->fIsValidValue( node->value ) == false ) {
-        /// invalid memory segment
-        return ARBTREE_INVALID_BAD_VALUE;
+    if (tree->fIsValidValue != NULL) {
+        if ( tree->fIsValidValue( node->value ) == false ) {
+            /// invalid value
+            return ARBTREE_INVALID_BAD_VALUE;
+        }
     }
 
     const ARBTreeValidationError validLeft = rbtree_isValid_checkValues(tree, node->left);
@@ -500,13 +506,18 @@ static bool rbtree_addToRight(const ARBTree* tree, ARBTreeNode* node, ARBTreeVal
  * Adding to left side: value should be smaller than 'node->value'
  */
 static bool rbtree_addToLeft(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value) {
-    if ( tree->fIsLessOrder(value, node->value) == false ) {
-        /// could not add on left side -- invalid order
+    if ( tree->fCanInsertLeft(value, node->value) == false ) {
+        /// could not add on left side  -- 'value' is greater than node
     	return false;
     }
 
     if ( node->left == NULL ) {
     	/// leaf case -- can add
+        if ( tree->fTryFitLeft != NULL ) {
+            if ( tree->fTryFitLeft(node, value) == false ) {
+                return false;
+            }
+        }
         ARBTreeNode* newNode = rbtree_insertLeftNode(node);
         newNode->value = value;
 		return true;
@@ -523,15 +534,17 @@ static bool rbtree_addToLeft(const ARBTree* tree, ARBTreeNode* node, ARBTreeValu
  * Adding to right side: value should be greater than 'node->value'
  */
 static bool rbtree_addToRight(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value) {
-    if ( tree->fIsLessOrder(value, node->value) == true ) {
-        /// could not add on right side -- invalid order
+    if ( tree->fCanInsertRight(value, node->value) == false ) {
+        /// could not add on right side -- 'value' is smaller than node
         return false;
     }
 
     if ( node->right == NULL ) {
         /// leaf case -- can add
-        if ( (tree->fCanInsertRight != NULL) && (tree->fCanInsertRight(node, value) == false) ) {
-            return false;
+        if ( tree->fTryFitRight != NULL ) {
+            if ( tree->fTryFitRight(node, value) == false ) {
+                return false;
+            }
         }
         ARBTreeNode* newNode = rbtree_insertRightNode(node);
         newNode->value = value;
@@ -561,8 +574,10 @@ static void rbtree_findRoot(ARBTree* tree) {
 bool rbtree_add(ARBTree* tree, const ARBTreeValue value) {
     assert( tree != NULL );
 
-    if (tree->fIsValidValue(value) == false) {
-        return false;
+    if (tree->fIsValidValue != NULL) {
+        if (tree->fIsValidValue(value) == false) {
+            return false;
+        }
     }
 
     if (tree->root == NULL) {
@@ -652,7 +667,7 @@ void rbtree_print(const ARBTree* tree) {
 
 
 static void releaseNode(ARBTree* tree, ARBTreeNode* node) {
-    tree->fFreeValue(node->value);
+    tree->fDeleteValue(node->value);
     free(node);
 }
 

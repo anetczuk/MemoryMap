@@ -61,13 +61,13 @@ typedef void* ARBTreeValue;
 
 typedef bool (* rbtree_isValidValue)(const ARBTreeValue value);
 
-typedef bool (* rbtree_isLessOrder)(const ARBTreeValue valueA, const ARBTreeValue valueB);
+typedef bool (* rbtree_isOrder)(const ARBTreeValue valueA, const ARBTreeValue valueB);
 
 typedef void (* rbtree_printValue)(const ARBTreeValue value);
 
-typedef void (* rbtree_freeValue)(ARBTreeValue value);
+typedef void (* rbtree_deleteValue)(ARBTreeValue value);
 
-typedef bool (* rbtree_canInsert)(const struct ARBTreeElement* node, ARBTreeValue value);
+typedef bool (* rbtree_tryFit)(const struct ARBTreeElement* node, ARBTreeValue value);
 
 
 /// ==================================================================
@@ -79,13 +79,17 @@ struct ARBTreeElement;
 typedef struct {
     struct ARBTreeElement* root;
 
-    rbtree_isValidValue fIsValidValue;
-    rbtree_isLessOrder fIsLessOrder;
-    rbtree_printValue fPrintValue;
-    rbtree_freeValue fFreeValue;            /// destroy value (release memory etc)
+    rbtree_isValidValue fIsValidValue;          /// can be NULL
 
-    rbtree_canInsert fCanInsertRight;
-    rbtree_canInsert fCanInsertLeft;
+    rbtree_isOrder fIsLessOrder;
+    rbtree_isOrder fCanInsertRight;
+    rbtree_isOrder fCanInsertLeft;
+
+    rbtree_tryFit fTryFitRight;                 /// can be NULL
+    rbtree_tryFit fTryFitLeft;                  /// can be NULL
+
+    rbtree_printValue fPrintValue;
+    rbtree_deleteValue fDeleteValue;            /// destroy value (release memory etc)
 } ARBTree;
 
 

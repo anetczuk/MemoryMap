@@ -24,7 +24,28 @@
 #include "memorymap/MemoryArea.h"
 
 #include <assert.h>
+#include <stdio.h>                             /// printf
 
+
+void memory_print( const MemoryArea* area ) {
+    if (area == NULL) {
+        printf("NULL");
+    } else {
+        printf("%zu,%zu", area->start, area->end);
+    }
+}
+
+int memory_compare( const MemoryArea* area1, const MemoryArea* area2 ) {
+    assert( area1!=NULL );
+    assert( area2!=NULL );
+    if ( area1->end <= area2->start ) {
+        return -1;
+    }
+    if ( area1->start >= area2->end ) {
+        return 1;
+    }
+    return 0;
+}
 
 static int memory_doesFitBefore(const MemoryArea* area, const MemoryArea* check) {
     assert( check != NULL );

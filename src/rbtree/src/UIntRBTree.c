@@ -28,14 +28,19 @@
 #include "rbtree/AbstractRBTree.h"
 
 
-static inline bool uirbtree_isValidValue(const ARBTreeValue value) {
-    return (value != NULL);
-}
 
 static inline bool uirbtree_checkOrder(const ARBTreeValue valueA, const ARBTreeValue valueB) {
     const UIntRBTreeValue vA = *((UIntRBTreeValue*)valueA);
     const UIntRBTreeValue vB = *((UIntRBTreeValue*)valueB);
     return (vA < vB);
+}
+
+static inline bool uirbtree_canInsertRight(const ARBTreeValue valueA, const ARBTreeValue valueB) {
+    return ( uirbtree_checkOrder(valueA, valueB) == false );
+}
+
+static inline bool uirbtree_canInsertLeft(const ARBTreeValue valueA, const ARBTreeValue valueB) {
+    return ( uirbtree_checkOrder(valueA, valueB) == true );
 }
 
 static inline void uirbtree_printValue(const ARBTreeValue value) {
@@ -58,10 +63,12 @@ bool uirbtree_init(UIntRBTree* tree) {
     ARBTree* baseTree = &(tree->tree);
     rbtree_init(baseTree);
 
-    baseTree->fIsValidValue = uirbtree_isValidValue;
     baseTree->fIsLessOrder = uirbtree_checkOrder;
+    baseTree->fCanInsertRight = uirbtree_canInsertRight;
+    baseTree->fCanInsertLeft = uirbtree_canInsertLeft;
+
     baseTree->fPrintValue = uirbtree_printValue;
-    baseTree->fFreeValue = uirbtree_freeValue;
+    baseTree->fDeleteValue = uirbtree_freeValue;
 
     return true;
 }
@@ -92,6 +99,7 @@ ARBTreeValidationError uirbtree_isValid(const UIntRBTree* tree) {
 
 void uirbtree_print(const UIntRBTree* tree) {
     if (tree == NULL) {
+        printf("%s", "[NULL]");
         return ;
     }
     const ARBTree* baseTree = &(tree->tree);

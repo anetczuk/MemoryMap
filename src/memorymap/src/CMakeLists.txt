@@ -6,7 +6,7 @@
 set( TARGET_NAME memorymap )
 
 
-set( EXT_LIBS  )
+set( EXT_LIBS rbtree )
 
 
 file(GLOB_RECURSE cpp_files *.c )

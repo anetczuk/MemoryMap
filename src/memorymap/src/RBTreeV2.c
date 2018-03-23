@@ -28,6 +28,75 @@
 #include <stdio.h>                      /// printf
 #include <string.h>
 
+#include "rbtree/AbstractRBTree.h"
+
+
+typedef ARBTreeNode RBTreeNode2;
+
+
+static inline bool tree2_isValidValue(const ARBTreeValue value) {
+    if (value == NULL) {
+        return false;
+    }
+    const int ret = memory_isValid(value);
+    return (ret == 0);
+}
+
+static inline bool tree2_checkOrder(const ARBTreeValue valueA, const ARBTreeValue valueB) {
+    const MemoryArea* vA = (MemoryArea*)valueA;
+    const MemoryArea* vB = (MemoryArea*)valueB;
+    const int ret = memory_compare(vA, vB);
+    return (ret < 0);
+}
+
+static inline bool tree2_canInsertRight(const ARBTreeValue valueA, const ARBTreeValue valueB) {
+    (void) valueA; /* unused */
+    (void) valueB; /* unused */
+    /// always can add to right
+    return true;
+}
+
+static inline void tree2_printValue(const ARBTreeValue value) {
+    const MemoryArea* v = (MemoryArea*)value;
+    memory_print(v);
+}
+
+static inline void tree2_freeValue(ARBTreeValue value) {
+    free(value);
+}
+
+static inline bool tree2_tryFitRight(const ARBTreeNode* node, ARBTreeValue value) {
+    const ARBTreeNode* ancestor = rbtree_getRightAncestor(node);
+    if (ancestor == NULL) {
+        /// greatest leaf case -- add node
+        memory_fitAfter(node->value, value);
+        return true;
+    }
+
+    /// leaf case -- check space
+    const int doesFit = memory_fitBetween(node->value, ancestor->value, value);
+    return (doesFit == 0);
+}
+
+static inline bool tree2_tryFitLeft(const ARBTreeNode* node, ARBTreeValue value) {
+    (void) value; /* unused */
+
+    const ARBTreeNode* ancestor = rbtree_getLeftAncestor(node);
+    if (ancestor == NULL) {
+        /// smallest leaf case -- add node
+        return true;
+    }
+
+//    /// leaf case -- check space
+//    const int doesFit = memory_fitBetween(node->value, ancestor->value, value);
+//    return (doesFit == 0);
+
+    /// no space
+    return false;
+}
+
+
+/// ========================================================================================
 
 
 static const RBTreeNode2* tree2_getLeftmostNode(const RBTreeNode2* node) {
@@ -52,46 +121,34 @@ static const RBTreeNode2* tree2_getRightmostNode(const RBTreeNode2* node) {
     return curr;
 }
 
-///**
-// * Returns ancestor on left side of current node.
-// */
-//static const RBTreeNode2* tree2_getLeftAncestor(const RBTreeNode2* node) {
-//    const RBTreeNode2* child = node;
-//    const RBTreeNode2* curr = node->parent;
-//    while( curr != NULL ) {
-//        if (curr->right == child) {
-//            return curr;
-//        }
-//        child = curr;
-//        curr = curr->parent;
-//    }
-//    /// root found
-//    return NULL;
-//}
-
 
 /// ===================================================
 
 
 size_t tree2_size(const RBTree2* tree) {
-    (void) tree; /* unused */
-    //TODO: implement
-    return 0;
+    if (tree == NULL) {
+        return 0;
+    }
+    const ARBTree* baseTree = &(tree->tree);
+    return rbtree_size(baseTree);
 }
 
 size_t tree2_depth(const RBTree2* tree) {
-    (void) tree; /* unused */
-    //TODO: implement
-    return 0;
+    if (tree == NULL) {
+        return 0;
+    }
+    const ARBTree* baseTree = &(tree->tree);
+    return rbtree_depth(baseTree);
 }
 
 size_t tree2_startAddress(const RBTree2* tree) {
     if (tree==NULL)
         return 0;
-    if (tree->root==NULL)
+    const ARBTree* baseTree = &(tree->tree);
+    if (baseTree->root==NULL)
         return 0;
 
-    const RBTreeNode2* node = tree2_getLeftmostNode(tree->root);
+    const RBTreeNode2* node = tree2_getLeftmostNode(baseTree->root);
     const MemoryArea* area = (const MemoryArea*)node->value;
     return area->start;
 }
@@ -99,18 +156,17 @@ size_t tree2_startAddress(const RBTree2* tree) {
 size_t tree2_endAddress(const RBTree2* tree) {
     if (tree==NULL)
         return 0;
-    if (tree->root==NULL)
+    const ARBTree* baseTree = &(tree->tree);
+    if (baseTree->root==NULL)
         return 0;
 
-    const RBTreeNode2* node = tree2_getRightmostNode(tree->root);
+    const RBTreeNode2* node = tree2_getRightmostNode(baseTree->root);
     const MemoryArea* area = (const MemoryArea*)node->value;
     return area->end;
 }
 
 MemoryArea tree2_area(const RBTree2* tree) {
     if (tree==NULL)
-        return memory_create(0, 0);
-    if (tree->root==NULL)
         return memory_create(0, 0);
 
     const size_t startAddress = tree2_startAddress(tree);
@@ -124,9 +180,11 @@ MemoryArea tree2_area(const RBTree2* tree) {
 
 
 ARBTreeValidationError tree2_isValid(const RBTree2* tree) {
-    (void) tree; /* unused */
-    //TODO: implement
-    return -1;
+    if (tree == NULL) {
+        return ARBTREE_INVALID_OK;
+    }
+    const ARBTree* baseTree = &(tree->tree);
+    return rbtree_isValid(baseTree);
 }
 
 
@@ -134,17 +192,32 @@ ARBTreeValidationError tree2_isValid(const RBTree2* tree) {
 
 
 size_t tree2_add(RBTree2* tree, const size_t address, const size_t size) {
-    (void) tree; /* unused */
-    (void) address; /* unused */
-    (void) size; /* unused */
-//    if (tree == NULL) {
-//        return 0;
-//    }
-//    MemoryArea area = memory_create(address, size);
-//    void* retAddr = tree2_addMemory(tree, &area);
-//    /// assert( tree2_isValid(tree) == 0 );
-//    return (size_t)retAddr;
+    if (tree==NULL)
+        return 0;
+    ARBTree* baseTree = &(tree->tree);
+    if (baseTree==NULL)
+        return 0;
+
+    MemoryArea* ptr = malloc( sizeof(MemoryArea) );
+    *ptr = memory_create(address, size);
+
+    if (rbtree_add(baseTree, ptr)==true) {
+        return ptr->start;
+    }
+
+    free(ptr);
     return 0;
+}
+
+void tree2_delete(RBTree2* tree, const size_t address) {
+    if (tree == NULL) {
+        return ;
+    }
+    ARBTree* baseTree = &(tree->tree);
+
+    MemoryArea area = memory_create(address, 1);
+    const ARBTreeValue v = (ARBTreeValue)&area;
+    rbtree_delete(baseTree, v);
 }
 
 
@@ -156,35 +229,20 @@ void tree2_print(const RBTree2* tree) {
         printf("%s", "[NULL]");
         return ;
     }
-//    tree2_printWhole(tree->root);
-    //TODO: implement
+    const ARBTree* baseTree = &(tree->tree);
+    rbtree_print(baseTree);
 }
 
 
 /// ==============================================================================================
 
 
-static int tree2_releaseNodes(RBTreeNode2* node) {
-    if (node == NULL) {
-        return 0;
+bool tree2_release(RBTree2* tree) {
+    if (tree == NULL) {
+        return false;
     }
-    /**
-     * Done in recursive manner. In case of very large structures consider
-     * reimplementing it using while() and vector structure.
-     */
-    const int leftReleased = tree2_releaseNodes(node->left);
-    const int rightReleased = tree2_releaseNodes(node->right);
-    free(node);
-    return leftReleased+rightReleased+1;
-}
-
-int tree2_release(RBTree2* tree) {
-    if (tree==NULL) {
-        return -1;
-    }
-    const int ret = tree2_releaseNodes(tree->root);
-    tree->root = NULL;
-    return ret;
+    ARBTree* baseTree = &(tree->tree);
+    return rbtree_release(baseTree);
 }
 
 
@@ -192,56 +250,49 @@ int tree2_release(RBTree2* tree) {
 
 
 void* tree2_mmap(RBTree2* tree, void *vaddr, unsigned int size) {
-    (void) vaddr; /* unused */
-    (void) size; /* unused */
-
-    if (tree == NULL) {
+    if (tree==NULL)
         return NULL;
+    ARBTree* baseTree = &(tree->tree);
+    if (baseTree==NULL)
+        return NULL;
+
+    MemoryArea* ptr = malloc( sizeof(MemoryArea) );
+    *ptr = memory_create((size_t)vaddr, size);
+
+    if (rbtree_add(baseTree, ptr)==true) {
+        return (void*)ptr->start;
     }
 
-//    MemoryArea area = memory_create( (size_t)vaddr, size );
-//    void* retAddr = tree2_addMemory(tree, &area);
-//    assert( tree2_isValid(tree) == ARBTREE_INVALID_OK );
-//    return retAddr;
-
-    //TODO: implement
-
+    free(ptr);
     return NULL;
 }
 
-
-/// =========================================================================
-
-
-void tree2_delete(RBTree2* tree, const size_t address) {
-    (void) tree; /* unused */
-    (void) address; /* unused */
-    //TODO: implement
-}
-
-
-/// =========================================================================
-
-
 void tree2_munmap(RBTree2* tree, void *vaddr) {
-    if (tree == NULL) {
-        return ;
-    }
-    if (tree->root==NULL) {
-        return ;
-    }
-
     const size_t voffset = (size_t)vaddr;
     tree2_delete(tree, voffset);
     assert( tree2_isValid(tree) == ARBTREE_INVALID_OK );
 }
 
-int tree2_init(RBTree2* tree) {
+bool tree2_init(RBTree2* tree) {
     if (tree == NULL) {
-        return -1;
+        return false;
     }
 
-    tree->root = NULL;
-    return 0;
+    ARBTree* baseTree = &(tree->tree);
+    rbtree_init(baseTree);
+
+    baseTree->fIsValidValue = tree2_isValidValue;
+
+    baseTree->fIsLessOrder = tree2_checkOrder;
+    baseTree->fCanInsertRight = tree2_canInsertRight;
+    baseTree->fCanInsertLeft = tree2_checkOrder;
+
+    baseTree->fTryFitRight = tree2_tryFitRight;
+    baseTree->fTryFitLeft = tree2_tryFitLeft;
+
+    baseTree->fPrintValue = tree2_printValue;
+    baseTree->fDeleteValue = tree2_freeValue;
+
+    return true;
 }
 

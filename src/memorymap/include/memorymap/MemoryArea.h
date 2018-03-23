@@ -76,6 +76,10 @@ static inline size_t memory_startAddress(const MemoryArea* area, const MemoryAre
     }
 }
 
+void memory_print( const MemoryArea* area );
+
+int memory_compare( const MemoryArea* area1, const MemoryArea* area2 );
+
 /**
  * Return 0 if successful, otherwise false.
  */

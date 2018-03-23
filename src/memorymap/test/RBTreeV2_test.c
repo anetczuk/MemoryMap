@@ -368,16 +368,16 @@ static void test_tree2_munmap_subtree(void **state) {
 static void test_tree2_init_NULL(void **state) {
     (void) state; /* unused */
 
-    const int ret = tree2_init(NULL);
-    assert_int_equal( ret, -1 );
+    const bool ret = tree2_init(NULL);
+    assert_int_equal( ret, false );
 }
 
 static void test_tree2_init_valid(void **state) {
     (void) state; /* unused */
 
     RBTree2 tree;
-    const int ret = tree2_init(&tree);
-    assert_int_equal( ret, 0 );
+    const bool ret = tree2_init(&tree);
+    assert_int_equal( ret, true );
 
     assert_int_equal( tree2_isValid(&tree), ARBTREE_INVALID_OK );
 
@@ -405,10 +405,10 @@ static void test_tree2_add_0(void **state) {
     assert_int_equal( retAddr, 0 );
 
     const size_t lSize = tree2_size(&tree);
-    assert_int_equal( lSize, 0 );
+    assert_int_equal( lSize, 1 );
 
     const size_t depth = tree2_depth(&tree);
-    assert_int_equal( depth, 0 );
+    assert_int_equal( depth, 1 );
 
     assert_int_equal( tree2_isValid(&tree), ARBTREE_INVALID_OK );
 
@@ -424,11 +424,8 @@ static void test_tree2_add_left(void **state) {
     tree2_add(&tree, 3, 1);
     tree2_add(&tree, 1, 1);
 
-    const size_t lSize = tree2_size(&tree);
-    assert_int_equal( lSize, 2 );
-
-    const size_t depth = tree2_depth(&tree);
-    assert_int_equal( depth, 2 );
+    assert_int_equal( tree2_size(&tree), 2 );
+    assert_int_equal( tree2_depth(&tree), 2 );
 
     assert_int_equal( tree2_isValid(&tree), ARBTREE_INVALID_OK );
 
@@ -570,7 +567,7 @@ static void test_tree2_add_subtree2_startAddr(void **state) {
 
     tree2_release(&tree);
 }
-static void test_tree2_add_subtree1(void **state) {
+static void test_tree2_add_subtree3(void **state) {
     (void) state; /* unused */
 
     const unsigned int seed = 1520466046;
@@ -712,8 +709,8 @@ static void test_tree2_isValid_valid(void **state) {
 static void test_tree2_release_NULL(void **state) {
     (void) state; /* unused */
 
-    const int ret = tree2_release(NULL);
-    assert_int_equal( ret, -1 );
+    const bool ret = tree2_release(NULL);
+    assert_int_equal( ret, false );
 }
 
 static void test_tree2_release_empty(void **state) {
@@ -721,8 +718,8 @@ static void test_tree2_release_empty(void **state) {
 
     RBTree2 tree;
     tree2_init(&tree);
-    const int ret = tree2_release(&tree);
-    assert_int_equal( ret, 0 );
+    const bool ret = tree2_release(&tree);
+    assert_int_equal( ret, true );
 }
 
 static void test_tree2_release_double(void **state) {
@@ -733,22 +730,23 @@ static void test_tree2_release_double(void **state) {
 
     tree2_add(&memMap, 10, 10);
 
-    assert_int_equal( tree2_release(&memMap), 1 );
-    assert_int_equal( tree2_release(&memMap), 0 );
+    assert_int_equal( tree2_release(&memMap), true );
+    assert_int_equal( tree2_release(&memMap), true );
 }
 
 static void test_tree2_release_2(void **state) {
     (void) state; /* unused */
 
     RBTree2 tree;
-    const int init = tree2_init(&tree);
-    assert_int_equal( init, 0 );
+    tree2_init(&tree);
 
     tree2_add(&tree, 1, 1);
     tree2_add(&tree, 2, 1);
 
-    const int ret = tree2_release(&tree);
-    assert_int_equal( ret, 2 );
+    assert_int_equal( tree2_size(&tree), 2 );
+
+    const bool ret = tree2_release(&tree);
+    assert_int_equal( ret, true );
 }
 
 static void test_tree2_delete_root(void **state) {
@@ -799,6 +797,8 @@ static void test_tree2_delete_R2(void **state) {
 //    tree2_print(&tree);
 
     const MemoryArea area = tree2_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
+
     const size_t addr = rand() % memory_size(&area) + area.start;
 
 //    printf("seed: %u deleting: %lu\n", seed, addr);
@@ -824,6 +824,8 @@ static void test_tree2_delete_R2_L(void **state) {
 //    tree2_print(&tree);
 
     const MemoryArea area = tree2_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
+
     const size_t addr = rand() % memory_size(&area) + area.start;
 
 //    printf("seed: %u deleting: %lu\n", seed, addr);
@@ -849,6 +851,8 @@ static void test_tree2_delete_R3(void **state) {
 //    tree2_print(&tree);
 
     const MemoryArea area = tree2_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
+
     const size_t addr = rand() % memory_size(&area) + area.start;
 
 //    printf("seed: %u deleting: %lu\n", seed, addr);
@@ -874,6 +878,8 @@ static void test_tree2_delete_R3b(void **state) {
 //    tree2_print(&tree);
 
     const MemoryArea area = tree2_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
+
     const size_t addr = rand() % memory_size(&area) + area.start;
 
 //    printf("seed: %u deleting: %lu\n", seed, addr);
@@ -899,6 +905,8 @@ static void test_tree2_delete_R3c(void **state) {
 //    tree2_print(&tree);
 
     const MemoryArea area = tree2_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
+
     const size_t addr = rand() % memory_size(&area) + area.start;
 
 //    printf("seed: %u deleting: %lu\n", seed, addr);
@@ -924,6 +932,8 @@ static void test_tree2_delete_R4(void **state) {
 //    tree2_print(&tree);
 
     const MemoryArea area = tree2_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
+
     const size_t addr = rand() % memory_size(&area) + area.start;
 
 //    printf("seed: %u deleting: %lu\n", seed, addr);
@@ -949,6 +959,8 @@ static void test_tree2_delete_R5(void **state) {
 //    tree2_print(&tree);
 
     const MemoryArea area = tree2_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
+
     const size_t addr = rand() % memory_size(&area) + area.start;
 
 //    printf("seed: %u deleting: %lu\n", seed, addr);
@@ -975,6 +987,8 @@ static void test_tree2_delete_random(void **state) {
     /// tree2_print(&tree);
 
     const MemoryArea area = tree2_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
+
     const size_t addr = rand() % memory_size(&area) + area.start;
 
 //    printf("seed: %u deleting: %lu\n", seed, addr);
@@ -997,6 +1011,7 @@ static void test_tree2_randomT1(void **state) {
     RBTree2 tree = create_random_tree2_map(seed, nodes_num, 200, 20);
 
     const MemoryArea area = tree2_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
 
     for(size_t i = 0; i < nodes_num; ++i) {
         const size_t addr = rand() % memory_size(&area) + area.start;
@@ -1023,6 +1038,7 @@ static void test_tree2_randomT2(void **state) {
     RBTree2 tree = create_random_tree2_map(seed, nodes_num, 200, 20);
 
     const MemoryArea area = tree2_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
 
     for(size_t i = 0; i < nodes_num; ++i) {
         const size_t addr = rand() % memory_size(&area) + area.start;
@@ -1057,6 +1073,7 @@ static void test_tree2_randomTest1(void **state) {
     assert_int_equal( tree2_isValid(&tree), ARBTREE_INVALID_OK );
 
     const MemoryArea area = tree2_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
 
     for(size_t i = 0; i < nodes_num; ++i) {
         const size_t addr = rand() % memory_size(&area) + area.start;
@@ -1093,6 +1110,7 @@ static void test_tree2_randomTest2(void **state) {
     assert_int_equal( treeSize, nodes_num );
 
     MemoryArea area = tree2_area(&tree);
+    assert_int_not_equal( memory_size(&area), 0 );
 
     for(size_t i = 0; i < nodes_num; ++i) {
         const size_t addr = rand() % memory_size(&area) + area.start;
@@ -1122,6 +1140,9 @@ int main(void) {
     //TODO: add selective run
 
     const struct UnitTest tests[] = {
+        unit_test(test_tree2_init_NULL),
+        unit_test(test_tree2_init_valid),
+
         unit_test(test_tree2_add_NULL),
         unit_test(test_tree2_add_0),
         unit_test(test_tree2_add_left),
@@ -1131,7 +1152,7 @@ int main(void) {
         unit_test(test_tree2_add_subtree),
         unit_test(test_tree2_add_subtree2_space),
         unit_test(test_tree2_add_subtree2_startAddr),
-        unit_test(test_tree2_add_subtree1),
+        unit_test(test_tree2_add_subtree3),
 
         unit_test(test_tree2_size_NULL),
         unit_test(test_tree2_depth_NULL),
@@ -1176,9 +1197,6 @@ int main(void) {
         unit_test(test_tree2_munmap_left),
         unit_test(test_tree2_munmap_left2),
         unit_test(test_tree2_munmap_subtree),
-
-        unit_test(test_tree2_init_NULL),
-        unit_test(test_tree2_init_valid),
 
         unit_test(test_tree2_randomT1),
         unit_test(test_tree2_randomT2),

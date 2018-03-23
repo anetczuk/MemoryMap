@@ -26,13 +26,13 @@
 
 #include <stddef.h>                            /// NULL, size_t
 
-#include "rbtree/AbstractRBTree.h"
+#include "rbtree/AbstractRBTreeDefs.h"
 #include "memorymap/MemoryArea.h"
 
 
-
-typedef ARBTreeNode RBTreeNode2;
-typedef ARBTree RBTree2;
+typedef struct {
+    ARBTree tree;
+} RBTree2;
 
 
 /// ===========================================================================
@@ -42,15 +42,15 @@ void* tree2_mmap(RBTree2* tree, void *vaddr, unsigned int size);
 
 void tree2_munmap(RBTree2* tree, void *vaddr);
 
+
+/// =============================================
+
+
 /**
  * If list has be initialized previously, then have to be released
  * before next initialization.
  */
-int tree2_init(RBTree2* tree);
-
-
-/// =============================================
-
+bool tree2_init(RBTree2* tree);
 
 size_t tree2_size(const RBTree2* tree);
 
@@ -71,10 +71,9 @@ void tree2_delete(RBTree2* tree, const size_t address);
 void tree2_print(const RBTree2* tree);
 
 /**
- * List has to be initialized before releasing.
- * Returns number of released elements (size of list)
+ * Tree has to be initialized before releasing.
  */
-int tree2_release(RBTree2* tree);
+bool tree2_release(RBTree2* tree);
 
 
 #endif /* RBTREEV2_H_ */
