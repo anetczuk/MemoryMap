@@ -441,18 +441,15 @@ static void test_tree2_add_right(void **state) {
     tree2_add(&tree, 3, 1);
     tree2_add(&tree, 6, 1);
 
-    const size_t lSize = tree2_size(&tree);
-    assert_int_equal( lSize, 2 );
-
-    const size_t depth = tree2_depth(&tree);
-    assert_int_equal( depth, 2 );
+    assert_int_equal( tree2_size(&tree), 2 );
+    assert_int_equal( tree2_depth(&tree), 2 );
 
     assert_int_equal( tree2_isValid(&tree), ARBTREE_INVALID_OK );
 
     tree2_release(&tree);
 }
 
-static void test_tree2_add_subtree2_left(void **state) {
+static void test_tree2_add_subtree_left(void **state) {
     (void) state; /* unused */
 
     RBTree2 tree;
@@ -474,7 +471,7 @@ static void test_tree2_add_subtree2_left(void **state) {
     tree2_release(&tree);
 }
 
-static void test_tree2_add_subtree2_right(void **state) {
+static void test_tree2_add_subtree_right(void **state) {
     (void) state; /* unused */
 
     RBTree2 tree;
@@ -485,11 +482,8 @@ static void test_tree2_add_subtree2_right(void **state) {
     tree2_add(&tree, 70, 1);
     tree2_add(&tree, 60, 1);
 
-    const size_t lSize = tree2_size(&tree);
-    assert_int_equal( lSize, 4 );
-
-    const size_t depth = tree2_depth(&tree);
-    assert_int_equal( depth, 3 );
+    assert_int_equal( tree2_size(&tree), 4 );
+    assert_int_equal( tree2_depth(&tree), 3 );
 
     assert_int_equal( tree2_isValid(&tree), ARBTREE_INVALID_OK );
 
@@ -514,18 +508,15 @@ static void test_tree2_add_subtree(void **state) {
     tree2_add(&tree, 22, 1);
     tree2_add(&tree, 27, 1);
 
-    const size_t lSize = tree2_size(&tree);
-    assert_int_equal( lSize, 10 );
-
-    const size_t depth = tree2_depth(&tree);
-    assert_int_equal( depth, 4 );
+    assert_int_equal( tree2_size(&tree), 10 );
+    assert_int_equal( tree2_depth(&tree), 4 );
 
     assert_int_equal( tree2_isValid(&tree), ARBTREE_INVALID_OK );
 
     tree2_release(&tree);
 }
 
-static void test_tree2_add_subtree2_space(void **state) {
+static void test_tree2_add_subtree_space(void **state) {
     (void) state; /* unused */
 
     RBTree2 tree;
@@ -535,18 +526,15 @@ static void test_tree2_add_subtree2_space(void **state) {
     tree2_add(&tree, 30, 10);
     tree2_add(&tree, 35, 15);
 
-    const size_t lSize = tree2_size(&tree);
-    assert_int_equal( lSize, 3 );
-
-    const size_t depth = tree2_depth(&tree);
-    assert_int_equal( depth, 2 );
+    assert_int_equal( tree2_size(&tree), 3 );
+    assert_int_equal( tree2_depth(&tree), 2 );
 
     assert_int_equal( tree2_isValid(&tree), ARBTREE_INVALID_OK );
 
     tree2_release(&tree);
 }
 
-static void test_tree2_add_subtree2_startAddr(void **state) {
+static void test_tree2_add_subtree_startAddr(void **state) {
     (void) state; /* unused */
 
     RBTree2 tree;
@@ -557,17 +545,14 @@ static void test_tree2_add_subtree2_startAddr(void **state) {
     tree2_add(&tree, 1793, 16);
     tree2_add(&tree, 1386, 13);
 
-    const size_t lSize = tree2_size(&tree);
-    assert_int_equal( lSize, 4 );
-
-    const size_t depth = tree2_depth(&tree);
-    assert_int_equal( depth, 3 );
+    assert_int_equal( tree2_size(&tree), 4 );
+    assert_int_equal( tree2_depth(&tree), 3 );
 
     assert_int_equal( tree2_isValid(&tree), ARBTREE_INVALID_OK );
 
     tree2_release(&tree);
 }
-static void test_tree2_add_subtree3(void **state) {
+static void test_tree2_add_subtree1(void **state) {
     (void) state; /* unused */
 
     const unsigned int seed = 1520466046;
@@ -1147,12 +1132,12 @@ int main(void) {
         unit_test(test_tree2_add_0),
         unit_test(test_tree2_add_left),
         unit_test(test_tree2_add_right),
-        unit_test(test_tree2_add_subtree2_left),
-        unit_test(test_tree2_add_subtree2_right),
+        unit_test(test_tree2_add_subtree_left),
+        unit_test(test_tree2_add_subtree_right),
         unit_test(test_tree2_add_subtree),
-        unit_test(test_tree2_add_subtree2_space),
-        unit_test(test_tree2_add_subtree2_startAddr),
-        unit_test(test_tree2_add_subtree3),
+        unit_test(test_tree2_add_subtree_space),
+        unit_test(test_tree2_add_subtree_startAddr),
+        unit_test(test_tree2_add_subtree1),
 
         unit_test(test_tree2_size_NULL),
         unit_test(test_tree2_depth_NULL),

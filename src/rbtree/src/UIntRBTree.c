@@ -24,6 +24,7 @@
 #include "rbtree/UIntRBTree.h"
 
 #include <stdlib.h>                     /// malloc, free
+#include <assert.h>
 
 #include "rbtree/AbstractRBTree.h"
 
@@ -115,12 +116,9 @@ bool uirbtree_add(UIntRBTree* tree, const UIntRBTreeValue value) {
     UIntRBTreeValue* ptr = malloc( sizeof(UIntRBTreeValue) );
     *ptr = value;
 
-    if (rbtree_add(baseTree, ptr)==true) {
-        return true;
-    }
-
-    free(ptr);
-    return false;
+    const bool added = rbtree_add(baseTree, ptr);
+    assert( added );
+    return added;
 }
 
 bool uirbtree_delete(UIntRBTree* tree, const UIntRBTreeValue value) {

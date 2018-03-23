@@ -424,11 +424,8 @@ static void test_tree_add_left(void **state) {
     tree_add(&tree, 3, 1);
     tree_add(&tree, 1, 1);
 
-    const size_t lSize = tree_size(&tree);
-    assert_int_equal( lSize, 2 );
-
-    const size_t depth = tree_depth(&tree);
-    assert_int_equal( depth, 2 );
+    assert_int_equal( tree_size(&tree), 2 );
+    assert_int_equal( tree_depth(&tree), 2 );
 
     assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
 
@@ -444,11 +441,8 @@ static void test_tree_add_right(void **state) {
     tree_add(&tree, 3, 1);
     tree_add(&tree, 6, 1);
 
-    const size_t lSize = tree_size(&tree);
-    assert_int_equal( lSize, 2 );
-
-    const size_t depth = tree_depth(&tree);
-    assert_int_equal( depth, 2 );
+    assert_int_equal( tree2_size(&tree), 2 );
+    assert_int_equal( tree2_depth(&tree), 2 );
 
     assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
 
@@ -488,11 +482,8 @@ static void test_tree_add_subtree_right(void **state) {
     tree_add(&tree, 70, 1);
     tree_add(&tree, 60, 1);
 
-    const size_t lSize = tree_size(&tree);
-    assert_int_equal( lSize, 4 );
-
-    const size_t depth = tree_depth(&tree);
-    assert_int_equal( depth, 3 );
+    assert_int_equal( tree_size(&tree), 4 );
+    assert_int_equal( tree_depth(&tree), 3 );
 
     assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
 
@@ -517,11 +508,8 @@ static void test_tree_add_subtree(void **state) {
     tree_add(&tree, 22, 1);
     tree_add(&tree, 27, 1);
 
-    const size_t lSize = tree_size(&tree);
-    assert_int_equal( lSize, 10 );
-
-    const size_t depth = tree_depth(&tree);
-    assert_int_equal( depth, 4 );
+    assert_int_equal( tree_size(&tree), 10 );
+    assert_int_equal( tree_depth(&tree), 4 );
 
     assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
 
@@ -538,11 +526,8 @@ static void test_tree_add_subtree_space(void **state) {
     tree_add(&tree, 30, 10);
     tree_add(&tree, 35, 15);
 
-    const size_t lSize = tree_size(&tree);
-    assert_int_equal( lSize, 3 );
-
-    const size_t depth = tree_depth(&tree);
-    assert_int_equal( depth, 2 );
+    assert_int_equal( tree_size(&tree), 3 );
+    assert_int_equal( tree_depth(&tree), 2 );
 
     assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
 
@@ -560,11 +545,8 @@ static void test_tree_add_subtree_startAddr(void **state) {
     tree_add(&tree, 1793, 16);
     tree_add(&tree, 1386, 13);
 
-    const size_t lSize = tree_size(&tree);
-    assert_int_equal( lSize, 4 );
-
-    const size_t depth = tree_depth(&tree);
-    assert_int_equal( depth, 3 );
+    assert_int_equal( tree_size(&tree), 4 );
+    assert_int_equal( tree_depth(&tree), 3 );
 
     assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
 
@@ -1178,6 +1160,9 @@ int main(void) {
     //TODO: add selective run
 
     const struct UnitTest tests[] = {
+        unit_test(test_tree_init_NULL),
+        unit_test(test_tree_init_valid),
+        
         unit_test(test_tree_add_NULL),
         unit_test(test_tree_add_0),
         unit_test(test_tree_add_left),
@@ -1237,9 +1222,6 @@ int main(void) {
         unit_test(test_tree_munmap_left),
         unit_test(test_tree_munmap_left2),
         unit_test(test_tree_munmap_subtree),
-
-        unit_test(test_tree_init_NULL),
-        unit_test(test_tree_init_valid),
 
         unit_test(test_tree_randomT1),
         unit_test(test_tree_randomT2),
