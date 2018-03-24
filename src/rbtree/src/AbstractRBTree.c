@@ -69,11 +69,27 @@ static const ARBTreeNode* rbtree_getRightmostNode(const ARBTreeNode* node) {
     return curr;
 }
 
-static const ARBTreeNode* rbtree_getLeftDescendant(const ARBTreeNode* node) {
+/**
+ *  node
+ *     \
+ *       \
+ *         n
+ *        /
+ *      ret
+ */
+static const ARBTreeNode* rbtree_getRightDescendant(const ARBTreeNode* node) {
     return rbtree_getLeftmostNode(node->right);
 }
 
-static const ARBTreeNode* rbtree_getRightDescendant(const ARBTreeNode* node) {
+/**
+ *      node
+ *      /
+ *    /
+ *  n
+ *   \
+ *   ret
+ */
+static const ARBTreeNode* rbtree_getLeftDescendant(const ARBTreeNode* node) {
     return rbtree_getRightmostNode(node->left);
 }
 
@@ -111,6 +127,50 @@ static size_t rbtree_depthSubtree(const ARBTreeNode* node) {
 size_t rbtree_depth(const ARBTree* tree) {
     assert( tree != NULL );
     return rbtree_depthSubtree(tree->root);
+}
+
+static const ARBTreeNode* rbtree_leftNode(const ARBTreeNode* node) {
+    const ARBTreeNode* desc = rbtree_getLeftDescendant(node);
+    if (desc != NULL) {
+        return desc;
+    }
+    return rbtree_getLeftAncestor(node);
+}
+
+static const ARBTreeNode* rbtree_rightNode(const ARBTreeNode* node) {
+    const ARBTreeNode* desc = rbtree_getRightDescendant(node);
+    if (desc != NULL) {
+        return desc;
+    }
+    return rbtree_getRightAncestor(node);
+}
+
+static const ARBTreeNode* rbtree_nodeByIndex(const ARBTreeNode* node, const size_t index) {
+    if (node==NULL) {
+        return NULL;
+    }
+    const size_t currIndex = rbtree_nodeIndex(node);
+    if (index < currIndex) {
+        const ARBTreeNode* left = rbtree_leftNode(node);
+        return rbtree_nodeByIndex(left, index);
+    }
+    if (index > currIndex) {
+        const ARBTreeNode* right = rbtree_rightNode(node);
+        return rbtree_nodeByIndex(right, index);
+    }
+    /// index equals
+    return node;
+}
+
+ARBTreeValue rbtree_valueByIndex(const ARBTree* tree, const size_t index) {
+    if (tree == NULL) {
+        return NULL;
+    }
+    const ARBTreeNode* node = rbtree_nodeByIndex( tree->root, index );
+    if (node == NULL) {
+        return NULL;
+    }
+    return node->value;
 }
 
 
@@ -182,13 +242,13 @@ static ARBTreeValidationError rbtree_isValid_checkSorted(const ARBTree* tree, co
         }
     }
 
-    const ARBTreeNode* prevBottom = rbtree_getRightDescendant(node);
+    const ARBTreeNode* prevBottom = rbtree_getLeftDescendant(node);
     if (prevBottom != NULL) {
         if (tree->fIsLessOrder(node->value, prevBottom->value) == true) {
         	return ARBTREE_INVALID_NOT_SORTED;
         }
     }
-    const ARBTreeNode* nextBottom = rbtree_getLeftDescendant(node);
+    const ARBTreeNode* nextBottom = rbtree_getRightDescendant(node);
     if (nextBottom != NULL) {
         if (tree->fIsLessOrder(nextBottom->value, node->value) == true) {
         	return ARBTREE_INVALID_NOT_SORTED;
@@ -918,7 +978,7 @@ bool rbtree_delete(ARBTree* tree, const ARBTreeValue value) {
     /// have both children
     /// there is right subtree
 
-    ARBTreeNode* nextNode = (ARBTreeNode*) rbtree_getLeftDescendant(node);      /// never NULL
+    ARBTreeNode* nextNode = (ARBTreeNode*) rbtree_getRightDescendant(node);      /// never NULL
 
     /// swap pointer values (it's important -- it causes to release proper pointer)
     ARBTreeValue tmpVal = node->value;

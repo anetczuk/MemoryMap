@@ -36,13 +36,15 @@
 #include <cmocka.h>
 
 
+
 static unsigned int current_seed = 0;
 
 static unsigned int get_next_seed() {
-	if (current_seed == 0) {
-		current_seed = time(NULL);
-	}
-	return (--current_seed);
+    if (current_seed == 0) {
+        srand( time(NULL) );
+        current_seed = rand();
+    }
+    return (++current_seed);
 }
 
 static RBTree2 create_default_tree(const size_t nodes) {
@@ -672,6 +674,60 @@ static void test_tree2_area_empty(void **state) {
     tree2_release(&tree);
 }
 
+static void test_tree2_valueByIndex_NULL(void **state) {
+    (void) state; /* unused */
+
+    const MemoryArea area = tree2_valueByIndex(NULL, 0);
+
+    assert_int_equal( area.start, 0 );
+    assert_int_equal( area.end, 0 );
+}
+
+static void test_tree2_valueByIndex_empty(void **state) {
+    (void) state; /* unused */
+
+    RBTree2 tree;
+    tree2_init(&tree);
+
+    const MemoryArea area = tree2_valueByIndex(&tree, 0);
+
+    assert_int_equal( area.start, 0 );
+    assert_int_equal( area.end, 0 );
+
+    tree2_release(&tree);
+}
+
+static void test_tree2_valueByIndex(void **state) {
+    (void) state; /* unused */
+
+    RBTree2 tree;
+    tree2_init(&tree);
+
+    tree2_add(&tree, 50, 1);
+    tree2_add(&tree, 10, 1);
+    tree2_add(&tree, 90, 1);
+
+    {
+        const MemoryArea area = tree2_valueByIndex(&tree, 0);
+        assert_int_equal( area.start, 10 );
+    }
+    {
+        const MemoryArea area = tree2_valueByIndex(&tree, 1);
+        assert_int_equal( area.start, 50 );
+    }
+    {
+        const MemoryArea area = tree2_valueByIndex(&tree, 2);
+        assert_int_equal( area.start, 90 );
+    }
+    {
+        const MemoryArea area = tree2_valueByIndex(&tree, 3);
+        assert_int_equal( area.start, 0 );
+        assert_int_equal( area.end, 0 );
+    }
+
+    tree2_release(&tree);
+}
+
 static void test_tree2_isValid_NULL(void **state) {
     (void) state; /* unused */
 
@@ -1146,6 +1202,10 @@ int main(void) {
         unit_test(test_tree2_endAddress_valid),
         unit_test(test_tree2_area_NULL),
         unit_test(test_tree2_area_empty),
+
+        unit_test(test_tree2_valueByIndex_NULL),
+        unit_test(test_tree2_valueByIndex_empty),
+        unit_test(test_tree2_valueByIndex),
 
         unit_test(test_tree2_isValid_NULL),
         unit_test(test_tree2_isValid_valid),

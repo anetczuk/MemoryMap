@@ -25,6 +25,7 @@
 #define MEMORYAREA_H_
 
 #include <stddef.h>                 /// size_t
+#include <stdbool.h>
 
 
 typedef enum {
@@ -79,6 +80,8 @@ static inline size_t memory_startAddress(const MemoryArea* area, const MemoryAre
 void memory_print( const MemoryArea* area );
 
 int memory_compare( const MemoryArea* area1, const MemoryArea* area2 );
+
+bool memory_isEqual( const MemoryArea* area1, const MemoryArea* area2 );
 
 /**
  * Return 0 if successful, otherwise false.

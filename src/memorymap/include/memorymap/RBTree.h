@@ -94,6 +94,8 @@ size_t tree_endAddress(const RBTree* tree);
 
 MemoryArea tree_area(const RBTree* tree);
 
+MemoryArea tree_valueByIndex(const RBTree* tree, const size_t index);
+
 RBTreeValidationError tree_isValid(const RBTree* tree);
 
 RBTreeNode* tree_findNode(const RBTree* tree, const size_t adress);
@@ -119,7 +121,6 @@ RBTreeNode* tree_makeDefaultNode();
 RBTreeNode* tree_makeColoredNode(const NodeColor color);
 
 size_t tree_nodeIndex(const RBTreeNode* node);
-
 
 
 #endif /* RBTREE_H_ */

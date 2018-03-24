@@ -58,7 +58,8 @@ static inline bool tree2_canInsertRight(const ARBTreeValue valueA, const ARBTree
 
 static inline void tree2_printValue(const ARBTreeValue value) {
     const MemoryArea* v = (MemoryArea*)value;
-    memory_print(v);
+    ///memory_print(v);
+    printf("%03lx,%02lx", v->start, v->end);
 }
 
 static inline void tree2_freeValue(ARBTreeValue value) {
@@ -173,6 +174,18 @@ MemoryArea tree2_area(const RBTree2* tree) {
     const size_t endAddress = tree2_endAddress(tree);
     const size_t addressSpace = endAddress - startAddress;
     return memory_create(startAddress, addressSpace);
+}
+
+MemoryArea tree2_valueByIndex(const RBTree2* tree, const size_t index) {
+    if (tree == NULL) {
+        return memory_create(0, 0);
+    }
+    const ARBTree* baseTree = &(tree->tree);
+    const MemoryArea* val = (const MemoryArea*)rbtree_valueByIndex(baseTree, index);
+    if (val==NULL) {
+        return memory_create(0, 0);
+    }
+    return *val;
 }
 
 

@@ -62,6 +62,8 @@ size_t tree2_endAddress(const RBTree2* tree);
 
 MemoryArea tree2_area(const RBTree2* tree);
 
+MemoryArea tree2_valueByIndex(const RBTree2* tree, const size_t index);
+
 ARBTreeValidationError tree2_isValid(const RBTree2* tree);
 
 size_t tree2_add(RBTree2* tree, const size_t address, const size_t size);

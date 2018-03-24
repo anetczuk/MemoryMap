@@ -52,16 +52,38 @@ static const RBTreeNode* tree_getRightmostNode(const RBTreeNode* node) {
     return curr;
 }
 
-static const RBTreeNode* tree_getLeftDescendant(const RBTreeNode* node) {
+/**
+ *  node
+ *     \
+ *       \
+ *         n
+ *        /
+ *      ret
+ */
+static const RBTreeNode* tree_getRightDescendant(const RBTreeNode* node) {
     return tree_getLeftmostNode(node->right);
 }
 
-static const RBTreeNode* tree_getRightDescendant(const RBTreeNode* node) {
+/**
+ *      node
+ *      /
+ *    /
+ *  n
+ *   \
+ *   ret
+ */
+static const RBTreeNode* tree_getLeftDescendant(const RBTreeNode* node) {
     return tree_getRightmostNode(node->left);
 }
 
 /**
  * Returns ancestor on right side of current node.
+ *         ret
+ *         /
+ *       /
+ *     n
+ *      \
+ *      node
  */
 static const RBTreeNode* tree_getRightAncestor(const RBTreeNode* node) {
     const RBTreeNode* child = node;
@@ -79,6 +101,12 @@ static const RBTreeNode* tree_getRightAncestor(const RBTreeNode* node) {
 
 /**
  * Returns ancestor on left side of current node.
+ *    ret
+ *      \
+ *        \
+ *          n
+ *         /
+ *       node
  */
 static const RBTreeNode* tree_getLeftAncestor(const RBTreeNode* node) {
     const RBTreeNode* child = node;
@@ -165,6 +193,50 @@ MemoryArea tree_area(const RBTree* tree) {
     return memory_create(startAddress, addressSpace);
 }
 
+static const RBTreeNode* tree_leftNode(const RBTreeNode* node) {
+    const RBTreeNode* desc = tree_getLeftDescendant(node);
+    if (desc != NULL) {
+        return desc;
+    }
+    return tree_getLeftAncestor(node);
+}
+
+static const RBTreeNode* tree_rightNode(const RBTreeNode* node) {
+    const RBTreeNode* desc = tree_getRightDescendant(node);
+    if (desc != NULL) {
+        return desc;
+    }
+    return tree_getRightAncestor(node);
+}
+
+static const RBTreeNode* tree_nodeByIndex(const RBTreeNode* node, const size_t index) {
+    if (node==NULL) {
+        return NULL;
+    }
+    const size_t currIndex = tree_nodeIndex(node);
+    if (index < currIndex) {
+        const RBTreeNode* left = tree_leftNode(node);
+        return tree_nodeByIndex(left, index);
+    }
+    if (index > currIndex) {
+        const RBTreeNode* right = tree_rightNode(node);
+        return tree_nodeByIndex(right, index);
+    }
+    /// index equals
+    return node;
+}
+
+MemoryArea tree_valueByIndex(const RBTree* tree, const size_t index) {
+    if (tree == NULL) {
+        return memory_create(0, 0);
+    }
+    const RBTreeNode* node = tree_nodeByIndex( tree->root, index );
+    if (node == NULL) {
+        return memory_create(0, 0);
+    }
+    return node->area;
+}
+
 
 /// ==================================================================================
 
@@ -233,13 +305,13 @@ static RBTreeValidationError tree_isValid_checkSorted(const RBTreeNode* node) {
         }
     }
 
-    const RBTreeNode* prevBottom = tree_getRightDescendant(node);
+    const RBTreeNode* prevBottom = tree_getLeftDescendant(node);
     if (prevBottom != NULL) {
         if ( prevBottom->area.end > node->area.start) {
             return RBTREE_INVALID_NOT_SORTED;
         }
     }
-    const RBTreeNode* nextBottom = tree_getLeftDescendant(node);
+    const RBTreeNode* nextBottom = tree_getRightDescendant(node);
     if (nextBottom != NULL) {
         if ( nextBottom->area.start < node->area.end) {
             return RBTREE_INVALID_NOT_SORTED;
@@ -1010,7 +1082,7 @@ void tree_delete(RBTree* tree, const size_t address) {
     /// have both children
     /// there is right subtree
 
-    RBTreeNode* nextNode = (RBTreeNode*) tree_getLeftDescendant(node);      /// never NULL
+    RBTreeNode* nextNode = (RBTreeNode*) tree_getRightDescendant(node);      /// never NULL
     node->area = nextNode->area;
 
     tree_changeChild(nextNode->parent, nextNode, nextNode->right);

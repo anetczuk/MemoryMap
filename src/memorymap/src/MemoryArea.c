@@ -47,6 +47,16 @@ int memory_compare( const MemoryArea* area1, const MemoryArea* area2 ) {
     return 0;
 }
 
+bool memory_isEqual( const MemoryArea* area1, const MemoryArea* area2 ) {
+    assert( area1!=NULL );
+    assert( area2!=NULL );
+    if (area1->start != area2->start)
+        return false;
+    if (area1->end != area2->end)
+        return false;
+    return true;
+}
+
 static int memory_doesFitBefore(const MemoryArea* area, const MemoryArea* check) {
     assert( check != NULL );
     if (area == NULL) {

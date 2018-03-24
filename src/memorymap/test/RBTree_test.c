@@ -36,13 +36,15 @@
 #include <cmocka.h>
 
 
+
 static unsigned int current_seed = 0;
 
 static unsigned int get_next_seed() {
-	if (current_seed == 0) {
-		current_seed = time(NULL);
-	}
-	return (--current_seed);
+    if (current_seed == 0) {
+        srand( time(NULL) );
+        current_seed = rand();
+    }
+    return (++current_seed);
 }
 
 static RBTree create_default_tree(const size_t nodes) {
@@ -672,6 +674,60 @@ static void test_tree_area_empty(void **state) {
     tree_release(&tree);
 }
 
+static void test_tree_valueByIndex_NULL(void **state) {
+    (void) state; /* unused */
+
+    const MemoryArea area = tree_valueByIndex(NULL, 0);
+
+    assert_int_equal( area.start, 0 );
+    assert_int_equal( area.end, 0 );
+}
+
+static void test_tree_valueByIndex_empty(void **state) {
+    (void) state; /* unused */
+
+    RBTree tree;
+    tree_init(&tree);
+
+    const MemoryArea area = tree_valueByIndex(&tree, 0);
+
+    assert_int_equal( area.start, 0 );
+    assert_int_equal( area.end, 0 );
+
+    tree_release(&tree);
+}
+
+static void test_tree_valueByIndex(void **state) {
+    (void) state; /* unused */
+
+    RBTree tree;
+    tree_init(&tree);
+
+    tree_add(&tree, 50, 1);
+    tree_add(&tree, 10, 1);
+    tree_add(&tree, 90, 1);
+
+    {
+        const MemoryArea area = tree_valueByIndex(&tree, 0);
+        assert_int_equal( area.start, 10 );
+    }
+    {
+        const MemoryArea area = tree_valueByIndex(&tree, 1);
+        assert_int_equal( area.start, 50 );
+    }
+    {
+        const MemoryArea area = tree_valueByIndex(&tree, 2);
+        assert_int_equal( area.start, 90 );
+    }
+    {
+        const MemoryArea area = tree_valueByIndex(&tree, 3);
+        assert_int_equal( area.start, 0 );
+        assert_int_equal( area.end, 0 );
+    }
+
+    tree_release(&tree);
+}
+
 static void test_tree_isValid_NULL(void **state) {
     (void) state; /* unused */
 
@@ -1182,6 +1238,10 @@ int main(void) {
         unit_test(test_tree_area_NULL),
         unit_test(test_tree_area_empty),
 
+        unit_test(test_tree_valueByIndex_NULL),
+        unit_test(test_tree_valueByIndex_empty),
+        unit_test(test_tree_valueByIndex),
+
         unit_test(test_tree_isValid_NULL),
         unit_test(test_tree_isValid_valid),
 
@@ -1226,7 +1286,7 @@ int main(void) {
         unit_test(test_tree_randomT1),
         unit_test(test_tree_randomT2),
         unit_test(test_tree_randomTest1),
-        unit_test(test_tree_randomTest2),
+        unit_test(test_tree_randomTest2)
     };
 
     return run_group_tests(tests);

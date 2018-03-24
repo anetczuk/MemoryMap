@@ -54,6 +54,8 @@ size_t rbtree_size(const ARBTree* tree);
 
 size_t rbtree_depth(const ARBTree* tree);
 
+ARBTreeValue rbtree_valueByIndex(const ARBTree* tree, const size_t index);
+
 ARBTreeValidationError rbtree_isValid(const ARBTree* tree);
 
 void rbtree_print(const ARBTree* tree);
@@ -80,6 +82,12 @@ bool rbtree_delete(ARBTree* tree, const ARBTreeValue value);
 
 /**
  * Returns ancestor on right side of current node.
+ *         ret
+ *         /
+ *       /
+ *     n
+ *      \
+ *      node
  */
 static inline const ARBTreeNode* rbtree_getRightAncestor(const ARBTreeNode* node) {
     const ARBTreeNode* child = node;
@@ -97,6 +105,12 @@ static inline const ARBTreeNode* rbtree_getRightAncestor(const ARBTreeNode* node
 
 /**
  * Returns ancestor on left side of current node.
+ *    ret
+ *      \
+ *        \
+ *          n
+ *         /
+ *       node
  */
 static inline const ARBTreeNode* rbtree_getLeftAncestor(const ARBTreeNode* node) {
     const ARBTreeNode* child = node;
