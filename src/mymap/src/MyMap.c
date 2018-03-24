@@ -23,6 +23,146 @@
 
 #include "mymap/MyMap.h"
 
+
+#define USE_ARBTREE
+
+#ifdef USE_ARBTREE
+
+#include <stddef.h>                     /// NULL
+#include <stdio.h>                      /// printf
+#include <stdlib.h>                     /// free
+
+
+#include <memorymap/RBTreeV2.h>
+
+
+
+typedef struct map_root {
+    RBTree2 tree;
+} map_element;
+
+
+
+/**
+ * Reserve memory space.
+ * Fields 'flags' and 'o' not supported for now.
+ */
+void *mymap_mmap(map_t *map, void *vaddr, unsigned int size, unsigned int flags, void* o) {
+    (void) flags; /* unused */
+    (void) o; /* unused */
+
+    if (map == NULL) {
+        return NULL;
+    }
+    if (map->root == NULL) {
+        return NULL;
+    }
+    return tree2_mmap( &(map->root->tree), vaddr, size );
+}
+
+/**
+ * Release memory.
+ */
+void mymap_munmap(map_t *map, void *vaddr) {
+    if (map == NULL) {
+        return ;
+    }
+    if (map->root == NULL) {
+        return ;
+    }
+    tree2_munmap( &(map->root->tree), vaddr );
+}
+
+/**
+ * Memory initialization.
+ */
+int mymap_init(map_t *map) {
+    if (map == NULL) {
+        return -1;
+    }
+    map->root = calloc(1, sizeof(map_element) );
+    if (tree2_init( &(map->root->tree) ) == false) {
+        return -2;
+    }
+    return 0;                   /// ok
+}
+
+int mymap_release(map_t *map) {
+    if (map == NULL) {
+        return -1;
+    }
+    if (map->root == NULL) {
+        return -2;
+    }
+    const bool ret = tree2_release( &(map->root->tree) );
+
+    free(map->root);
+    map->root = NULL;
+
+    if (ret == false) {
+        return -3;
+    }
+    return 1;                   /// ok
+}
+
+/**
+ * Print memory structure.
+ */
+int mymap_dump(map_t *map) {
+    if (map == NULL) {
+        return 0;
+    }
+    if (map->root == NULL) {
+        return 0;
+    }
+    tree2_print( &(map->root->tree) );
+    return 0;
+}
+
+size_t mymap_size(const map_t *map) {
+    if (map == NULL) {
+        return 0;
+    }
+    if (map->root == NULL) {
+        return 0;
+    }
+    return tree2_size( &(map->root->tree) );
+}
+
+void *mymap_startAddress(const map_t *map) {
+    if (map == NULL) {
+        return NULL;
+    }
+    if (map->root == NULL) {
+        return NULL;
+    }
+    return (void *)tree2_startAddress( &(map->root->tree) );
+}
+
+void *mymap_endAddress(const map_t *map) {
+    if (map == NULL) {
+        return NULL;
+    }
+    if (map->root == NULL) {
+        return NULL;
+    }
+    return (void *)tree2_endAddress( &(map->root->tree) );
+}
+
+int mymap_isValid(const map_t *map) {
+    if (map == NULL) {
+        return 0;
+    }
+    if (map->root == NULL) {
+        return -1;
+    }
+    return tree2_isValid( &(map->root->tree) );
+}
+
+#else
+
+/// old implementation
+
 #include <stddef.h>                     /// NULL
 #include <stdio.h>                      /// printf
 #include <stdlib.h>                     /// free
@@ -147,3 +287,5 @@ int mymap_isValid(const map_t *map) {
     }
     return tree_isValid( &(map->root->tree) );
 }
+
+#endif
