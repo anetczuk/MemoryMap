@@ -34,8 +34,6 @@ void rbtree_init(ARBTree* tree) {
 
     tree->root = NULL;
 
-    tree->fIsValidValue = NULL;
-
     tree->fIsLessOrder = NULL;
     tree->fCanInsertRight = NULL;
     tree->fCanInsertLeft = NULL;
@@ -201,29 +199,6 @@ static ARBTreeValidationError rbtree_isValid_checkConnections(const ARBTreeNode*
     return ARBTREE_INVALID_OK;
 }
 
-static ARBTreeValidationError rbtree_isValid_checkValues(const ARBTree* tree, const ARBTreeNode* node) {
-    if (node == NULL) {
-        return ARBTREE_INVALID_OK;
-    }
-    if (tree->fIsValidValue != NULL) {
-        if ( tree->fIsValidValue( node->value ) == false ) {
-            /// invalid value
-            return ARBTREE_INVALID_BAD_VALUE;
-        }
-    }
-
-    const ARBTreeValidationError validLeft = rbtree_isValid_checkValues(tree, node->left);
-    if (validLeft != ARBTREE_INVALID_OK) {
-        return validLeft;
-    }
-    const ARBTreeValidationError validRight = rbtree_isValid_checkValues(tree, node->right);
-    if (validRight != ARBTREE_INVALID_OK) {
-        return validRight;
-    }
-
-    return ARBTREE_INVALID_OK;
-}
-
 static ARBTreeValidationError rbtree_isValid_checkSorted(const ARBTree* tree, const ARBTreeNode* node) {
     if (node == NULL) {
         return ARBTREE_INVALID_OK;
@@ -355,12 +330,6 @@ ARBTreeValidationError rbtree_isValid(const ARBTree* tree) {
         return validPointers;
     }
     /// if pointers are valid, then there is no cycles
-
-    /// check memory segments
-    const ARBTreeValidationError validMemory = rbtree_isValid_checkValues(tree, rootNode);
-    if (validMemory != ARBTREE_INVALID_OK) {
-        return validMemory;
-    }
 
     /// check is sorted
     const ARBTreeValidationError validOrder = rbtree_isValid_checkSorted(tree, rootNode);
@@ -635,12 +604,6 @@ static bool rbtree_addToNode(const ARBTree* tree, ARBTreeNode* node, ARBTreeValu
 
 bool rbtree_add(ARBTree* tree, const ARBTreeValue value) {
     assert( tree != NULL );
-
-    if (tree->fIsValidValue != NULL) {
-        if (tree->fIsValidValue(value) == false) {
-            return false;
-        }
-    }
 
     if (tree->root == NULL) {
         tree->root = rbtree_makeDefaultNode();

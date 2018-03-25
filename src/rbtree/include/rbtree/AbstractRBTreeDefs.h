@@ -40,7 +40,6 @@ typedef enum {
     ARBTREE_INVALID_ROOT_PARENT = 1,
     ARBTREE_INVALID_NODE_PARENT = 2,
     ARBTREE_INVALID_SAME_CHILD = 3,                /// 'left' and 'right' points to the same node
-    ARBTREE_INVALID_BAD_VALUE = 4,
     ARBTREE_INVALID_NOT_SORTED = 5,
 
     /// red-black tree properties
@@ -75,14 +74,12 @@ typedef bool (* rbtree_tryFit)(const struct ARBTreeElement* node, ARBTreeValue v
 typedef struct {
     struct ARBTreeElement* root;
 
-    rbtree_isValidValue fIsValidValue;          /// can be NULL
-
     rbtree_isOrder fIsLessOrder;
     rbtree_isOrder fCanInsertRight;
     rbtree_isOrder fCanInsertLeft;
 
-    rbtree_tryFit fTryFitRight;                 /// can be NULL
-    rbtree_tryFit fTryFitLeft;                  /// can be NULL
+    rbtree_tryFit fTryFitRight;                 /// optional, can be NULL
+    rbtree_tryFit fTryFitLeft;                  /// optional, can be NULL
 
     rbtree_printValue fPrintValue;
     rbtree_deleteValue fDeleteValue;            /// destroy value (release memory etc)

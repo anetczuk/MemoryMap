@@ -37,10 +37,12 @@ static inline bool uirbtree_checkOrder(const ARBTreeValue valueA, const ARBTreeV
 }
 
 static inline bool uirbtree_canInsertRight(const ARBTreeValue valueA, const ARBTreeValue valueB) {
+    /// is 'valueA' greater or equal to 'valueB'
     return ( uirbtree_checkOrder(valueA, valueB) == false );
 }
 
 static inline bool uirbtree_canInsertLeft(const ARBTreeValue valueA, const ARBTreeValue valueB) {
+    /// is 'valueA' smaller than 'valueB'
     return ( uirbtree_checkOrder(valueA, valueB) == true );
 }
 

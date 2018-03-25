@@ -34,14 +34,6 @@
 typedef ARBTreeNode RBTreeNode2;
 
 
-static inline bool tree2_isValidValue(const ARBTreeValue value) {
-    if (value == NULL) {
-        return false;
-    }
-    const int ret = memory_isValid(value);
-    return (ret == 0);
-}
-
 static inline bool tree2_checkOrder(const ARBTreeValue valueA, const ARBTreeValue valueB) {
     const MemoryArea* vA = (MemoryArea*)valueA;
     const MemoryArea* vB = (MemoryArea*)valueB;
@@ -74,21 +66,19 @@ static inline bool tree2_tryFitRight(const ARBTreeNode* node, ARBTreeValue value
         return true;
     }
 
-    /// leaf case -- check space
+    /// check space between nodes
     const int doesFit = memory_fitBetween(node->value, ancestor->value, value);
     return (doesFit == 0);
 }
 
 static inline bool tree2_tryFitLeft(const ARBTreeNode* node, ARBTreeValue value) {
-    (void) value; /* unused */
-
     const ARBTreeNode* ancestor = rbtree_getLeftAncestor(node);
     if (ancestor == NULL) {
         /// smallest leaf case -- add node
         return true;
     }
 
-    /// check space
+    /// check space between nodes
     const int doesFit = memory_fitBetween(ancestor->value, node->value, value);
     return (doesFit == 0);
 }
@@ -290,8 +280,6 @@ bool tree2_init(RBTree2* tree) {
 
     ARBTree* baseTree = &(tree->tree);
     rbtree_init(baseTree);
-
-    baseTree->fIsValidValue = tree2_isValidValue;
 
     baseTree->fIsLessOrder = tree2_checkOrder;
     baseTree->fCanInsertRight = tree2_canInsertRight;
