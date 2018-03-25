@@ -11,12 +11,24 @@ In case of memory segmentation - new block cannot be added in pointed address - 
 
 ### Features
 
-* red-black trees implementation without 3rd party dependencies
+* generalised red-black trees implementation without 3rd party dependencies
 * unit tests using cmocka library
 * valgrind integration
 * code coverage calculation (more than 95% of code covered by tests)
 * cppcheck analysis
 * clang static analysis
+
+
+### Generalised red-black tree
+
+Core part is implemented in _rbtree/AbstractRBTree.h_. It consists of generalisation based on _void*_ and function pointers. Those pointers enables storing any data in the tree, by simply providing implementation of following operations:
+* _less_ comparison operator
+* _can insert right_ - checking if value can be inserted into _right_ branch of node
+* _can insert left_ - checking if value can be inserted into _left_ branch of node
+* _try fit right_ - generalised fitting value into _right_ branch of node
+* _try fit left_ - generalised fitting value into _left_ branch of node
+* _print_ function of stored value
+* _delete_ function of stored value
 
 
 ### Modules
@@ -25,6 +37,7 @@ In case of memory segmentation - new block cannot be added in pointed address - 
 * _rbtree/UIntRBTree.h_ contains red-black tree of integers -- use example of _AbstractRBTree_
 * _memorymap/LinkedList.h_ contains implementation of memory map based on linked list
 * _memorymap/RBTree.h_ implementation of memory map based on red-black trees
+* _memorymap/RBTreeV2.h_ implementation of memory map based on _AbstractRBTree_
 * _mymap/MyMap.h_ access interface to memory map using _RBTree.h_ under the hood
 
 
