@@ -48,12 +48,56 @@ static unsigned int get_next_seed() {
     return (++current_seed);
 }
 
+static bool compare_trees(RBTree* tree, RBTree2* tree2) {
+    const size_t size1 = tree_size(tree);
+    const size_t size2 = tree2_size(tree2);
+    if (size1 != size2 ) {
+        printf("First tree:\n");
+        tree_print(tree);
+        printf("Second tree:\n");
+        tree2_print(tree2);
+        printf("bad size: %lu != %lu", size1, size2);
+        return false;
+    }
+    const size_t depth1 = tree_depth(tree);
+    const size_t depth2 = tree2_depth(tree2);
+    if (depth1 != depth2 ) {
+        printf("First tree:\n");
+        tree_print(tree);
+        printf("Second tree:\n");
+        tree2_print(tree2);
+        printf("bad depth: %lu != %lu", depth1, depth2);
+        return false;
+    }
+
+    if ( tree_isValid(tree) != RBTREE_INVALID_OK ) {
+        return false;
+    }
+    if ( tree2_isValid(tree2) != ARBTREE_INVALID_OK ) {
+        return false;
+    }
+
+    for(size_t x = 0; x < size1; ++x) {
+        const MemoryArea area1 = tree_valueByIndex(tree, x);
+        const MemoryArea area2 = tree2_valueByIndex(tree2, x);
+        if (memory_isEqual( &area1, &area2 ) == false) {
+            printf("First tree:\n");
+            tree_print(tree);
+            printf("Second tree:\n");
+            tree2_print(tree2);
+            printf("bad elements in index %lu", x);
+            return false;
+        }
+    }
+
+    return true;
+}
 
 static void test_trees_comparison(void **state) {
     (void) state; /* unused */
 
-//    const unsigned int seed = get_next_seed();
-    const unsigned int seed = 1753553511;
+    const unsigned int seed = get_next_seed();
+//    const unsigned int seed = 1753553511;
     srand( seed );
 
 //    printf("seed: %u\n", seed);
@@ -78,44 +122,14 @@ static void test_trees_comparison(void **state) {
         tree_add(&tree, addr, msize);
         tree2_add(&tree2, addr, msize);
 
-        printf("Iteration %lu: adding (%lu, %lu)\n", i, addr, msize );
+//        printf("Iteration %lu: adding (%lu, %lu)\n", i, addr, msize );
 //        printf("Iteration %lu: adding (%lx, %lx)\n", i, addr, msize );
 
-        const size_t size1 = tree_size(&tree);
-        const size_t size2 = tree2_size(&tree2);
-        if (size1 != size2 ) {
-            printf("First tree:\n");
-            tree_print(&tree);
-            printf("Second tree:\n");
-            tree2_print(&tree2);
-            fail_msg("bad size: %lu != %lu for seed: %u", size1, size2, seed);
-        }
-        const size_t depth1 = tree_depth(&tree);
-        const size_t depth2 = tree2_depth(&tree2);
-        if (depth1 != depth2 ) {
-            printf("First tree:\n");
-            tree_print(&tree);
-            printf("Second tree:\n");
-            tree2_print(&tree2);
-            fail_msg("bad depth: %lu != %lu for seed: %u", depth1, depth2, seed);
-        }
-        assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
-        assert_int_equal( tree2_isValid(&tree2), ARBTREE_INVALID_OK );
 
-        for(size_t x = 0; x < size1; ++x) {
-            const MemoryArea area1 = tree_valueByIndex(&tree, x);
-            const MemoryArea area2 = tree2_valueByIndex(&tree2, x);
-            if (memory_isEqual( &area1, &area2 ) == false) {
-                printf("First tree:\n");
-                tree_print(&tree);
-                printf("Second tree:\n");
-                tree2_print(&tree2);
-                fail_msg("bad elements in index %lu for seed: %u, last item: (%lx,%lx)", x, seed, addr, msize);
-            }
+        if (compare_trees(&tree, &tree2) == false) {
+            fail_msg("trees differ for seed %u", seed);
         }
     }
-
-    //TODO: compare nodes
 
     const MemoryArea area1 = tree_area(&tree);
     const MemoryArea area2 = tree2_area(&tree2);
@@ -132,29 +146,10 @@ static void test_trees_comparison(void **state) {
         tree_delete(&tree, addr);
         tree2_delete(&tree2, addr);
 
-        const size_t size1 = tree_size(&tree);
-        const size_t size2 = tree2_size(&tree2);
-        if (size1 != size2 ) {
-            printf("First tree:\n");
-            tree_print(&tree);
-            printf("Second tree:\n");
-            tree2_print(&tree2);
-            fail_msg("bad size: %lu != %lu for seed: %u", size1, size2, seed);
+        if (compare_trees(&tree, &tree2) == false) {
+            fail_msg("trees differ for seed %u", seed);
         }
-        const size_t depth1 = tree_depth(&tree);
-        const size_t depth2 = tree2_depth(&tree2);
-        if (depth1 != depth2 ) {
-            printf("First tree:\n");
-            tree_print(&tree);
-            printf("Second tree:\n");
-            tree2_print(&tree2);
-            fail_msg("bad depth: %lu != %lu for seed: %u", depth1, depth2, seed);
-        }
-        assert_int_equal( tree_isValid(&tree), RBTREE_INVALID_OK );
-        assert_int_equal( tree2_isValid(&tree2), ARBTREE_INVALID_OK );
     }
-
-    //TODO: compare nodes
 
     ///printf("Releasing\n");
     tree_release(&tree);
