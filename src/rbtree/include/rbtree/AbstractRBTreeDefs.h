@@ -57,15 +57,13 @@ typedef void* ARBTreeValue;
 /// ==================================================================
 
 
-typedef bool (* rbtree_isValidValue)(const ARBTreeValue value);
+typedef bool (* rbtree_isLessOrder)(const ARBTreeValue valueA, const ARBTreeValue valueB);
 
-typedef bool (* rbtree_isOrder)(const ARBTreeValue valueA, const ARBTreeValue valueB);
+typedef bool (* rbtree_tryFit)(const struct ARBTreeElement* node, ARBTreeValue value);
 
 typedef void (* rbtree_printValue)(const ARBTreeValue value);
 
 typedef void (* rbtree_deleteValue)(ARBTreeValue value);
-
-typedef bool (* rbtree_tryFit)(const struct ARBTreeElement* node, ARBTreeValue value);
 
 
 /// ==================================================================
@@ -74,7 +72,7 @@ typedef bool (* rbtree_tryFit)(const struct ARBTreeElement* node, ARBTreeValue v
 typedef struct {
     struct ARBTreeElement* root;
 
-    rbtree_isOrder fIsLessOrder;
+    rbtree_isLessOrder fIsLessOrder;
 
     rbtree_tryFit fTryFitRight;                 /// optional, can be NULL
     rbtree_tryFit fTryFitLeft;                  /// optional, can be NULL
