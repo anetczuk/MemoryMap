@@ -406,11 +406,8 @@ static void test_tree2_add_0(void **state) {
     const size_t retAddr = tree2_add(&tree, 0, 1);
     assert_int_equal( retAddr, 0 );
 
-    const size_t lSize = tree2_size(&tree);
-    assert_int_equal( lSize, 1 );
-
-    const size_t depth = tree2_depth(&tree);
-    assert_int_equal( depth, 1 );
+    assert_int_equal( tree2_size(&tree), 1 );
+    assert_int_equal( tree2_depth(&tree), 1 );
 
     assert_int_equal( tree2_isValid(&tree), ARBTREE_INVALID_OK );
 
@@ -447,6 +444,37 @@ static void test_tree2_add_right(void **state) {
     assert_int_equal( tree2_depth(&tree), 2 );
 
     assert_int_equal( tree2_isValid(&tree), ARBTREE_INVALID_OK );
+
+    tree2_release(&tree);
+}
+
+static void test_tree2_add_rotate(void **state) {
+    (void) state; /* unused */
+
+    RBTree2 tree;
+    tree2_init(&tree);
+
+    tree2_add(&tree, 32, 14);
+    tree2_add(&tree, 837, 47);
+    tree2_add(&tree, 691, 6);
+
+    assert_int_equal( tree2_size(&tree), 3 );
+    assert_int_equal( tree2_depth(&tree), 2 );
+
+    assert_int_equal( tree2_isValid(&tree), ARBTREE_INVALID_OK );
+
+    {
+        const MemoryArea area = tree2_valueByIndex(&tree, 0);
+        assert_int_equal( area.start, 32 );
+    }
+    {
+        const MemoryArea area = tree2_valueByIndex(&tree, 1);
+        assert_int_equal( area.start, 691 );
+    }
+    {
+        const MemoryArea area = tree2_valueByIndex(&tree, 2);
+        assert_int_equal( area.start, 837 );
+    }
 
     tree2_release(&tree);
 }
@@ -1188,6 +1216,7 @@ int main(void) {
         unit_test(test_tree2_add_0),
         unit_test(test_tree2_add_left),
         unit_test(test_tree2_add_right),
+        unit_test(test_tree2_add_rotate),
         unit_test(test_tree2_add_subtree_left),
         unit_test(test_tree2_add_subtree_right),
         unit_test(test_tree2_add_subtree),

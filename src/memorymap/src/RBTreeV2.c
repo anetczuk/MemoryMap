@@ -88,12 +88,9 @@ static inline bool tree2_tryFitLeft(const ARBTreeNode* node, ARBTreeValue value)
         return true;
     }
 
-//    /// leaf case -- check space
-//    const int doesFit = memory_fitBetween(node->value, ancestor->value, value);
-//    return (doesFit == 0);
-
-    /// no space
-    return false;
+    /// check space
+    const int doesFit = memory_fitBetween(ancestor->value, node->value, value);
+    return (doesFit == 0);
 }
 
 

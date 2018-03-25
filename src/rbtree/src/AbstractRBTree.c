@@ -414,6 +414,19 @@ ARBTreeNode* rbtree_findNode(const ARBTree* tree, const ARBTreeValue value) {
     return NULL;
 }
 
+static const ARBTreeNode* rbtree_findRootFromNode(const ARBTreeNode* node) {
+    /// find the new root to return
+    const ARBTreeNode* curr = node;
+    while (curr->parent != NULL)
+        curr = curr->parent;
+    return curr;
+}
+
+static void rbtree_findRoot(ARBTree* tree) {
+    /// find the new root to return
+    tree->root = (ARBTreeNode*) rbtree_findRootFromNode(tree->root);
+}
+
 
 /// ==================================================================================
 
@@ -556,7 +569,11 @@ static ARBTreeNode* rbtree_insertRightNode(ARBTreeNode* node) {
 	return newNode;
 }
 
-static bool rbtree_addToRight(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value);
+
+/// ======================================================================================
+
+
+static bool rbtree_addToNode(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value);
 
 /**
  * Adding to left side: value should be smaller than 'node->value'
@@ -564,11 +581,11 @@ static bool rbtree_addToRight(const ARBTree* tree, ARBTreeNode* node, ARBTreeVal
 static bool rbtree_addToLeft(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value) {
     if ( tree->fCanInsertLeft(value, node->value) == false ) {
         /// could not add on left side  -- 'value' is greater than node
-    	return false;
+        return false;
     }
 
     if ( node->left == NULL ) {
-    	/// leaf case -- can add
+        /// leaf case -- can add
         if ( tree->fTryFitLeft != NULL ) {
             if ( tree->fTryFitLeft(node, value) == false ) {
                 return false;
@@ -576,14 +593,10 @@ static bool rbtree_addToLeft(const ARBTree* tree, ARBTreeNode* node, ARBTreeValu
         }
         ARBTreeNode* newNode = rbtree_insertLeftNode(node);
         newNode->value = value;
-		return true;
+        return true;
     }
 
-	if (rbtree_addToLeft(tree, node->left, value) == true) {
-		return true;
-	}
-
-	return rbtree_addToRight(tree, node->left, value);
+    return rbtree_addToNode(tree, node->left, value);
 }
 
 /**
@@ -607,24 +620,17 @@ static bool rbtree_addToRight(const ARBTree* tree, ARBTreeNode* node, ARBTreeVal
         return true;
     }
 
-    if (rbtree_addToLeft(tree, node->right, value) == true) {
+    return rbtree_addToNode(tree, node->right, value);
+}
+
+static bool rbtree_addToNode(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value) {
+    if (rbtree_addToLeft(tree, node, value)) {
         return true;
     }
-
-    return rbtree_addToRight(tree, node->right, value);
-}
-
-static const ARBTreeNode* rbtree_findRootFromNode(const ARBTreeNode* node) {
-    /// find the new root to return
-    const ARBTreeNode* curr = node;
-    while (curr->parent != NULL)
-        curr = curr->parent;
-    return curr;
-}
-
-static void rbtree_findRoot(ARBTree* tree) {
-    /// find the new root to return
-    tree->root = (ARBTreeNode*) rbtree_findRootFromNode(tree->root);
+    if (rbtree_addToRight(tree, node, value)) {
+        return true;
+    }
+    return false;
 }
 
 bool rbtree_add(ARBTree* tree, const ARBTreeValue value) {
@@ -645,17 +651,11 @@ bool rbtree_add(ARBTree* tree, const ARBTreeValue value) {
         return true;
     }
 
-    bool addResult = rbtree_addToLeft(tree, tree->root, value);
-    if (addResult==true) {
-        rbtree_findRoot(tree);
-        return addResult;
+    if (rbtree_addToNode(tree, tree->root, value) == false) {
+        return false;
     }
-    /// go to right, called on root should always work
-    addResult = rbtree_addToRight(tree, tree->root, value);
-    if (addResult==true) {
-        rbtree_findRoot(tree);
-    }
-    return addResult;
+    rbtree_findRoot(tree);
+    return true;
 }
 
 
