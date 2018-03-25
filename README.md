@@ -23,8 +23,6 @@ In case of memory segmentation - new block cannot be added in pointed address - 
 
 Core part is implemented in _rbtree/AbstractRBTree.h_. It consists of generalisation based on _void*_ and function pointers. Those pointers enables storing any data in the tree, by simply providing implementation of following operations:
 * _less_ comparison operator
-* _can insert right_ - checking if value can be inserted into _right_ branch of node
-* _can insert left_ - checking if value can be inserted into _left_ branch of node
 * _try fit right_ - generalised fitting value into _right_ branch of node
 * _try fit left_ - generalised fitting value into _left_ branch of node
 * _print_ function of stored value

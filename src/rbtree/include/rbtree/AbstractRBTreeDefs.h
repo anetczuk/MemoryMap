@@ -75,8 +75,6 @@ typedef struct {
     struct ARBTreeElement* root;
 
     rbtree_isOrder fIsLessOrder;
-    rbtree_isOrder fCanInsertRight;
-    rbtree_isOrder fCanInsertLeft;
 
     rbtree_tryFit fTryFitRight;                 /// optional, can be NULL
     rbtree_tryFit fTryFitLeft;                  /// optional, can be NULL

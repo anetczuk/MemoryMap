@@ -36,16 +36,6 @@ static inline bool uirbtree_checkOrder(const ARBTreeValue valueA, const ARBTreeV
     return (vA < vB);
 }
 
-static inline bool uirbtree_canInsertRight(const ARBTreeValue valueA, const ARBTreeValue valueB) {
-    /// is 'valueA' greater or equal to 'valueB'
-    return ( uirbtree_checkOrder(valueA, valueB) == false );
-}
-
-static inline bool uirbtree_canInsertLeft(const ARBTreeValue valueA, const ARBTreeValue valueB) {
-    /// is 'valueA' smaller than 'valueB'
-    return ( uirbtree_checkOrder(valueA, valueB) == true );
-}
-
 static inline void uirbtree_printValue(const ARBTreeValue value) {
     const UIntRBTreeValue v = *((UIntRBTreeValue*)value);
     printf("%zu", v);
@@ -67,8 +57,6 @@ bool uirbtree_init(UIntRBTree* tree) {
     rbtree_init(baseTree);
 
     baseTree->fIsLessOrder = uirbtree_checkOrder;
-    baseTree->fCanInsertRight = uirbtree_canInsertRight;
-    baseTree->fCanInsertLeft = uirbtree_canInsertLeft;
 
     baseTree->fPrintValue = uirbtree_printValue;
     baseTree->fDeleteValue = uirbtree_freeValue;

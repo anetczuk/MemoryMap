@@ -41,13 +41,6 @@ static inline bool tree2_checkOrder(const ARBTreeValue valueA, const ARBTreeValu
     return (ret < 0);
 }
 
-static inline bool tree2_canInsertRight(const ARBTreeValue valueA, const ARBTreeValue valueB) {
-    (void) valueA; /* unused */
-    (void) valueB; /* unused */
-    /// always can add to right
-    return true;
-}
-
 static inline void tree2_printValue(const ARBTreeValue value) {
     const MemoryArea* v = (MemoryArea*)value;
     ///memory_print(v);
@@ -282,8 +275,6 @@ bool tree2_init(RBTree2* tree) {
     rbtree_init(baseTree);
 
     baseTree->fIsLessOrder = tree2_checkOrder;
-    baseTree->fCanInsertRight = tree2_canInsertRight;
-    baseTree->fCanInsertLeft = tree2_checkOrder;
 
     baseTree->fTryFitRight = tree2_tryFitRight;
     baseTree->fTryFitLeft = tree2_tryFitLeft;
