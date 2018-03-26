@@ -56,7 +56,7 @@ static bool compare_trees(RBTree* tree, RBTree2* tree2) {
         tree_print(tree);
         printf("Second tree:\n");
         tree2_print(tree2);
-        printf("bad size: %lu != %lu", size1, size2);
+        printf("bad size: %zu != %zu", size1, size2);
         return false;
     }
     const size_t depth1 = tree_depth(tree);
@@ -66,7 +66,7 @@ static bool compare_trees(RBTree* tree, RBTree2* tree2) {
         tree_print(tree);
         printf("Second tree:\n");
         tree2_print(tree2);
-        printf("bad depth: %lu != %lu", depth1, depth2);
+        printf("bad depth: %zu != %zu", depth1, depth2);
         return false;
     }
 
@@ -85,7 +85,7 @@ static bool compare_trees(RBTree* tree, RBTree2* tree2) {
             tree_print(tree);
             printf("Second tree:\n");
             tree2_print(tree2);
-            printf("bad elements in index %lu", x);
+            printf("bad elements in index %zu", x);
             return false;
         }
     }
