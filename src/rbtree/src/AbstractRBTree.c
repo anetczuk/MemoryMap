@@ -680,12 +680,12 @@ void rbtree_print(const ARBTree* tree) {
 /// ==============================================================================================
 
 
-static void releaseNode(ARBTree* tree, ARBTreeNode* node) {
+static void rbtree_releaseNode(ARBTree* tree, ARBTreeNode* node) {
     tree->fDeleteValue(node->value);
     free(node);
 }
 
-static int rbtree_releaseNodes(ARBTree* tree, ARBTreeNode* node) {
+static int rbtree_releaseSubtree(ARBTree* tree, ARBTreeNode* node) {
     if (node == NULL) {
         return 0;
     }
@@ -693,10 +693,10 @@ static int rbtree_releaseNodes(ARBTree* tree, ARBTreeNode* node) {
      * Done in recursive manner. In case of very large structures consider
      * reimplementing it using while() and vector structure.
      */
-    const int leftReleased = rbtree_releaseNodes(tree, node->left);
-    const int rightReleased = rbtree_releaseNodes(tree, node->right);
+    const int leftReleased = rbtree_releaseSubtree(tree, node->left);
+    const int rightReleased = rbtree_releaseSubtree(tree, node->right);
 
-    releaseNode(tree, node);
+    rbtree_releaseNode(tree, node);
 
     return leftReleased+rightReleased+1;
 }
@@ -707,7 +707,7 @@ bool rbtree_release(ARBTree* tree) {
         /// empty is valid, so releasing is successful
         return true;
     }
-    rbtree_releaseNodes(tree, tree->root);
+    rbtree_releaseSubtree(tree, tree->root);
     tree->root = NULL;
     return true;
 }
@@ -906,7 +906,7 @@ bool rbtree_delete(ARBTree* tree, const ARBTreeValue value) {
             rbtree_findRoot(tree);
         }
 
-        releaseNode(tree, node);
+        rbtree_releaseNode(tree, node);
         return true;
     }
 
@@ -929,7 +929,7 @@ bool rbtree_delete(ARBTree* tree, const ARBTreeValue value) {
             rbtree_findRoot(tree);
         }
 
-        releaseNode(tree, node);
+        rbtree_releaseNode(tree, node);
         return true;
     }
 
@@ -950,7 +950,7 @@ bool rbtree_delete(ARBTree* tree, const ARBTreeValue value) {
         rbtree_findRoot(tree);
     }
 
-    releaseNode(tree, nextNode);
+    rbtree_releaseNode(tree, nextNode);
     return true;
 }
 
