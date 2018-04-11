@@ -24,10 +24,12 @@
 #include "memorymap/RBTree.h"
 #include "memorymap/RBTreeV2.h"
 
+#include "benchmark/Timer.h"
+
 #include <time.h>
 #include <stdlib.h>
 #include <assert.h>
-//#include <stdio.h>                              /// printf
+#include <stdio.h>                              /// printf
 
 
 
@@ -61,12 +63,18 @@ static void test_trees_comparison() {
 
     /// adding random elements
 
+    double timer1 = 0.0;
+    double timer2 = 0.0;
+
     for(size_t i = 0; i < nodes_num; ++i) {
         const size_t addr = rand() % max_address +1;
         const size_t msize = rand() % max_size +1;
 
+        timer_elapsed();
         tree_add(&tree, addr, msize);
+        timer1 += timer_elapsed();
         tree2_add(&tree2, addr, msize);
+        timer2 += timer_elapsed();
     }
 
     const MemoryArea area1 = tree_area(&tree);
@@ -81,9 +89,74 @@ static void test_trees_comparison() {
 
         /// printf("Iteration %lu: removing %lu\n", i, addr);
 
+        timer_elapsed();
         tree_delete(&tree, addr);
+        timer1 += timer_elapsed();
         tree2_delete(&tree2, addr);
+        timer2 += timer_elapsed();
     }
+
+    printf("Timing: %f %f\n", timer1, timer2);
+
+    ///printf("Releasing\n");
+    tree_release(&tree);
+    tree2_release(&tree2);
+}
+
+static void test_trees_exhaustive() {
+    const unsigned int seed = get_next_seed();
+//    const unsigned int seed = 1753553511;
+    srand( seed );
+
+//    printf("seed: %u\n", seed);
+
+    #define nodes_num 10000
+    #define max_size 50
+    static const size_t max_address = nodes_num*max_size / 2;
+
+    RBTree tree;
+    tree_init(&tree);
+
+    RBTree2 tree2;
+    tree2_init(&tree2);
+
+
+    /// adding random elements
+
+    double timer1 = 0.0;
+    double timer2 = 0.0;
+
+    for(size_t i = 0; i < nodes_num; ++i) {
+        const size_t addr = rand() % max_address +1;
+        const size_t msize = rand() % max_size +1;
+
+        timer_elapsed();
+        tree_add(&tree, addr, msize);
+        timer1 += timer_elapsed();
+        tree2_add(&tree2, addr, msize);
+        timer2 += timer_elapsed();
+    }
+
+    const MemoryArea area1 = tree_area(&tree);
+    const MemoryArea area2 = tree2_area(&tree2);
+    assert( memory_isEqual( &area1, &area2 ) == true );
+
+
+    /// deleting random elements
+
+    for(size_t i = 0; i < nodes_num; ++i) {
+        const size_t addr = rand() % memory_size(&area1) + area1.start;
+
+        /// printf("Iteration %lu: removing %lu\n", i, addr);
+
+        timer_elapsed();
+        tree_delete(&tree, addr);
+        timer1 += timer_elapsed();
+        tree2_delete(&tree2, addr);
+        timer2 += timer_elapsed();
+    }
+
+    printf("Timing: %f %f\n", timer1, timer2);
 
     ///printf("Releasing\n");
     tree_release(&tree);
@@ -97,6 +170,8 @@ static void test_trees_comparison() {
 int main(void) {
 
     test_trees_comparison();
+
+    test_trees_exhaustive();
 
     return 0;
 }
