@@ -540,60 +540,74 @@ static ARBTreeNode* rbtree_insertRightNode(ARBTreeNode* node) {
 /// ======================================================================================
 
 
-static bool rbtree_addToNode(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value);
+static bool rbtree_addToNode(const ARBTree* tree, ARBTreeNode* currNode, ARBTreeValue value);
 
 /**
  * Adding to left side: value should be smaller than 'node->value'
  */
-static bool rbtree_addToLeft(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value) {
+static int rbtree_addToLeft(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value) {
     if ( tree->fIsLessOrder(value, node->value) == false ) {
         /// could not add on left side  -- 'value' is greater than node
-        return false;
+        return 0;               /// go to right
     }
 
     if ( node->left == NULL ) {
         /// leaf case -- can add
         if ( tree->fTryFitLeft != NULL ) {
             if ( tree->fTryFitLeft(node, value) == false ) {
-                return false;
+                return 0;       /// go to right
             }
         }
         ARBTreeNode* newNode = rbtree_insertLeftNode(node);
         newNode->value = value;
-        return true;
+        return 1;
     }
 
-    return rbtree_addToNode(tree, node->left, value);
+    return -1;                  /// go to left
 }
 
 /**
  * Adding to right side: value should be greater than 'node->value'
  */
-static bool rbtree_addToRight(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value) {
+static int rbtree_addToRight(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value) {
     /// if is not less than left, then it goes to right
 
     if ( node->right == NULL ) {
         /// leaf case -- can add
         if ( tree->fTryFitRight != NULL ) {
             if ( tree->fTryFitRight(node, value) == false ) {
-                return false;
+                return 0;
             }
         }
         ARBTreeNode* newNode = rbtree_insertRightNode(node);
         newNode->value = value;
-        return true;
+        return 1;
     }
 
-    return rbtree_addToNode(tree, node->right, value);
+    return -1;              /// go to right
 }
 
-static bool rbtree_addToNode(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value) {
-    if (rbtree_addToLeft(tree, node, value)) {
+static bool rbtree_addToNode(const ARBTree* tree, ARBTreeNode* currNode, ARBTreeValue value) {
+    const int leftState = rbtree_addToLeft(tree, currNode, value);
+    if (leftState > 0) {
         return true;
     }
-    if (rbtree_addToRight(tree, node, value)) {
+    if (leftState < 0) {
+        if (rbtree_addToNode(tree, currNode->left, value) == true) {
+            return true;
+        }
+    }
+
+    const int rightState = rbtree_addToRight(tree, currNode, value);
+    if (rightState > 0) {
         return true;
     }
+    if (rightState < 0) {
+        if (rbtree_addToNode(tree, currNode->right, value) == true) {
+            return true;
+        }
+    }
+
     return false;
 }
 
