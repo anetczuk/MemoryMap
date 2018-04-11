@@ -57,6 +57,9 @@ typedef void* ARBTreeValue;
 /// ==================================================================
 
 
+/**
+ * Means following operation on custom data type: valueA < valueB
+ */
 typedef bool (* rbtree_isLessOrder)(const ARBTreeValue valueA, const ARBTreeValue valueB);
 
 typedef bool (* rbtree_tryFit)(const struct ARBTreeElement* node, ARBTreeValue value);

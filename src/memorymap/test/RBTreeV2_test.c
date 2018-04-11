@@ -88,9 +88,10 @@ static RBTree2 create_random_tree2_map(const unsigned int seed, const size_t nod
         const size_t addr = rand() % addressRange +1;
         const size_t msize = rand() % sizeRange +1;
 
-        tree2_add(&tree, addr, msize);
+//        printf("Iteration %lu: adding (%02lx,%02lx), size: %lu\n", i, addr, msize, tree2_size(&tree) );
+//        tree2_print(&tree);
 
-//        printf("Iteration %lu: adding (%lu, %lu), size: %lu\n", i, addr, msize, tree2_size(&tree) );
+        tree2_add(&tree, addr, msize);
 
 //        assert_int_equal( tree2_size(&tree), i+1 );
 //        assert_int_equal( tree2_isValid(&tree), ARBTREE_INVALID_OK );

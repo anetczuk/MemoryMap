@@ -267,6 +267,8 @@ static void test_uirbtree_add_subtree(void **state) {
     assert_int_equal( uirbtree_size(&tree), 10 );
     assert_int_equal( uirbtree_depth(&tree), 4 );
 
+//    uirbtree_print(&tree);
+
     assert_int_equal( uirbtree_isValid(&tree), ARBTREE_INVALID_OK );
 
     uirbtree_release(&tree);
