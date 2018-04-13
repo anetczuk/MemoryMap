@@ -79,7 +79,12 @@ static void test_trees_comparison() {
 
     const MemoryArea area1 = tree_area(&tree);
     const MemoryArea area2 = tree2_area(&tree2);
+#ifdef NDEBUG
+    (void) area2;
+#else
+    /// debug
     assert( memory_isEqual( &area1, &area2 ) == true );
+#endif
 
 
     /// deleting random elements
@@ -96,7 +101,8 @@ static void test_trees_comparison() {
         timer2 += timer_elapsed();
     }
 
-    printf("Timing: %f %f\n", timer1, timer2);
+    const double factor = timer2 / timer1 * 100.0;
+    printf("Timing: %f %f %f%%\n", timer1, timer2, factor);
 
     ///printf("Releasing\n");
     tree_release(&tree);
@@ -139,7 +145,12 @@ static void test_trees_exhaustive() {
 
     const MemoryArea area1 = tree_area(&tree);
     const MemoryArea area2 = tree2_area(&tree2);
+#ifdef NDEBUG
+    (void) area2;
+#else
+    /// debug
     assert( memory_isEqual( &area1, &area2 ) == true );
+#endif
 
 
     /// deleting random elements
@@ -156,7 +167,8 @@ static void test_trees_exhaustive() {
         timer2 += timer_elapsed();
     }
 
-    printf("Timing: %f %f\n", timer1, timer2);
+    const double factor = timer2 / timer1 * 100.0;
+    printf("Timing: %f %f %f%%\n", timer1, timer2, factor);
 
     ///printf("Releasing\n");
     tree_release(&tree);

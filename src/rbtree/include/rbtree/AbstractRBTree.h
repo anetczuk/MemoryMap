@@ -82,9 +82,9 @@ bool rbtree_delete(ARBTree* tree, const ARBTreeValue value);
 
 /**
  * Returns ancestor on right side of current node.
- *         ret
- *         /
- *       /
+ *         ret         ret
+ *         /           /
+ *       /           node
  *     n
  *      \
  *      node
@@ -105,9 +105,9 @@ static inline const ARBTreeNode* rbtree_getRightAncestor(const ARBTreeNode* node
 
 /**
  * Returns ancestor on left side of current node.
- *    ret
- *      \
- *        \
+ *    ret            ret
+ *      \              \
+ *        \            node
  *          n
  *         /
  *       node

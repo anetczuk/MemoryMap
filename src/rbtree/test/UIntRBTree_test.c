@@ -220,6 +220,8 @@ static void test_uirbtree_add_subrbtree_right(void **state) {
     uirbtree_add(&tree, 70);
     uirbtree_add(&tree, 60);
 
+//    uirbtree_print(&tree);
+
     assert_int_equal( uirbtree_size(&tree), 4 );
     assert_int_equal( uirbtree_depth(&tree), 3 );
 

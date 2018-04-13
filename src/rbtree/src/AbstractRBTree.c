@@ -66,10 +66,10 @@ static const ARBTreeNode* rbtree_getRightmostNode(const ARBTreeNode* node) {
 }
 
 /**
- *  node
- *     \
- *       \
- *         n
+ *  node         node
+ *     \            \
+ *       \            \
+ *         n          ret
  *        /
  *      ret
  */
@@ -516,22 +516,17 @@ static void rbtree_repair_insert(ARBTreeNode* node) {
 }
 
 static ARBTreeNode* rbtree_insertLeftNode(ARBTreeNode* node) {
-	ARBTreeNode* oldLeft = node->left;
+    assert( node->left == NULL );
 	ARBTreeNode* newNode = rbtree_makeColoredNode(ARBTREE_COLOR_RED);         /// default color of new node
 	rbtree_setLeftChild(node, newNode);
-	rbtree_setLeftChild(newNode, oldLeft);
-
 	rbtree_repair_insert(newNode);
 	return newNode;
 }
 
 static ARBTreeNode* rbtree_insertRightNode(ARBTreeNode* node) {
-	ARBTreeNode* oldLeft = node->right;
+    assert( node->right == NULL );
 	ARBTreeNode* newNode = rbtree_makeColoredNode(ARBTREE_COLOR_RED);         /// default color of new node
 	rbtree_setRightChild(node, newNode);
-	newNode->right = oldLeft;
-	rbtree_setRightChild(newNode, oldLeft);
-
 	rbtree_repair_insert(node->right);
 	return newNode;
 }
@@ -541,58 +536,49 @@ static ARBTreeNode* rbtree_insertRightNode(ARBTreeNode* node) {
 
 
 /**
- * Adding to left side: value should be smaller than 'node->value'
+ * Adding to left side: value should be smaller than 'node->value'.
+ * We assume 'node->left' is NULL.
  * Returns:
- *      -1 - if cannot add because of sub-node
- *       0 - if cannot fit: bad order or cannot fit
- *       1 - if added
+ *       false - if cannot fit: bad order or cannot fit
+ *       true  - if added
  */
-static int rbtree_addToLeft(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value) {
-    if ( tree->fIsLessOrder(value, node->value) == false ) {
-        /// could not add on left side  -- 'value' is equal or greater than node
-        return 0;               /// go to right
-    }
-
-    if ( node->left != NULL ) {
-        /// leaf exists -- go to left
-        return -1;
-    }
+static bool rbtree_addToLeft(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value) {
+    assert( node->left == NULL );
 
     /// leaf case -- can add
     if ( tree->fTryFitLeft != NULL ) {
         if ( tree->fTryFitLeft(node, value) == false ) {
-            return 0;       /// go to right
+            return false;       /// go to right
         }
     }
     ARBTreeNode* newNode = rbtree_insertLeftNode(node);
     newNode->value = value;
-    return 1;
+    return true;
 }
 
 /**
  * Adding to right side: value should be greater than 'node->value'
  * Returns:
- *      -1 - if cannot add because of sub-node
- *       0 - if cannot fit
- *       1 - if added
+ *       false - if cannot add because of sub-node or cannot fir
+ *       true - if added
  */
-static int rbtree_addToRight(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value) {
-    /// if is not less than left, then it goes to right
-
+static bool rbtree_addToRight(const ARBTree* tree, ARBTreeNode* node, ARBTreeValue value) {
     if ( node->right != NULL ) {
         /// leaf exists -- go to right
-        return -1;
+        return false;
     }
+
+//    assert( node->right == NULL );
 
     /// leaf case -- can add
     if ( tree->fTryFitRight != NULL ) {
         if ( tree->fTryFitRight(node, value) == false ) {
-            return 0;
+            return false;
         }
     }
     ARBTreeNode* newNode = rbtree_insertRightNode(node);
     newNode->value = value;
-    return 1;
+    return true;
 }
 
 /**
@@ -627,43 +613,76 @@ static ARBTreeNode* rbtree_findSmallerNode(const ARBTree* tree, ARBTreeNode* cur
     return bestNode;
 }
 
-/**
- * Returns node that has at least one NULLed leaf.
- */
-static const ARBTreeNode* rbtree_getRightLeaf(const ARBTreeNode* node) {
-    const ARBTreeNode* bellow = rbtree_getRightDescendant(node);        /// NULL when no right node
-    if (bellow!=NULL) {
-        /// left node is NULL
-        return bellow;
-    }
-    const ARBTreeNode* ancestor = rbtree_getRightAncestor(node);        /// NULL when no parent
-    if (ancestor==NULL) {
-        return NULL;
-    }
-    const ARBTreeNode* right = rbtree_getRightDescendant(ancestor);     /// NULL when no right node
-    if (right!=NULL) {
-        /// left node is NULL
-        return right;
-    }
-    /// right node is NULL
-    return ancestor;
-}
-
 static bool rbtree_addToNode(const ARBTree* tree, ARBTreeNode* currNode, ARBTreeValue value) {
     ARBTreeNode* tmpNode = rbtree_findSmallerNode(tree, currNode, value);       /// never NULL
-    while(tmpNode!=NULL) {
-        const int leftState = rbtree_addToLeft(tree, tmpNode, value);
-        if (leftState > 0) {
-            return true;
+    if ( tmpNode->left == NULL ) {
+        if ( tree->fIsLessOrder(value, tmpNode->value) ) {
+            const bool leftAdded = rbtree_addToLeft(tree, tmpNode, value);
+            if (leftAdded) {
+                return true;
+            }
         }
-        const int rightState = rbtree_addToRight(tree, tmpNode, value);
-        if (rightState > 0) {
-            return true;
+    }
+    const bool rightAdded = rbtree_addToRight(tree, tmpNode, value);
+    if (rightAdded) {
+        return true;
+    }
+
+    while(tmpNode!=NULL) {
+
+        /**
+         * Consider three cases:
+         *      1. right descendant of current node -- not having left node
+         *      2. right descendant of ancestor -- not having left node
+         *      3. ancestor if does not have right node -- not having right node
+         */
+
+        const ARBTreeNode* below = rbtree_getRightDescendant(tmpNode);        /// NULL when no right node
+        if (below!=NULL) {
+            /// left node is NULL -- check both
+            tmpNode = (ARBTreeNode*)below;
+
+            const bool leftAdded = rbtree_addToLeft(tree, tmpNode, value);
+            if (leftAdded) {
+                return true;
+            }
+
+            const bool rightAdded = rbtree_addToRight(tree, tmpNode, value);
+            if (rightAdded) {
+                return true;
+            }
+
+            continue;
         }
 
-        tmpNode = (ARBTreeNode*) rbtree_getRightLeaf(tmpNode);
-        assert(tmpNode != NULL);
+        const ARBTreeNode* ancestor = rbtree_getRightAncestor(tmpNode);        /// NULL when no parent
+        assert(ancestor);                                                      /// should always be valid
+
+        const ARBTreeNode* right = rbtree_getRightDescendant(ancestor);     /// NULL when no right node
+        if (right!=NULL) {
+            /// left node is NULL -- check both
+            tmpNode = (ARBTreeNode*)right;
+
+            const bool leftAdded = rbtree_addToLeft(tree, tmpNode, value);
+            if (leftAdded) {
+                return true;
+            }
+
+            const bool rightAdded = rbtree_addToRight(tree, tmpNode, value);
+            if (rightAdded) {
+                return true;
+            }
+        } else {
+            /// left node is NOT NULL -- check only right
+            tmpNode = (ARBTreeNode*)ancestor;
+
+            const bool rightAdded = rbtree_addToRight(tree, tmpNode, value);
+            if (rightAdded) {
+                return true;
+            }
+        }
     }
+
     return false;
 }
 
